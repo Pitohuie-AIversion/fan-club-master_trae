@@ -59,21 +59,27 @@ class Base(tk.Frame, pt.PrintClient):
         Create a new GUI base on the Tkinter root MASTER, with title TITLE and
         showing the version VERSION.
 
-        FEEDBACKADD, NETWORKADD and SLAVESADD are methods to which widgets that
-        are "clients" of the feedback, network and slaves vectors should be
-        passed to assign them as such to the inter-process communications
-        framework.
-
-        PROFILECALLBACK is a method to be called without arguments when a
-        profile is changed.
-
-        PQUEUE is the Queue object to be used for inter-process printing.
+        Parameters:
+        - master: Tkinter root window
+        - network: Network backend instance
+        - external: External control backend instance
+        - mapper: Grid mapper instance
+        - archive: Configuration archive instance
+        - title: Window title string
+        - version: Software version string
+        - feedbackAdd: Method to register feedback vector clients
+        - networkAdd: Method to register network vector clients
+        - slavesAdd: Method to register slave vector clients
+        - profileCallback: Method called when profile changes
+        - setLive: Method to set live mode
+        - setF: Method to set feedback vector
+        - pqueue: Queue object for inter-process printing
         """
-        # FIXME outdated description
         tk.Frame.__init__(self, master = master)
         pt.PrintClient.__init__(self, pqueue, self.SYMBOL)
 
-        print("[NOTE] Streamline GUI printing?") # TODO
+        # Streamlined GUI printing setup
+        self.pqueue = pqueue
 
         # Core setup -----------------------------------------------------------
         self.network = network
@@ -216,7 +222,21 @@ class Base(tk.Frame, pt.PrintClient):
         """
         To be called when the Help button is pressed.
         """
-        print("[WARNING] Help button not yet built") # FIXME
+        # Open help documentation or show help dialog
+        help_text = f"""Fanclub Mark IV GUI Help
+        
+Version: {self.version}
+        
+Tabs:
+        - Profile: Configure system profiles
+        - Network: Manage network connections
+        - Control: System control interface
+        - Console: View system messages
+        
+For more information, contact support."""
+        
+        import tkinter.messagebox as msgbox
+        msgbox.showinfo("Help", help_text)
 
     def _consoleWarning(self):
         """

@@ -1,0 +1,31 @@
+{
+    "config": {
+        "network-interface": {
+            "help": "Network interface type (ETHERNET, WIFI_ESP8266, WIFI_IDW0XX1)",
+            "value": "ETHERNET"
+        },
+        "main-stack-size": {
+            "help": "Main thread stack size",
+            "value": 4096
+        }
+    },
+    "target_overrides": {
+        "NUCLEO_F429ZI": {
+            "target.bootloader_img": "../Slave_Bootloader/BUILD/NUCLEO_F429ZI/GCC_ARM/Slave_Bootloader.bin",
+            "target.restrict_size": "0x80000",
+            "platform.stdio-baud-rate": 115200,
+            "platform.default-serial-baud-rate": 115200,
+            "target.network-default-interface-type": "ETHERNET",
+            "rtos.main-thread-stack-size": 4096,
+            "rtos.timer-thread-stack-size": 768
+        }
+    },
+    "macros": [
+        "MBED_CONF_LWIP_IPV4_ENABLED=1",
+        "MBED_CONF_LWIP_ETHERNET_ENABLED=1",
+        "MBED_CONF_NSAPI_DEFAULT_STACK=LWIP",
+        "MBED_CONF_LWIP_TCP_SOCKET_MAX=4",
+        "MBED_CONF_LWIP_UDP_SOCKET_MAX=4",
+        "MBED_CONF_LWIP_SOCKET_MAX=8"
+    ]
+}

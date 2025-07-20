@@ -29,7 +29,7 @@ OOP representation of Slave units.
 
 ## DEPENDENCIES ################################################################
 
-import random # FIXME
+
 
 # Network:
 import socket
@@ -262,7 +262,7 @@ class FCSlave:
         self.mosiQueue = queue.Queue(2)
         self.misoQueue = queue.Queue(misoQueueSize)
 
-        # Buffers: FIXME
+        # Communication buffers for MISO/MOSI data
         self.misoBuffer = None
         self.mosiBuffer = None
 

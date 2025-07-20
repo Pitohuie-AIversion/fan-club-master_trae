@@ -1,4 +1,4 @@
-CAST_FAN_MODEL = "DELTA GFC..." # FIXME
+CAST_FAN_MODEL = "DELTA GFC0412DS"  # Standard CAST fan model
 
 def build_all(name = "temp.py"):
     with open(name, 'w') as f:

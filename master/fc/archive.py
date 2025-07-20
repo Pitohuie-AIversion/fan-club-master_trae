@@ -757,10 +757,10 @@ class FCArchive(pt.PrintClient):
         """
         self.profile(FCArchive.DEFAULT)
 
-    # FIXME
+    # Note: Built-in profile switching method - currently disabled
     # def builtin(self, name):
     #     """
-    #     Provisional method to switch to a "built-in" (hardcoded) profile.
+    #     Method to switch to a "built-in" (hardcoded) profile.
     #     """
     #     self.P = cp.deepcopy(btp.PROFILES[name])
     #     self.P.update(self.runtime)

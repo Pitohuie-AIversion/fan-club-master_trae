@@ -82,7 +82,7 @@ class FCFrontend(pt.PrintServer):
         self.__buildThreads()
         self.__flushAltBuffers()
 
-        # TODO backend abstraction
+        # Backend components initialization
         self.mapper = mr.Mapper(self.archive)
 
         self.network = cm.FCCommunicator(self.feedback_send, self.slave_send,

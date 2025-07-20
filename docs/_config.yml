@@ -1,0 +1,121 @@
+# GitHub Pages Configuration for Fan Club MkIV
+
+# Site settings
+title: Fan Club MkIV
+description: 基于STM32的智能风扇控制系统
+baseurl: "/fan-club-master" # the subpath of your site, e.g. /blog
+url: "https://your-username.github.io" # the base hostname & protocol for your site
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+  - LICENSE
+  - .gitignore
+
+# Include files
+include:
+  - _pages
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Default values
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "doc"
+
+# SEO settings
+author: Fan Club MkIV Team
+twitter:
+  username: fanclubmkiv
+  card: summary
+
+social:
+  name: Fan Club MkIV
+  links:
+    - https://github.com/your-username/fan-club-master
+
+# Google Analytics (optional)
+# google_analytics: UA-XXXXXXXX-X
+
+# Disqus comments (optional)
+# disqus:
+#   shortname: fanclubmkiv
+
+# GitHub Pages specific settings
+github:
+  repository_url: https://github.com/your-username/fan-club-master
+  repository_name: fan-club-master
+
+# Custom variables
+project:
+  name: Fan Club MkIV
+  version: "1.0.0"
+  description: 智能风扇控制系统
+  keywords: [STM32, Mbed OS, PWM, 风扇控制, 嵌入式系统]
+  license: MIT
+  
+# Navigation
+navigation:
+  - title: 项目概述
+    url: "#overview"
+  - title: 功能特性
+    url: "#features"
+  - title: 系统架构
+    url: "#architecture"
+  - title: 快速开始
+    url: "#setup"
+  - title: API文档
+    url: "#api"
+  - title: 下载
+    url: "#download"
+
+# Features
+features:
+  - title: 高精度PWM控制
+    description: 支持0-100%无级调速，响应时间小于10ms
+    icon: ⚡
+  - title: 串口通信
+    description: 115200波特率串口通信，支持实时命令控制
+    icon: 📡
+  - title: 实时监控
+    description: 实时监控风扇状态、转速和系统参数
+    icon: 🔄
+  - title: 安全保护
+    description: 过载保护、温度监控、故障自动恢复
+    icon: 🛡️
+  - title: 模块化设计
+    description: 组件化架构，易于扩展和维护
+    icon: 🔧
+  - title: 性能优化
+    description: 低功耗设计，高效率控制算法
+    icon: 📈

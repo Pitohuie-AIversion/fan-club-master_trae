@@ -74,8 +74,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.numcolumns = 3
 
         # Callbacks:
-        # FIXME
-        self.applyCallback = self._nothing
+        self.applyCallback = callback if callback else self._nothing
 
         # File I/O:
         self.loader = ldr.Loader(self, (("Fan Club Profile",".fcp"),))
@@ -204,14 +203,14 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
             else:
                 self._addPrimitive(meta[ac.NAME], module[child],
                     meta[ac.PRECEDENCE], iid)
-        # FIXME: map?
+        self.map[iid] = (name, module)
         return iid
 
 
     def _addPrimitive(self, name, value, precedence, parent = ''):
         iid = self.display.insert(parent, precedence, values = (name,
             repr(value)))
-        # FIXME: map?
+        self.map[iid] = (name, value)
         return iid
 
     def _addMap(self, name, M, precedence, parent = ''):
@@ -227,10 +226,9 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
 
         indexer = self.archive.defaults[ac.INVERSE[name]][ac.INDEXER]
         for element in iterable:
-            # FIXME
-            self._addModule(indexer(element), element, indexer(element), iid)
-            #self._addPrimitive(indexer(element), element, indexer(element),iid)
-            # FIXME: map?
+            # Add list elements as modules or primitives based on type
+            element_iid = self._addModule(indexer(element), element, indexer(element), iid)
+            self.map[element_iid] = (indexer(element), element)
         return iid
 
     # Callbacks ----------------------------------------------------------------

@@ -792,8 +792,6 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         self.callback = lambda i: None
         self.testi = 0
 
-        print("[NOTE] No callback implemented for SlaveList double click")
-
     # API ......................................................................
     def slavesIn(self, S):
         """
@@ -805,9 +803,8 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
                 s.SD_LEN))
 
         for i in range(0, size, s.SD_LEN):
-            # FIXME too redundant (getting two copies. What the hell, m8)
-            index, name, mac, status, fans, version = S[i:i+s.SD_LEN]
-            slave = (index, name, mac, status, fans, version)
+            slave = tuple(S[i:i+s.SD_LEN])
+            index = slave[s.SD_INDEX]
             if index not in self.slaves:
                 self.addSlave(slave)
             else:

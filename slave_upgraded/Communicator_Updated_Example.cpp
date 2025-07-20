@@ -1,0 +1,400 @@
+/*
+ * 这是一个示例文件，展示如何更新 Communicator.cpp 以适配新版本的 Mbed OS
+ * 主要变更包括网络接口初始化和套接字 API 的更新
+ */
+
+#include "mbed.h"
+#include "netsocket/EthernetInterface.h"
+#include "netsocket/UDPSocket.h"
+#include "rtos/Thread.h"
+#include "rtos/Mutex.h"
+#include "SocketAddress.h"
+
+#include "Communicator.h"
+#include "settings.h"
+#include "Processor.h"
+
+// 全局变量声明
+static EthernetInterface *eth = nullptr;
+static UDPSocket *udp_socket = nullptr;
+static Thread *listener_thread = nullptr;
+static Thread *miso_thread = nullptr;
+static Thread *mosi_thread = nullptr;
+
+// 网络状态
+static volatile NetworkStatus network_status = NO_NETWORK;
+static Mutex status_mutex;
+
+// 构造函数
+Communicator::Communicator() {
+    // 初始化成员变量
+    _network_status = NO_NETWORK;
+    _led_status = L_OFF;
+}
+
+// 析构函数
+Communicator::~Communicator() {
+    stop();
+}
+
+// 网络初始化 - 更新为 Mbed OS 6.x API
+int Communicator::initNetwork() {
+    printf("[COMM] Initializing network...\n");
+    
+    // 获取默认以太网接口 (Mbed OS 6.x 新 API)
+    eth = EthernetInterface::get_default_instance();
+    if (eth == nullptr) {
+        printf("[COMM] ERROR: Failed to get default Ethernet interface\n");
+        return -1;
+    }
+    
+    // 连接网络
+    printf("[COMM] Connecting to network...\n");
+    nsapi_error_t result = eth->connect();
+    if (result != NSAPI_ERROR_OK) {
+        printf("[COMM] ERROR: Network connection failed: %d\n", result);
+        return -1;
+    }
+    
+    // 获取网络信息
+    SocketAddress addr;
+    eth->get_ip_address(&addr);
+    printf("[COMM] IP Address: %s\n", addr.get_ip_address());
+    
+    eth->get_netmask(&addr);
+    printf("[COMM] Netmask: %s\n", addr.get_ip_address());
+    
+    eth->get_gateway(&addr);
+    printf("[COMM] Gateway: %s\n", addr.get_ip_address());
+    
+    // 获取 MAC 地址
+    const char *mac = eth->get_mac_address();
+    if (mac) {
+        printf("[COMM] MAC Address: %s\n", mac);
+    }
+    
+    // 更新网络状态
+    {
+        status_mutex.lock();
+        network_status = NO_MASTER;
+        _network_status = NO_MASTER;
+        status_mutex.unlock();
+    }
+    
+    printf("[COMM] Network initialization complete\n");
+    return 0;
+}
+
+// 套接字初始化 - 更新为 Mbed OS 6.x API
+int Communicator::initSockets() {
+    printf("[COMM] Initializing sockets...\n");
+    
+    // 创建 UDP 套接字
+    udp_socket = new UDPSocket();
+    if (udp_socket == nullptr) {
+        printf("[COMM] ERROR: Failed to create UDP socket\n");
+        return -1;
+    }
+    
+    // 打开套接字 (Mbed OS 6.x API)
+    nsapi_error_t result = udp_socket->open(eth);
+    if (result != NSAPI_ERROR_OK) {
+        printf("[COMM] ERROR: Failed to open UDP socket: %d\n", result);
+        delete udp_socket;
+        udp_socket = nullptr;
+        return -1;
+    }
+    
+    // 设置套接字选项
+    udp_socket->set_timeout(SOCKET_TIMEOUT_MS);
+    
+    // 绑定到监听端口
+    SocketAddress bind_addr(INADDR_ANY, LISTENER_PORT);
+    result = udp_socket->bind(bind_addr);
+    if (result != NSAPI_ERROR_OK) {
+        printf("[COMM] ERROR: Failed to bind socket: %d\n", result);
+        udp_socket->close();
+        delete udp_socket;
+        udp_socket = nullptr;
+        return -1;
+    }
+    
+    printf("[COMM] Socket bound to port %d\n", LISTENER_PORT);
+    return 0;
+}
+
+// 启动通信线程
+int Communicator::start() {
+    printf("[COMM] Starting communication threads...\n");
+    
+    // 启动监听线程
+    listener_thread = new Thread(osPriorityNormal, 2048);
+    if (listener_thread == nullptr) {
+        printf("[COMM] ERROR: Failed to create listener thread\n");
+        return -1;
+    }
+    listener_thread->start(callback(this, &Communicator::listenerTask));
+    
+    // 启动 MISO 线程 (发送数据到主控)
+    miso_thread = new Thread(osPriorityNormal, 2048);
+    if (miso_thread == nullptr) {
+        printf("[COMM] ERROR: Failed to create MISO thread\n");
+        return -1;
+    }
+    miso_thread->start(callback(this, &Communicator::misoTask));
+    
+    // 启动 MOSI 线程 (接收主控命令)
+    mosi_thread = new Thread(osPriorityNormal, 2048);
+    if (mosi_thread == nullptr) {
+        printf("[COMM] ERROR: Failed to create MOSI thread\n");
+        return -1;
+    }
+    mosi_thread->start(callback(this, &Communicator::mosiTask));
+    
+    printf("[COMM] All communication threads started\n");
+    return 0;
+}
+
+// 监听线程任务
+void Communicator::listenerTask() {
+    printf("[COMM] Listener thread started\n");
+    
+    char buffer[MAX_MESSAGE_LENGTH];
+    SocketAddress sender_addr;
+    
+    while (true) {
+        // 接收数据
+        nsapi_size_or_error_t received = udp_socket->recvfrom(&sender_addr, buffer, sizeof(buffer));
+        
+        if (received > 0) {
+            buffer[received] = '\0';  // 确保字符串结束;
+            printf("[COMM] Received %d bytes from %s:%d\n", 
+                   received, sender_addr.get_ip_address(), sender_addr.get_port());
+            
+            // 处理接收到的消息
+            processMessage(buffer, received, sender_addr);
+            
+            // 更新 LED 状态
+            setLED(L_TOGGLE);
+        } else if (received == NSAPI_ERROR_WOULD_BLOCK) {
+            // 超时，继续监听
+            ThisThread::sleep_for(10ms);
+        } else {
+            printf("[COMM] Socket receive error: %d\n", received);
+            ThisThread::sleep_for(100ms);
+        }
+    }
+}
+
+// MISO 线程任务 (发送状态到主控)
+void Communicator::misoTask() {
+    printf("[COMM] MISO thread started\n");
+    
+    while (true) {
+        if (_network_status == CONNECTED) {
+            // 发送状态信息到主控
+            sendStatusUpdate();
+        }
+        
+        // 等待下一个发送周期
+        ThisThread::sleep_for(chrono::milliseconds(MISO_PERIOD_MS));
+    }
+}
+
+// MOSI 线程任务 (处理主控命令)
+void Communicator::mosiTask() {
+    printf("[COMM] MOSI thread started\n");
+    
+    while (true) {
+        // 检查是否有待处理的命令
+        if (hasCommandPending()) {
+            processCommand();
+        }
+        
+        ThisThread::sleep_for(10ms);
+    }
+}
+
+// 发送状态更新
+void Communicator::sendStatusUpdate() {
+    // 构建状态消息
+    char status_msg[256];
+    int len = snprintf(status_msg, sizeof(status_msg), 
+                      "STATUS:%s:%d:%d\n", 
+                      eth->get_mac_address(),
+                      getFanCount(),
+                      getSystemStatus());
+    
+    // 发送到主控
+    SocketAddress master_addr(MASTER_IP, MASTER_PORT);
+    nsapi_size_or_error_t sent = udp_socket->sendto(master_addr, status_msg, len);
+    
+    if (sent != len) {
+        printf("[COMM] Failed to send status update: %d\n", sent);
+    }
+}
+
+// 处理接收到的消息
+void Communicator::processMessage(const char* message, int length, const SocketAddress& sender) {
+    printf("[COMM] Processing message: %s\n", message);
+    
+    // 解析消息类型
+    if (strncmp(message, "BCAST:", 6) == 0) {
+        // 广播消息
+        processBroadcast(message + 6, length - 6, sender);
+    } else if (strncmp(message, "CMD:", 4) == 0) {
+        // 命令消息
+        processCommand(message + 4, length - 4, sender);
+    } else if (strncmp(message, "PING", 4) == 0) {
+        // Ping 消息
+        processPing(sender);
+    } else {
+        printf("[COMM] Unknown message type\n");
+    }
+}
+
+// 处理广播消息
+void Communicator::processBroadcast(const char* message, int length, const SocketAddress& sender) {
+    printf("[COMM] Processing broadcast from %s\n", sender.get_ip_address());
+    
+    // 更新主控地址
+    _master_address = sender;
+    
+    // 更新连接状态
+    {
+        status_mutex.lock();
+        if (_network_status != CONNECTED) {
+            _network_status = CONNECTED;
+            network_status = CONNECTED;
+            printf("[COMM] Connected to master at %s:%d\n", 
+                   sender.get_ip_address(), sender.get_port());
+        }
+        status_mutex.unlock();
+    }
+    
+    // 发送响应
+    sendBroadcastResponse(sender);
+}
+
+// 发送广播响应
+void Communicator::sendBroadcastResponse(const SocketAddress& master_addr) {
+    char response[128];
+    int len = snprintf(response, sizeof(response), 
+                      "SLAVE:%s:%d:%s\n",
+                      eth->get_mac_address(),
+                      getFanCount(),
+                      FCMKII_VERSION);
+    
+    nsapi_size_or_error_t sent = udp_socket->sendto(master_addr, response, len);
+    if (sent != len) {
+        printf("[COMM] Failed to send broadcast response: %d\n", sent);
+    }
+}
+
+// 设置 LED 状态
+void Communicator::setLED(LEDStatus status) {
+    _led_status = status;
+    
+    switch (status) {
+        case L_ON:
+            // 打开 LED
+            break;
+        case L_OFF:
+            // 关闭 LED
+            break;
+        case L_TOGGLE:
+            // 切换 LED 状态
+            break;
+    }
+}
+
+// 停止通信
+void Communicator::stop() {
+    printf("[COMM] Stopping communication...\n");
+    
+    // 停止线程
+    if (listener_thread) {
+        listener_thread->terminate();
+        delete listener_thread;
+        listener_thread = nullptr;
+    }
+    
+    if (miso_thread) {
+        miso_thread->terminate();
+        delete miso_thread;
+        miso_thread = nullptr;
+    }
+    
+    if (mosi_thread) {
+        mosi_thread->terminate();
+        delete mosi_thread;
+        mosi_thread = nullptr;
+    }
+    
+    // 关闭套接字
+    if (udp_socket) {
+        udp_socket->close();
+        delete udp_socket;
+        udp_socket = nullptr;
+    }
+    
+    // 断开网络连接
+    if (eth) {
+        eth->disconnect();
+        eth = nullptr;
+    }
+    
+    printf("[COMM] Communication stopped\n");
+}
+
+// 获取网络状态
+NetworkStatus Communicator::getNetworkStatus() {
+    status_mutex.lock();
+    NetworkStatus status = _network_status;
+    status_mutex.unlock();
+    return status;
+}
+
+// 获取 IP 地址
+const char* Communicator::getIPAddress() {
+    if (eth) {
+        SocketAddress addr;
+        eth->get_ip_address(&addr);
+        return addr.get_ip_address();
+    }
+    return "0.0.0.0";
+}
+
+// 获取 MAC 地址
+const char* Communicator::getMACAddress() {
+    if (eth) {
+        return eth->get_mac_address();
+    }
+    return "00:00:00:00:00:00";
+}
+
+/*
+ * 主要变更说明:
+ * 
+ * 1. 网络接口初始化:
+ *    - 旧版本: EthernetInterface eth; eth.connect();
+ *    - 新版本: EthernetInterface *eth = EthernetInterface::get_default_instance(); eth->connect();
+ * 
+ * 2. 套接字 API:
+ *    - 旧版本: socket.open(&eth);
+ *    - 新版本: socket.open(eth);
+ * 
+ * 3. 线程创建:
+ *    - 新版本支持在构造函数中指定堆栈大小和优先级
+ *    - Thread(osPriorityNormal, 2048)
+ * 
+ * 4. 错误处理:
+ *    - 使用 nsapi_error_t 和 nsapi_size_or_error_t 类型
+ *    - 更详细的错误码检查
+ * 
+ * 5. 时间处理:
+ *    - 使用 chrono 库: ThisThread::sleep_for(10ms)
+ * 
+ * 6. 内存管理:
+ *    - 更明确的资源管理和清理
+ */

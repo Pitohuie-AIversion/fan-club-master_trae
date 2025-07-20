@@ -568,7 +568,13 @@ class FCCommunicator(pt.PrintClient):
         Process the command vector D with the corresponding command.
         See fc.standards for the expected form of D.
         """
-        self.printw("SHUTDOWN COMMAND BEHAVIOR NOT YET IMPLEMENTED") # FIXME
+        self.printr("Received shutdown command. Stopping all operations.")
+        # Stop all slave communications
+        for slave in self.slaves:
+            if slave.getStatus() == sv.CONNECTED:
+                slave.disconnect()
+        # Stop the communicator
+        self.stop()
 
     def __handle_input_CMD_FUPDATE_START(self, D):
         """
@@ -618,8 +624,14 @@ class FCCommunicator(pt.PrintClient):
         Process the command vector D with the corresponding command.
         See fc.standards for the expected form of D.
         """
-        self.broadcastMode = D[s.CMD_I_BM_BMODE]
-        self.printw("BMODE BEHAVIOR NOT YET IMPLEMENTED") # FIXME
+        new_mode = D[s.CMD_I_BM_BMODE]
+        if new_mode in [s.BMODE_BROADCAST, s.BMODE_TARGETTED]:
+            self.broadcastMode = new_mode
+            mode_name = "broadcast" if new_mode == s.BMODE_BROADCAST else "targeted"
+            self.prints(f"Broadcast mode set to {mode_name}")
+            self._sendNetwork()  # Update network status
+        else:
+            self.printe(f"Invalid broadcast mode: {new_mode}")
 
     def __handle_input_CMD_BIP(self, D):
         """

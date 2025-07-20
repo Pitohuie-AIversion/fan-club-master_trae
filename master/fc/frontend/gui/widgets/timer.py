@@ -230,7 +230,6 @@ class TimerWidget(tk.Frame):
                 self._step()
 
     def _stop(self, *_):
-        # FIXME:
         if self.running:
             if self.endDCVar.get():
                 endDC_raw = self.endDCEntry.get()

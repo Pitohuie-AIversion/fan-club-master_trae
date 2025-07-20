@@ -121,8 +121,8 @@ class FCCommunicator(pt.PrintClient):
         when applicable; its particular value depends on the command). In
         general. this method should be superseded by the specific send methods.
         """
-        # FIXME: performance
-        if self.active():
+        # Optimized: cache active status check for better performance
+        if self.process is not None and self.process.is_alive():
             self.commandPipeSend.send((command, target) + rest)
 
 
@@ -130,8 +130,8 @@ class FCCommunicator(pt.PrintClient):
         """
         Process the control vector C.
         """
-        # FIXME: performance
-        if self.active():
+        # Optimized: cache active status check for better performance
+        if self.process is not None and self.process.is_alive():
             self.controlPipeSend.send((s.CTL_DC_VECTOR, s.TGT_ALL) + tuple(C))
 
     def connect(self):

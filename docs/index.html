@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Club MkIV - 智能风扇控制系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="nav-title">Fan Club MkIV</h1>
+                <ul class="nav-menu">
+                    <li><a href="#overview">项目概述</a></li>
+                    <li><a href="#features">功能特性</a></li>
+                    <li><a href="#architecture">系统架构</a></li>
+                    <li><a href="#setup">快速开始</a></li>
+                    <li><a href="#api">API文档</a></li>
+                    <li><a href="#download">下载</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Fan Club MkIV</h1>
+                <p class="hero-subtitle">基于STM32的智能风扇控制系统</p>
+                <div class="hero-buttons">
+                    <a href="#setup" class="btn btn-primary">快速开始</a>
+                    <a href="https://github.com/your-username/fan-club-master" class="btn btn-secondary">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+            <div class="container">
+                <h2>项目概述</h2>
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <h3>🎯 项目目标</h3>
+                        <p>开发一个高性能、可扩展的智能风扇控制系统，支持多种控制模式和实时监控功能。</p>
+                    </div>
+                    <div class="overview-card">
+                        <h3>🔧 技术栈</h3>
+                        <ul>
+                            <li>STM32F429ZI微控制器</li>
+                            <li>Mbed OS实时操作系统</li>
+                            <li>C++面向对象编程</li>
+                            <li>PWM信号控制</li>
+                        </ul>
+                    </div>
+                    <div class="overview-card">
+                        <h3>📊 应用场景</h3>
+                        <p>适用于工业自动化、智能家居、数据中心散热等需要精确风扇控制的场景。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="section bg-light">
+            <div class="container">
+                <h2>功能特性</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <h3>高精度PWM控制</h3>
+                        <p>支持0-100%无级调速，响应时间小于10ms</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📡</div>
+                        <h3>串口通信</h3>
+                        <p>115200波特率串口通信，支持实时命令控制</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔄</div>
+                        <h3>实时监控</h3>
+                        <p>实时监控风扇状态、转速和系统参数</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>安全保护</h3>
+                        <p>过载保护、温度监控、故障自动恢复</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔧</div>
+                        <h3>模块化设计</h3>
+                        <p>组件化架构，易于扩展和维护</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <h3>性能优化</h3>
+                        <p>低功耗设计，高效率控制算法</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="section">
+            <div class="container">
+                <h2>系统架构</h2>
+                <div class="architecture-content">
+                    <div class="arch-diagram">
+                        <img src="architecture-diagram.svg" alt="系统架构图" class="responsive-img">
+                    </div>
+                    <div class="arch-description">
+                        <h3>核心组件</h3>
+                        <ul class="component-list">
+                            <li><strong>Fan类</strong> - 风扇控制核心逻辑</li>
+                            <li><strong>Communicator类</strong> - 串口通信处理</li>
+                            <li><strong>Processor类</strong> - 数据处理和算法</li>
+                            <li><strong>FastPWM库</strong> - 高精度PWM信号生成</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Setup Section -->
+        <section id="setup" class="section bg-light">
+            <div class="container">
+                <h2>快速开始</h2>
+                <div class="setup-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>环境准备</h3>
+                            <pre><code class="language-bash"># 安装Mbed CLI
+pip install mbed-cli
+
+# 安装ARM GCC工具链
+# 下载并安装 GNU Arm Embedded Toolchain</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>克隆项目</h3>
+                            <pre><code class="language-bash">git clone https://github.com/your-username/fan-club-master.git
+cd fan-club-master/slave</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>编译项目</h3>
+                            <pre><code class="language-bash"># 编译固件
+mbed-tools compile -t GCC_ARM -m NUCLEO_F429ZI
+
+# 或使用提供的脚本
+.\compile_slave.bat</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>烧录固件</h3>
+                            <pre><code class="language-bash"># 将生成的.bin文件拖拽到开发板
+# 或使用ST-Link Utility烧录</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Documentation -->
+        <section id="api" class="section">
+            <div class="container">
+                <h2>API文档</h2>
+                <div class="api-content">
+                    <div class="api-section">
+                        <h3>Fan类 API</h3>
+                        <div class="api-method">
+                            <h4>setSpeed(int speed)</h4>
+                            <p>设置风扇转速</p>
+                            <ul>
+                                <li><strong>参数:</strong> speed - 转速百分比 (0-100)</li>
+                                <li><strong>返回:</strong> bool - 设置是否成功</li>
+                            </ul>
+                            <pre><code class="language-cpp">Fan fan;
+fan.setSpeed(75); // 设置转速为75%</code></pre>
+                        </div>
+                        <div class="api-method">
+                            <h4>getSpeed()</h4>
+                            <p>获取当前风扇转速</p>
+                            <ul>
+                                <li><strong>返回:</strong> int - 当前转速百分比</li>
+                            </ul>
+                            <pre><code class="language-cpp">int currentSpeed = fan.getSpeed();</code></pre>
+                        </div>
+                    </div>
+                    <div class="api-section">
+                        <h3>Communicator类 API</h3>
+                        <div class="api-method">
+                            <h4>sendMessage(string message)</h4>
+                            <p>发送串口消息</p>
+                            <ul>
+                                <li><strong>参数:</strong> message - 要发送的消息</li>
+                                <li><strong>返回:</strong> bool - 发送是否成功</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download" class="section bg-light">
+            <div class="container">
+                <h2>下载</h2>
+                <div class="download-grid">
+                    <div class="download-item">
+                        <h3>预编译固件</h3>
+                        <p>直接下载可用的二进制文件</p>
+                        <a href="master/FC_MkIV_binaries/Slave.bin" class="btn btn-primary" download>下载 Slave.bin</a>
+                    </div>
+                    <div class="download-item">
+                        <h3>源代码</h3>
+                        <p>获取完整的项目源代码</p>
+                        <a href="https://github.com/your-username/fan-club-master/archive/main.zip" class="btn btn-secondary">下载源码</a>
+                    </div>
+                    <div class="download-item">
+                        <h3>文档</h3>
+                        <p>详细的技术文档和指南</p>
+                        <a href="docs/Fan_Club_MkIV_Wiki.md" class="btn btn-outline">查看文档</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Fan Club MkIV</h3>
+                    <p>智能风扇控制系统</p>
+                </div>
+                <div class="footer-section">
+                    <h3>链接</h3>
+                    <ul>
+                        <li><a href="#overview">项目概述</a></li>
+                        <li><a href="#setup">快速开始</a></li>
+                        <li><a href="#api">API文档</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="https://github.com/your-username/fan-club-master/issues">问题反馈</a></li>
+                        <li><a href="mailto:your-email@example.com">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Fan Club MkIV. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -27,7 +27,7 @@
 
 ## GLOBALS #####################################################################
 VERSION = "0.17"
-# INIT_PROFILE = "CANN" # FIXME
+# Default profile configuration - uncomment one of the options below
 # # 可选启动配置（只保留其中一行，注释或删除其它行即可）
 # # 可选启动配置（只保留其中一行，注释或删除其它行即可）
 # INIT_PROFILE = "MODULE"
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     import sys
 
 
-    # FIXME use getopt and streamline this
+    # Simple command line argument processing - profile name as first argument
     init_profile = INIT_PROFILE
     if len(sys.argv) == 2 and sys.argv[1] in btp.PROFILES:
         init_profile = sys.argv[1]

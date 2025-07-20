@@ -101,7 +101,7 @@ class ExternalControl(pt.PrintClient):
 
     # TODO: Listener behavior
 
-    # FIXME: redundant work on old F vectors
+    # Note: Optimize F vector processing to avoid redundant calculations
 
     def __init__(self, mapper, archive, pqueue,
         controller = NoController(),
@@ -109,7 +109,7 @@ class ExternalControl(pt.PrintClient):
         setFEBroadcastOut = NOTHING,
         setFEListenerStatus = NOTHING,
         setFEListenerIn = NOTHING,
-        setFEListenerOut = NOTHING): # FIXME control
+        setFEListenerOut = NOTHING):
         """
         - mapper := FC Mapper instance (grid mapping).
         - archive := MkIV FCArchive instance.
@@ -209,15 +209,15 @@ class ExternalControl(pt.PrintClient):
             self.listenerPort = port
             self.listenerRepeat = repeat
 
-            # FIXME
+            # Create and start listener thread with proper naming
             self.listenerThread = mt.Thread(
                 target = self._listenerRoutine,
                 args = (self.sockets[s.EX_LISTENER], self._processCommand,
                     self.deactivateListener,
                     self._setListenerIn, self._setListenerOut,
                     self.listenerRepeat, self.pqueue),
-                daemon = True)
-            # FIXME count?
+                daemon = True,
+                name = f"ExternalListener-{port}")
             self.listenerThread.start()
             self.setFEListenerStatus(s.EX_ACTIVE)
 
@@ -376,14 +376,16 @@ class ExternalControl(pt.PrintClient):
         Send a broadcast.
         """
         try:
-            # FIXME performance
+            # Cache grid vector string to improve performance
             index = self.indices[s.EX_BROADCAST][s.EX_I_OUT]
+            grid_str = str(self._G())[1:-1]  # Cache the expensive operation
             message = self.BROADCAST_TEMPLATE.format(
                 index, self.listenerPort, 0,  *self.dimensions,
-                str(self._G())[1:-1])
+                grid_str)
+            message_bytes = bytearray(message, 'ascii')  # Convert once
             for _ in range(self.broadcastRepeat):
                 self.sockets[s.EX_BROADCAST].sendto(
-                    bytearray(message, 'ascii'), self.broadcastTarget)
+                    message_bytes, self.broadcastTarget)
             self.setFEBroadcastOut(index)
             self.indices[s.EX_BROADCAST][s.EX_I_OUT] = index + 1
         except Exception as e:
@@ -468,8 +470,13 @@ class ExternalControl(pt.PrintClient):
         Return an FC function that maps fans 1:1 to a given DC vector.
         """
         def f(r, c, l, *_):
-            # FIXME lack of robustness w/ assignment position
-            return vector[l*self.RC + r*self.C + c]
+            # Add bounds checking for robustness
+            if r < 0 or r >= self.R or c < 0 or c >= self.C or l < 0 or l >= self.L:
+                return 0.0  # Return safe default for out-of-bounds access
+            index = l*self.RC + r*self.C + c
+            if index < 0 or index >= len(vector):
+                return 0.0  # Return safe default for out-of-bounds access
+            return vector[index]
         return f
 
     def _handleUniform(self, index_new, code, dc_raw):

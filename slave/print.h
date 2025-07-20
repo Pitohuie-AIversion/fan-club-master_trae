@@ -25,7 +25,6 @@
 
 //// IMPORTS ///////////////////////////////////////////////////////////////////
 
-#include "Mutex.h" // For thread-safety
 #include "mbed.h" // For custom baud rates
 
 #include "settings.h" // Custom settings

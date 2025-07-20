@@ -154,7 +154,7 @@ class Mapper:
                         self.KG[index_KG] = index_GK
                         self.GK[index_GK] = index_KG
 
-        # FIXME debug
+        # Mapping construction completed
 
     def _testMapping(self):
         print("** Testing FC mapping for profile '{}'".format(archive[ac.name]))

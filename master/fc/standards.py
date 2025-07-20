@@ -71,8 +71,22 @@ MP_STOP_TIMEOUT_S = 0.5
 
 # Number of decimals to have for duty cyle. Indicates by which power of 10 to
 # normalize
-DC_DECIMALS = 2 # FIXME make this part of the profile
+# Default value - can be overridden by profile configuration
+DC_DECIMALS = 2
 DC_NORMALIZER = 10.0**(DC_DECIMALS + 2) # .... Divide by this to normalize
+
+def get_dc_normalizer(archive=None):
+    """
+    Get the DC normalizer value from archive configuration if available,
+    otherwise use the default value.
+    """
+    if archive is not None:
+        try:
+            decimals = archive['dcDecimals']
+            return 10.0**(decimals + 2)
+        except (KeyError, TypeError):
+            pass
+    return DC_NORMALIZER
 
 
 # Target codes:
