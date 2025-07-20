@@ -1,0 +1,20 @@
+# basic sine wave
+# assuming time step of 100ms
+
+t_0 = 0
+freq = 1 # Hz
+
+a = .2                  # amplitude in DC
+w = 2*math.pi*freq         # angular freq
+phase = 2*math.pi*0        # phase shift
+v_offset = 0.3             # vertical offset in DC
+
+
+if t < t_0:
+	return v_offset
+else:
+	return a*math.sin(w*t + phase) + v_offset
+
+
+
+

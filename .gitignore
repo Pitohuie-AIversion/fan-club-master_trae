@@ -1,0 +1,10 @@
+BUILD
+*.[oa]
+*~
+*.pyc
+*.swp
+mbed-os
+esp8266-driver
+mcr20a-rf-driver
+stm-spirit1-rf-driver
+

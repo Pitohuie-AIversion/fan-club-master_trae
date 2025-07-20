@@ -1,0 +1,10 @@
+# Sweep through fans setting one on at a time
+# (per module)
+
+maxFans = 21
+dc_on = .8
+base_amplitude = .6
+
+return dc_on if f == k%maxFans else \
+	base_amplitude*(s/S)
+
