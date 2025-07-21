@@ -1,10 +1,37 @@
 {
-	"target_overrides":{
-		
-		"NUCLEO_F429ZI":{
-			
-		}
-	
-	}
-
+  "target_overrides": {
+    "*": {
+      "platform.stdio-baud-rate": 115200,
+      "target.features_remove": [
+        "LWIP",
+        "NETSOCKET",
+        "STORAGE",
+        "FILESYSTEM",
+        "BLE",
+        "CELLULAR",
+        "LORAWAN",
+        "WIFI",
+        "ETHERNET",
+        "USB",
+        "USBDEVICE",
+        "USBHOST"
+      ],
+      "target.components_remove": [
+        "SD",
+        "FLASHIAP",
+        "QSPIF",
+        "SPIF",
+        "DATAFLASH",
+        "WIFI_ESP8266",
+        "WIFI_ISM43362",
+        "WIFI_RTW",
+        "CELLULAR_QUECTEL",
+        "CELLULAR_UBLOX",
+        "CELLULAR_TELIT"
+      ]
+    },
+    "NUCLEO_F429ZI": {
+      "target.bootloader_img": "../slave_bootloader/BUILD/NUCLEO_F429ZI/GCC_ARM-RELEASE/slave_bootloader.bin"
+    }
+  }
 }
