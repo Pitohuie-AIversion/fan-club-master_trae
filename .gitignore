@@ -8,3 +8,47 @@ esp8266-driver
 mcr20a-rf-driver
 stm-spirit1-rf-driver
 
+# Python virtual environments
+venv_python311/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# CMake build directories
+cmake_build/
+build/
+BUILD/
+
+# Mbed OS specific
+mbed-os.lib
+mbed_config.h
+*.bin
+*.hex
+*.elf
+*.map
+
+# Backup files
+*.backup
+*.backup_*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Log files
+*.log
+
