@@ -1,0 +1,39 @@
+# Ignore all test files to avoid multiple main() definitions
+mbed-os/TESTS/*
+mbed-os/features/*/TESTS/*
+mbed-os/features/*/test/*
+mbed-os/features/*/tests/*
+mbed-os/features/*/TEST/*
+mbed-os/features/*/unittest/*
+mbed-os/features/*/UNITTESTS/*
+mbed-os/features/frameworks/*/test/*
+mbed-os/features/frameworks/*/TESTS/*
+mbed-os/features/frameworks/*/unittest/*
+mbed-os/features/frameworks/*/UNITTESTS/*
+mbed-os/features/frameworks/utest/*
+mbed-os/features/frameworks/unity/*
+mbed-os/features/unsupported/tests/*
+mbed-os/features/cellular/TESTS/*
+mbed-os/features/cellular/UNITTESTS/*
+mbed-os/features/storage/*/TESTS/*
+mbed-os/features/filesystem/*/TESTS/*
+mbed-os/features/nanostack/*/test/*
+mbed-os/features/nanostack/*/unittest/*
+mbed-os/features/device_key/TESTS/*
+mbed-os/features/nvstore/TESTS/*
+mbed-os/events/equeue/tests/*
+mbed-os/targets/*/TESTS/*
+
+# Ignore specific test files with main() functions
+mbed-os/features/unsupported/USBDevice/targets/TARGET_Silicon_Labs/src/em_usbd.c
+mbed-os/features/FEATURE_LWIP/lwip-interface/lwip/src/apps/httpd/makefsdata/lwip_makefsdata.c
+
+# Ignore any file named main.cpp or main.c in test directories
+**/test*/**/main.cpp
+**/test*/**/main.c
+**/TEST*/**/main.cpp
+**/TEST*/**/main.c
+**/unittest*/**/main.cpp
+**/unittest*/**/main.c
+**/UNITTEST*/**/main.cpp
+**/UNITTEST*/**/main.c

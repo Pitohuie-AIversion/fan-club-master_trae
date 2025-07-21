@@ -1,11 +1,31 @@
 {
-	"target_overrides":{
-		
-		"NUCLEO_F429ZI":{
-			"target.bootloader_img":
-				"../Slave_Bootloader/BUILD/NUCLEO_F429ZI/GCC_ARM/Slave_Bootloader.bin"
-		}
-	
-	}
-
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "target.features_remove": [
+                "STORAGE",
+                "FILESYSTEM",
+                "BLE",
+                "CELLULAR",
+                "LORAWAN",
+                "WIFI",
+                "USB",
+                "USBDEVICE",
+                "USBHOST"
+            ],
+            "target.components_remove": [
+                "SD",
+                "FLASHIAP",
+                "QSPIF",
+                "SPIF",
+                "DATAFLASH",
+                "WIFI_ESP8266",
+                "WIFI_ISM43362",
+                "WIFI_RTW",
+                "CELLULAR_QUECTEL",
+                "CELLULAR_UBLOX",
+                "CELLULAR_TELIT"
+            ]
+        }
+    }
 }

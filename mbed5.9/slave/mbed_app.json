@@ -1,0 +1,10 @@
+{
+	"target_overrides":{
+		
+		"NUCLEO_F429ZI":{
+			
+		}
+	
+	}
+
+}

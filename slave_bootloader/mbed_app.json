@@ -1,16 +1,13 @@
 {
   "target_overrides": {
     "*": {
-      "platform.stdio-baud-rate": 9600,
-      "platform.default-serial-baud-rate": 9600,
+      "platform.stdio-baud-rate": 115200,
+      "platform.default-serial-baud-rate": 115200,
       "platform.stdio-convert-newlines": true,
       "platform.stdio-buffered-serial": true
     },
     "NUCLEO_F429ZI": {
-      "target.bootloader_img": "../Slave_Bootloader/BUILD/NUCLEO_F429ZI/GCC_ARM/Slave_Bootloader.bin"
-    },
-    "NUCLEO_F446RE": {
-      "target.bootloader_img": "../Slave_Bootloader/BUILD/NUCLEO_F446RE/GCC_ARM/Slave_Bootloader.bin"
+      "target.restrict_size": "0x40000"
     }
   },
   "config": {

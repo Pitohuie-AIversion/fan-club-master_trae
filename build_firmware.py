@@ -29,7 +29,7 @@ class FirmwareBuilder:
         
         # 编译配置
         self.target = "NUCLEO_F446RE"
-        self.toolchain = "ARMC6"
+        self.toolchain = "GCC_ARM"
         
         # 统计信息
         self.start_time = None
