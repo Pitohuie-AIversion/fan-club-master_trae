@@ -3,8 +3,8 @@
 # Site settings
 title: Fan Club MkIV
 description: 基于STM32的智能风扇控制系统
-baseurl: "/fan-club-master" # the subpath of your site, e.g. /blog
-url: "https://your-username.github.io" # the base hostname & protocol for your site
+baseurl: "/fan-club-master_trae" # the subpath of your site, e.g. /blog
+url: "https://chendashuai.github.io" # the base hostname & protocol for your site
 
 # Build settings
 markdown: kramdown
@@ -62,7 +62,7 @@ twitter:
 social:
   name: Fan Club MkIV
   links:
-    - https://github.com/your-username/fan-club-master
+    - https://github.com/chendashuai/fan-club-master_trae
 
 # Google Analytics (optional)
 # google_analytics: UA-XXXXXXXX-X
@@ -73,8 +73,8 @@ social:
 
 # GitHub Pages specific settings
 github:
-  repository_url: https://github.com/your-username/fan-club-master
-  repository_name: fan-club-master
+  repository_url: https://github.com/chendashuai/fan-club-master_trae
+  repository_name: fan-club-master_trae
 
 # Custom variables
 project:
