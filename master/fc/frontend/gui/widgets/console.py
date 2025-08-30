@@ -36,6 +36,7 @@ import tkinter.ttk as ttk
 import tkinter.font as fnt
 
 from fc.frontend.gui import guiutils as gus
+from fc.frontend.gui.theme import TEXT_ON_DARK, SUCCESS_MAIN, WARNING_MAIN, ERROR_MAIN, INFO_MAIN
 from fc import printer as pt
 
 ## GLOBALS #####################################################################
@@ -48,20 +49,20 @@ TAG_ERROR = "E"
 TAG_DEBUG = "D"
 
 # Background and foreground colors:
-FG_DEFAULT = "white"
+FG_DEFAULT = TEXT_ON_DARK
 
 FG_REGULAR = FG_DEFAULT
-FG_SUCCESS = "#b1ff35"
-FG_WARNING = "orange"
-FG_ERROR = "red"
-FG_DEBUG = "#ff007f"
+FG_SUCCESS = SUCCESS_MAIN
+FG_WARNING = WARNING_MAIN
+FG_ERROR = TEXT_ON_DARK
+FG_DEBUG = INFO_MAIN
 
-BG_DEFAULT = "#474747" # old: "#d3d3d3"
-BG_SELECT = "black"
+BG_DEFAULT = gus.SURFACE_5  # Dark console background from theme
+BG_SELECT = gus.PRIMARY_100
 BG_REGULAR = BG_DEFAULT
 BG_SUCCESS = BG_DEFAULT
 BG_WARNING = BG_DEFAULT
-BG_ERROR = "#510000"
+BG_ERROR = ERROR_MAIN
 BG_DEBUG = BG_DEFAULT
 
 
@@ -83,10 +84,12 @@ class ConsoleWidget(tk.Frame):
         self.grid_columnconfigure(0, weight = 1)
 
         # Build output text field:
-        self.screen = tk.Text(self,
-            fg = FG_DEFAULT, bg=self.background, font = 'Courier 9',
-            selectbackground = BG_SELECT,
-            state = tk.DISABLED)
+        screen_conf = dict(gus.text_conf)
+        screen_conf["fg"] = FG_DEFAULT
+        screen_conf["bg"] = self.background
+        screen_conf["selectbackground"] = BG_SELECT
+        screen_conf["state"] = tk.DISABLED
+        self.screen = tk.Text(self, **screen_conf)
         self.scrollbar = tk.Scrollbar(self)
         self.scrollbar.grid(row = 0, column = 1, sticky = "NS")
         self.scrollbar.config(command=self.screen.yview)
@@ -109,13 +112,13 @@ class ConsoleWidget(tk.Frame):
             sticky = "EW")
 
         # Print out button:
-        self.saveButton = tk.Button(self.controlFrame, text = "Print to File",
-            command = self._save, **gus.fontc)
+        self.saveButton = ttk.Button(self.controlFrame, text = "Print to File",
+            command = self._save)
         self.saveButton.pack(side = tk.RIGHT)
 
         # Clear functionality:
-        self.clearButton = tk.Button(self.controlFrame, text = "Clear",
-            command = self._clear, **gus.fontc)
+        self.clearButton = ttk.Button(self.controlFrame, text = "Clear",
+            command = self._clear, style = "Secondary.TButton")
         self.clearButton.pack(side = tk.RIGHT)
 
         # Debug button:
@@ -123,15 +126,15 @@ class ConsoleWidget(tk.Frame):
         self.debugVar.set(0)
 
         self.debugButton = tk.Checkbutton(self.controlFrame,
-            text ="Debug prints", variable = self.debugVar, **gus.fontc,
-            command = self._debug)
+            text ="Debug prints", variable = self.debugVar,
+            command = self._debug, **gus.cb_primary)
         self.debugButton.pack(side = tk.RIGHT)
 
         # Autoscroll button:
         self.autoscrollVar = tk.IntVar()
         self.autoscrollVar.set(1)
         self.autoscrollButton = tk.Checkbutton(self.controlFrame,
-            text ="Autoscroll", variable = self.autoscrollVar, **gus.fontc)
+            text ="Autoscroll", variable = self.autoscrollVar, **gus.cb_primary)
         self.autoscrollButton.pack(side = tk.RIGHT)
 
     # API ----------------------------------------------------------------------

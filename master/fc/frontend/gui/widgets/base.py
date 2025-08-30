@@ -35,12 +35,15 @@ from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.widgets import network as ntw, control as ctr, \
     profile as pro, console as csl
 from fc.frontend.gui.embedded import caltech_white as cte
+import fc.frontend.gui.embedded.icon as icn
 from fc import printer as pt, utils as us
 
 ## AUXILIARY GLOBALS ###########################################################
-BG_CT = "#ff6e1f"
-BG_ERROR = "#510000"
-FG_ERROR = "red"
+# Import theme colors
+from fc.frontend.gui.theme import (
+    BG_CT, BG_ACCENT, BG_ERROR, FG_ERROR, BG_SUCCESS, BG_WARNING,
+    BG_LIGHT, FG_PRIMARY, FG_SECONDARY
+)
 
 NOPE = lambda m: print("[SILENCED]: ", m)
 
@@ -96,6 +99,13 @@ class Base(tk.Frame, pt.PrintClient):
         self.screenHeight = self.master.winfo_screenheight()
 
         self.winfo_toplevel().title(title)
+        
+        # Set window icon
+        try:
+            self.icon = tk.PhotoImage(data=icn.ICON)
+            self.winfo_toplevel().iconphoto(True, self.icon)
+        except Exception as e:
+            self.printd(f"Could not set window icon: {e}")
 
         """
         self.winfo_toplevel().geometry("{}x{}".format(
@@ -109,8 +119,7 @@ class Base(tk.Frame, pt.PrintClient):
         # Containers -----------------------------------------------------------
 
         # Top bar ..............................................................
-        self.topBar = tk.Frame(self, relief = 'ridge', borderwidth = 2,
-            bg = BG_CT)
+        self.topBar = tk.Frame(self, relief='flat', borderwidth=0, bg=BG_CT)
         self.topBar.grid(row = 0, sticky = 'EW')
 
         self.caltechImage = tk.PhotoImage(data = cte.CALTECH)
@@ -120,25 +129,31 @@ class Base(tk.Frame, pt.PrintClient):
 
         self.caltechLabel.pack(side = tk.LEFT, ipady = 4, padx = 6)
 
-        self.errorLabel = tk.Label(self.topBar, text = self.ERROR_MESSAGE,
-            bg = BG_ERROR, fg = FG_ERROR, padx = 10)
+        self.errorLabel = tk.Label(self.topBar, text=self.ERROR_MESSAGE,
+            **gus.btn_error)
         self.errorLabel.bind("<Button-1>", self.focusConsole)
         self.warning = False
 
         self.topWidgets = []
 
         # Help:
-        self.helpButton = tk.Button(self.topBar, text = "Help",
-            command = self._helpCallback)
-        self.helpButton.pack(side = tk.RIGHT)
+        # self.helpButton = tk.Button(self.topBar, text=" Help ", 
+        #     command=self._helpCallback, **gus.btn_primary)
+        self.helpButton = ttk.Button(self.topBar, text=" Help ",
+            command=self._helpCallback, style="Secondary.TButton")
+        self.helpButton.pack(side=tk.RIGHT, padx=10, pady=5)
         self.topWidgets.append(self.helpButton)
 
         # Notebook .............................................................
         self.notebook = ttk.Notebook(self)
-        self.profileTab = tk.Frame(self.notebook)
-        self.networkTab = tk.Frame(self.notebook)
-        self.controlTab = tk.Frame(self.notebook)
-        self.consoleTab = tk.Frame(self.notebook)
+        # self.profileTab = tk.Frame(self.notebook, bg=BG_LIGHT)
+        # self.networkTab = tk.Frame(self.notebook, bg=BG_LIGHT)
+        # self.controlTab = tk.Frame(self.notebook, bg=BG_LIGHT)
+        # self.consoleTab = tk.Frame(self.notebook, bg=BG_LIGHT)
+        self.profileTab = ttk.Frame(self.notebook)
+        self.networkTab = ttk.Frame(self.notebook)
+        self.controlTab = ttk.Frame(self.notebook)
+        self.consoleTab = ttk.Frame(self.notebook)
 
         # Profile tab:
         self.profileWidget = pro.ProfileDisplay(self.profileTab, archive,
@@ -184,8 +199,9 @@ class Base(tk.Frame, pt.PrintClient):
         self.notebook.grid(row = 1, sticky = 'NWES')
 
         # Bottom bar ...........................................................
-        self.bottomBar = tk.Frame(self)
-        self.bottomBar.grid(row = 2, sticky = 'EW')
+        self.bottomBar = tk.Frame(self, relief='flat', borderwidth=0,
+            bg=BG_CT)
+        self.bottomBar.grid(row=2, sticky='EW')
         self.bottomWidget = ntw.StatusBarWidget(self.bottomBar,
             network.shutdown, pqueue)
         self.bottomWidget.pack(side = tk.LEFT, fill = tk.X, expand = True,

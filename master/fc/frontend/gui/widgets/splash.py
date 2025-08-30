@@ -38,7 +38,8 @@ import multiprocessing as mp
 import threading as mt
 import time as tm
 
-from fc.frontend.gui.embedded import splash3_bg as stp
+from fc.frontend.gui.embedded import splash_custom as stp
+from fc.frontend.gui.theme import SURFACE_1, PRIMARY_500
 
 ## AUXILIARY GLOBALS ###########################################################
 DEFAULT_TIMEOUT = 3
@@ -74,12 +75,12 @@ class SplashFrame(tk.Frame):
 
 class FCSplashWidget(tk.Frame):
     def __init__(self, master):
-        tk.Frame.__init__(self, master)
+        tk.Frame.__init__(self, master, bg=SURFACE_1)
 
         self.image = tk.PhotoImage(data = stp.SPLASH)
         self.image = self.image.subsample(2)
-        self.label = tk.Label(self, image = self.image, anchor = tk.CENTER,
-            bg = '#ff6e1f')
+        self.label = ttk.Label(self, image = self.image, anchor = tk.CENTER,
+            style = "Surface1.TLabel")
         self.label.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
 class SerialSplash:

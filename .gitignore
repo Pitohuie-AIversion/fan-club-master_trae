@@ -21,7 +21,7 @@ __pycache__/
 cmake_build/
 build/
 BUILD/
-
+master_copy/
 # Mbed OS specific
 mbed-os.lib
 mbed_config.h
@@ -52,3 +52,247 @@ Thumbs.db
 # Log files
 *.log
 
+master copy/chaser.fcpy
+master copy/FC_MkIV_binaries.zip
+master copy/main.py
+master copy/makefile
+master copy/fc/__init__.py
+master copy/fc/archive.py
+master copy/fc/printer.py
+master copy/fc/standards.py
+master copy/fc/tests.py
+master copy/fc/utils.py
+master copy/fc/auxiliary/cast_generate_modules.py
+master copy/fc/auxiliary/ex_broadcast.py
+master copy/fc/auxiliary/ex_listener.py
+master copy/fc/auxiliary/mkiv_ec.py
+master copy/fc/auxiliary/temp_saved_flows.txt
+master copy/fc/auxiliary/fcmkiv_matlab/Drone_Tracking_Script.m
+master copy/fc/auxiliary/fcmkiv_matlab/eg_broadcast.m
+master copy/fc/auxiliary/fcmkiv_matlab/eg_listener.m
+master copy/fc/auxiliary/fcmkiv_matlab/FanRepr.m
+master copy/fc/auxiliary/fcmkiv_matlab/FAWT3DGraph.m
+master copy/fc/auxiliary/fcmkiv_matlab/FCBroadcast.m
+master copy/fc/auxiliary/fcmkiv_matlab/FCBroadcastClient.m
+master copy/fc/auxiliary/fcmkiv_matlab/FCExternalController.m
+master copy/fc/auxiliary/fcmkiv_matlab/Load_Cell_Calibration.m
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/Draw2.png
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/Real_time_plotting.m
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/Calibration.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/HX711.h.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/HX711.h/HX711.h.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/.gitignore
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/.travis.yml
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/HX711.cpp
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/HX711.h
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/library.json
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/LICENSE
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/README.md
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/examples/HX711Serial/HX711Serial.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/examples/HX711SerialBegin/HX711SerialBegin.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/Measurement.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/.gitignore
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/.travis.yml
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/HX711.cpp
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/HX711.h
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/library.json
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/LICENSE
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/README.md
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/examples/HX711Serial/HX711Serial.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/examples/HX711SerialBegin/HX711SerialBegin.ino
+master copy/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement_with_pwm/Measurement_with_pwm.ino
+master copy/fc/auxiliary/functions/avalanche.fcpy
+master copy/fc/auxiliary/functions/basic_sine_jump.fcpy
+master copy/fc/auxiliary/functions/center_range.fcpy
+master copy/fc/auxiliary/functions/demo_circle.fcpy
+master copy/fc/auxiliary/functions/demo_donut.fcpy
+master copy/fc/auxiliary/functions/demo_dual_layer.fcpy
+master copy/fc/auxiliary/functions/demo_ghost.fcpy
+master copy/fc/auxiliary/functions/demo_SEA_spacesine.fcpy
+master copy/fc/auxiliary/functions/demo_sine.fcpy
+master copy/fc/auxiliary/functions/demo_spinner.fcpy
+master copy/fc/auxiliary/functions/donut.fcpy
+master copy/fc/auxiliary/functions/fan_sweep.fcpy
+master copy/fc/auxiliary/functions/howler1.fcpy
+master copy/fc/auxiliary/functions/hybrid_1.fcpy
+master copy/fc/auxiliary/functions/ramp.fcpy
+master copy/fc/auxiliary/functions/side-shear.fcpy
+master copy/fc/auxiliary/functions/sine_basic.fcpy
+master copy/fc/auxiliary/functions/sine_composed.fcpy
+master copy/fc/auxiliary/functions/sine_layered.fcpy
+master copy/fc/auxiliary/functions/sine_rail.fcpy
+master copy/fc/auxiliary/functions/sine_squared.fcpy
+master copy/fc/auxiliary/functions/sonar_layer.fcpy
+master copy/fc/auxiliary/functions/sonar.fcpy
+master copy/fc/auxiliary/functions/spinner.fcpy
+master copy/fc/auxiliary/functions/tod_basic.fcpy
+master copy/fc/auxiliary/functions/tod_shear.fcpy
+master copy/fc/backend/__init__.py
+master copy/fc/backend/communicator.py
+master copy/fc/backend/external.py
+master copy/fc/backend/mapper.py
+master copy/fc/backend/mkiii/__init__.py
+master copy/fc/backend/mkiii/FCCommunicator.py
+master copy/fc/backend/mkiii/FCSlave.py
+master copy/fc/backend/mkiii/hardcoded.py
+master copy/fc/backend/mkiii/names.py
+master copy/fc/builtin/__init__.py
+master copy/fc/builtin/profiles.py
+master copy/fc/frontend/__init__.py
+master copy/fc/frontend/frontend.py
+master copy/fc/frontend/gui/guiutils.py
+master copy/fc/frontend/gui/tkgui.py
+master copy/fc/frontend/gui/embedded/__init__.py
+master copy/fc/frontend/gui/embedded/caltech_orange.py
+master copy/fc/frontend/gui/embedded/caltech_white.py
+master copy/fc/frontend/gui/embedded/colormaps.py
+master copy/fc/frontend/gui/embedded/embedded.py
+master copy/fc/frontend/gui/embedded/icon.py
+master copy/fc/frontend/gui/embedded/splash_tp.py
+master copy/fc/frontend/gui/embedded/splash2_bg.py
+master copy/fc/frontend/gui/embedded/splash3_bg.py
+master copy/fc/frontend/gui/images/caltech_white.png
+master copy/fc/frontend/gui/images/caltech.png
+master copy/fc/frontend/gui/images/fcmkiv_icon_ico.ico
+master copy/fc/frontend/gui/images/fcmkiv_icon.png
+master copy/fc/frontend/gui/images/galcit.png
+master copy/fc/frontend/gui/images/splash_bg.png
+master copy/fc/frontend/gui/images/splash_tp.png
+master copy/fc/frontend/gui/images/splash2_bg.png
+master copy/fc/frontend/gui/images/splash3_bg.png
+master copy/fc/frontend/gui/widgets/__init__.py
+master copy/fc/frontend/gui/widgets/.control.py.swn
+master copy/fc/frontend/gui/widgets/base.py
+master copy/fc/frontend/gui/widgets/console.py
+master copy/fc/frontend/gui/widgets/control.py
+master copy/fc/frontend/gui/widgets/external.py
+master copy/fc/frontend/gui/widgets/grid.py
+master copy/fc/frontend/gui/widgets/loader.py
+master copy/fc/frontend/gui/widgets/network.py
+master copy/fc/frontend/gui/widgets/profile.py
+master copy/fc/frontend/gui/widgets/splash.py
+master copy/fc/frontend/gui/widgets/timer.py
+master copy 2/chaser.fcpy
+master copy 2/FC_MkIV_binaries.zip
+master copy 2/main.py
+master copy 2/makefile
+master copy 2/fc/__init__.py
+master copy 2/fc/archive.py
+master copy 2/fc/printer.py
+master copy 2/fc/standards.py
+master copy 2/fc/tests.py
+master copy 2/fc/utils.py
+master copy 2/fc/auxiliary/cast_generate_modules.py
+master copy 2/fc/auxiliary/ex_broadcast.py
+master copy 2/fc/auxiliary/ex_listener.py
+master copy 2/fc/auxiliary/mkiv_ec.py
+master copy 2/fc/auxiliary/temp_saved_flows.txt
+master copy 2/fc/auxiliary/fcmkiv_matlab/Drone_Tracking_Script.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/eg_broadcast.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/eg_listener.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/FanRepr.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/FAWT3DGraph.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/FCBroadcast.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/FCBroadcastClient.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/FCExternalController.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/Load_Cell_Calibration.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/Draw2.png
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/Real_time_plotting.m
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/Calibration.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/HX711.h.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Calibration/HX711.h/HX711.h.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/.gitignore
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/.travis.yml
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/HX711.cpp
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/HX711.h
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/library.json
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/LICENSE
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/README.md
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/examples/HX711Serial/HX711Serial.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/HX711-master/HX711-master/examples/HX711SerialBegin/HX711SerialBegin.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/Measurement.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/.gitignore
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/.travis.yml
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/HX711.cpp
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/HX711.h
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/library.json
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/LICENSE
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/README.md
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/examples/HX711Serial/HX711Serial.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement/HX711-master/HX711-master/examples/HX711SerialBegin/HX711SerialBegin.ino
+master copy 2/fc/auxiliary/fcmkiv_matlab/Arduino HX711/HX711 Load Cell/Measurement_with_pwm/Measurement_with_pwm.ino
+master copy 2/fc/auxiliary/functions/avalanche.fcpy
+master copy 2/fc/auxiliary/functions/basic_sine_jump.fcpy
+master copy 2/fc/auxiliary/functions/center_range.fcpy
+master copy 2/fc/auxiliary/functions/demo_circle.fcpy
+master copy 2/fc/auxiliary/functions/demo_donut.fcpy
+master copy 2/fc/auxiliary/functions/demo_dual_layer.fcpy
+master copy 2/fc/auxiliary/functions/demo_ghost.fcpy
+master copy 2/fc/auxiliary/functions/demo_SEA_spacesine.fcpy
+master copy 2/fc/auxiliary/functions/demo_sine.fcpy
+master copy 2/fc/auxiliary/functions/demo_spinner.fcpy
+master copy 2/fc/auxiliary/functions/donut.fcpy
+master copy 2/fc/auxiliary/functions/fan_sweep.fcpy
+master copy 2/fc/auxiliary/functions/howler1.fcpy
+master copy 2/fc/auxiliary/functions/hybrid_1.fcpy
+master copy 2/fc/auxiliary/functions/ramp.fcpy
+master copy 2/fc/auxiliary/functions/side-shear.fcpy
+master copy 2/fc/auxiliary/functions/sine_basic.fcpy
+master copy 2/fc/auxiliary/functions/sine_composed.fcpy
+master copy 2/fc/auxiliary/functions/sine_layered.fcpy
+master copy 2/fc/auxiliary/functions/sine_rail.fcpy
+master copy 2/fc/auxiliary/functions/sine_squared.fcpy
+master copy 2/fc/auxiliary/functions/sonar_layer.fcpy
+master copy 2/fc/auxiliary/functions/sonar.fcpy
+master copy 2/fc/auxiliary/functions/spinner.fcpy
+master copy 2/fc/auxiliary/functions/tod_basic.fcpy
+master copy 2/fc/auxiliary/functions/tod_shear.fcpy
+master copy 2/fc/backend/__init__.py
+master copy 2/fc/backend/communicator.py
+master copy 2/fc/backend/external.py
+master copy 2/fc/backend/mapper.py
+master copy 2/fc/backend/mkiii/__init__.py
+master copy 2/fc/backend/mkiii/FCCommunicator.py
+master copy 2/fc/backend/mkiii/FCSlave.py
+master copy 2/fc/backend/mkiii/hardcoded.py
+master copy 2/fc/backend/mkiii/names.py
+master copy 2/fc/builtin/__init__.py
+master copy 2/fc/builtin/profiles.py
+master copy 2/fc/frontend/__init__.py
+master copy 2/fc/frontend/frontend.py
+master copy 2/fc/frontend/gui/guiutils.py
+master copy 2/fc/frontend/gui/modern_widgets.py
+master copy 2/fc/frontend/gui/theme.py
+master copy 2/fc/frontend/gui/tkgui.py
+master copy 2/fc/frontend/gui/embedded/__init__.py
+master copy 2/fc/frontend/gui/embedded/caltech_orange.py
+master copy 2/fc/frontend/gui/embedded/caltech_white.py
+master copy 2/fc/frontend/gui/embedded/colormaps.py
+master copy 2/fc/frontend/gui/embedded/custom_splash.svg
+master copy 2/fc/frontend/gui/embedded/embedded.py
+master copy 2/fc/frontend/gui/embedded/icon.py
+master copy 2/fc/frontend/gui/embedded/splash_custom.py
+master copy 2/fc/frontend/gui/embedded/splash_tp.py
+master copy 2/fc/frontend/gui/embedded/splash2_bg.py
+master copy 2/fc/frontend/gui/embedded/splash3_bg.py
+master copy 2/fc/frontend/gui/images/caltech_white.png
+master copy 2/fc/frontend/gui/images/caltech.png
+master copy 2/fc/frontend/gui/images/fcmkiv_icon_ico.ico
+master copy 2/fc/frontend/gui/images/fcmkiv_icon.png
+master copy 2/fc/frontend/gui/images/galcit.png
+master copy 2/fc/frontend/gui/images/splash_bg.png
+master copy 2/fc/frontend/gui/images/splash_tp.png
+master copy 2/fc/frontend/gui/images/splash2_bg.png
+master copy 2/fc/frontend/gui/images/splash3_bg.png
+master copy 2/fc/frontend/gui/widgets/__init__.py
+master copy 2/fc/frontend/gui/widgets/.control.py.swn
+master copy 2/fc/frontend/gui/widgets/base.py
+master copy 2/fc/frontend/gui/widgets/console.py
+master copy 2/fc/frontend/gui/widgets/control.py
+master copy 2/fc/frontend/gui/widgets/external.py
+master copy 2/fc/frontend/gui/widgets/grid.py
+master copy 2/fc/frontend/gui/widgets/loader.py
+master copy 2/fc/frontend/gui/widgets/network.py
+master copy 2/fc/frontend/gui/widgets/profile.py
+master copy 2/fc/frontend/gui/widgets/splash.py
+master copy 2/fc/frontend/gui/widgets/timer.py

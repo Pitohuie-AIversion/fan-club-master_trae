@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="750" height="500" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Fan blade gradient -->
+    <radialGradient id="fanGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff6e1f;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#e85a0a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8460a;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Text shadow -->
+    <filter id="textShadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="750" height="500" fill="url(#bgGradient)"/>
+  
+  <!-- Animated circuit pattern background -->
+  <g opacity="0.1">
+    <path d="M50 50 L150 50 L150 150 L250 150" stroke="#ff6e1f" stroke-width="1" fill="none"/>
+    <path d="M300 100 L400 100 L400 200 L500 200" stroke="#ff6e1f" stroke-width="1" fill="none"/>
+    <path d="M550 50 L650 50 L650 150 L700 150" stroke="#ff6e1f" stroke-width="1" fill="none"/>
+    <circle cx="150" cy="50" r="3" fill="#ff6e1f"/>
+    <circle cx="400" cy="100" r="3" fill="#ff6e1f"/>
+    <circle cx="650" cy="50" r="3" fill="#ff6e1f"/>
+  </g>
+  
+  <!-- Main fan array representation -->
+  <g transform="translate(375, 250)">
+    <!-- Central large fan -->
+    <g filter="url(#glow)">
+      <circle cx="0" cy="0" r="40" fill="url(#fanGradient)" opacity="0.8"/>
+      <!-- Fan blades -->
+      <g id="fanBlades">
+        <path d="M0,-35 L-10,-25 L0,-15 L10,-25 Z" fill="#ffffff" opacity="0.9"/>
+        <path d="M25,-25 L15,-10 L35,0 L25,10 Z" fill="#ffffff" opacity="0.9"/>
+        <path d="M0,35 L10,25 L0,15 L-10,25 Z" fill="#ffffff" opacity="0.9"/>
+        <path d="M-25,25 L-15,10 L-35,0 L-25,-10 Z" fill="#ffffff" opacity="0.9"/>
+      </g>
+      <circle cx="0" cy="0" r="8" fill="#333333"/>
+    </g>
+    
+    <!-- Surrounding smaller fans -->
+    <!-- Top row -->
+    <g transform="translate(-80, -80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    <g transform="translate(0, -80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    <g transform="translate(80, -80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    
+    <!-- Middle row -->
+    <g transform="translate(-80, 0)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    <g transform="translate(80, 0)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    
+    <!-- Bottom row -->
+    <g transform="translate(-80, 80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    <g transform="translate(0, 80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+    <g transform="translate(80, 80)">
+      <circle cx="0" cy="0" r="20" fill="url(#fanGradient)" opacity="0.6"/>
+      <circle cx="0" cy="0" r="4" fill="#333333"/>
+    </g>
+  </g>
+  
+  <!-- Air flow lines -->
+  <g opacity="0.4">
+    <path d="M100 200 Q200 180 300 200" stroke="#87ceeb" stroke-width="2" fill="none"/>
+    <path d="M100 220 Q200 200 300 220" stroke="#87ceeb" stroke-width="2" fill="none"/>
+    <path d="M100 240 Q200 220 300 240" stroke="#87ceeb" stroke-width="2" fill="none"/>
+    
+    <path d="M450 200 Q550 180 650 200" stroke="#87ceeb" stroke-width="2" fill="none"/>
+    <path d="M450 220 Q550 200 650 220" stroke="#87ceeb" stroke-width="2" fill="none"/>
+    <path d="M450 240 Q550 220 650 240" stroke="#87ceeb" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Title text -->
+  <g transform="translate(375, 100)">
+    <text x="0" y="0" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" 
+          fill="#ffffff" filter="url(#textShadow)">
+      FAN CLUB
+    </text>
+    <text x="0" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="normal" 
+          fill="#ff6e1f" filter="url(#textShadow)">
+      Mark IV Master Controller
+    </text>
+  </g>
+  
+  <!-- Version and status -->
+  <g transform="translate(375, 420)">
+    <text x="0" y="0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" 
+          fill="#87ceeb" opacity="0.8">
+      Wind Tunnel Control System
+    </text>
+    <text x="0" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" 
+          fill="#87ceeb" opacity="0.6">
+      Initializing 10×10 Fan Array...
+    </text>
+  </g>
+  
+  <!-- Loading animation dots -->
+  <g transform="translate(375, 460)">
+    <circle cx="-20" cy="0" r="3" fill="#ff6e1f">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0s"/>
+    </circle>
+    <circle cx="0" cy="0" r="3" fill="#ff6e1f">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="20" cy="0" r="3" fill="#ff6e1f">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
+  
+  <!-- Fan blade rotation animation -->
+  <animateTransform attributeName="transform" type="rotate" 
+                    values="0 375 250;360 375 250" dur="2s" repeatCount="indefinite"
+                    href="#fanBlades"/>
+</svg>

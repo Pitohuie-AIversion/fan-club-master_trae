@@ -34,6 +34,7 @@ from fc import archive as ac, printer as pt
 from fc.builtin import profiles as btp
 from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.widgets import loader as ldr
+from fc.frontend.gui.theme import BG_ACCENT
 
 ## AUXILIARY GLOBALS ###########################################################
 TAG_SUB = "M"
@@ -83,32 +84,28 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.topBar = tk.Frame(self)
         self.topBar.grid(row = 0, columnspan = self.numcolumns, sticky = "EW")
 
-        self.topLabel = tk.Label(self.topBar, text = "Profile:   ",
+        self.topLabel = ttk.Label(self.topBar, text = "Profile:   ",
             justify = tk.LEFT)
         self.topLabel.pack(side = tk.LEFT)
 
-        self.defaultButton = tk.Button(self.topBar, text = "Default",
-            command = self._default)
-        self.defaultButton.pack(side = tk.LEFT)
+        self.defaultButton = ttk.Button(self.topBar, text="Default", command=self._default)
+        self.defaultButton.pack(side=tk.LEFT, padx=5)
 
-        self.loadButton = tk.Button(self.topBar, text = "Load",
-            command = self._load)
-        self.loadButton.pack(side = tk.LEFT)
+        self.loadButton = ttk.Button(self.topBar, text="Load", command=self._load)
+        self.loadButton.pack(side=tk.LEFT, padx=5)
 
-        self.saveButton = tk.Button(self.topBar, text = "Save",
-            command = self._save)
-        self.saveButton.pack(side = tk.LEFT)
+        self.saveButton = ttk.Button(self.topBar, text="Save", command=self._save)
+        self.saveButton.pack(side=tk.LEFT, padx=5)
 
-        self.applyButton = tk.Button(self.topBar, text = "Apply",
-            command = self.applyCallback)
-        self.applyButton.pack(side = tk.LEFT)
+        self.applyButton = ttk.Button(self.topBar, text="Apply", command=self.applyCallback)
+        self.applyButton.pack(side=tk.LEFT, padx=5)
 
         # Built-in menu:
         self.builtin = btp.PROFILES
         builtinkeys = ("N/A",) + tuple(self.builtin.keys())
         self.builtinFrame = tk.Frame(self.topBar)
         self.builtinFrame.pack(side = tk.RIGHT)
-        self.builtinLabel = tk.Label(self.builtinFrame,
+        self.builtinLabel = ttk.Label(self.builtinFrame,
             text = "Built-in: ")
         self.builtinLabel.pack(side = tk.LEFT)
         self.builtinMenuVar = tk.StringVar()
@@ -122,7 +119,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.displayFrame = tk.Frame(self)
         self.displayFrame.grid(row = 2, column = 0, sticky = "NEWS", pady = 10)
 
-        self.font = tk.font.Font(font = "TkDefaultFont 16 bold")
+        self.font = tk.font.Font(font = gus.typography["headline_large"]["font"])
 
         self.display = ttk.Treeview(self.displayFrame)
         self.display.configure(columns = ("Attribute", "Value"))
@@ -134,8 +131,8 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.display.heading("Value", text = "Value")
         self.display.pack(fill = tk.BOTH, expand = True)
 
-        self.display.tag_configure(TAG_SUB, font = "TkDefaultFont 7 bold")
-        self.display.tag_configure(TAG_LIST, font = "TkDefaultFont 7 bold")
+        self.display.tag_configure(TAG_SUB, font = gus.typography["label_small"]["font"])
+        self.display.tag_configure(TAG_LIST, font = gus.typography["label_small"]["font"])
 
         for event in ("<ButtonRelease-1>", "<KeyRelease-Up>",
             "<KeyRelease-Down>"):
@@ -415,22 +412,24 @@ class PythonEditor(tk.Frame):
         self.grid_columnconfigure(1, weight = 1)
         row = 0
 
-        self.topLabel = tk.Label(self, text = \
+        self.topLabel = ttk.Label(self, text = \
             "Value editor (as Python 3.7 expression):", anchor = tk.W)
         self.topLabel.grid(row = row, column = 0, columnspan = 2, sticky = "EW")
         row += 1
 
-        self.font = tk.font.Font(font = "Courier 12 bold")
+        self.font = tk.font.Font(font = gus.typography["code"]["font"])
         self.tabstr = "  "
         self.tabsize = self.font.measure(self.tabstr)
         self.realtabs = "    "
 
-        # Input ................................................................
+        # Input ...............................................................
         self.grid_rowconfigure(row, weight = 1)
-        self.input = tk.Text(self, font = self.font,
-            width = 30, height = 2, padx = 10, pady = 0, bg = 'black',
-            fg = 'lightgray', insertbackground = "#ff6e1f",
-            tabs = self.tabsize)
+        conf = dict(gus.text_conf)
+        conf["font"] = self.font
+        conf["tabs"] = self.tabsize
+        self.input = tk.Text(self,
+            width = 30, height = 2, padx = 10, pady = 0,
+            **conf)
         self.input.grid(row = row, column = 1, rowspan = 2, sticky = "NEWS")
 
         # For scrollbar, see:
@@ -449,18 +448,15 @@ class PythonEditor(tk.Frame):
             sticky = "WE")
         self.editButtons = []
 
-        self.addButton = tk.Button(self.buttonFrame, text = "Add to",
-            command = self._add)
+        self.addButton = ttk.Button(self.buttonFrame, text="Add to", command=self._add)
         self.addButton.pack(side = tk.LEFT)
         self.editButtons.append(self.addButton)
 
-        self.editButton = tk.Button(self.buttonFrame, text = "Edit",
-            command = self._edit)
+        self.editButton = ttk.Button(self.buttonFrame, text="Edit", command=self._edit)
         self.editButton.pack(side = tk.LEFT)
         self.editButtons.append(self.editButton)
 
-        self.removeButton = tk.Button(self.buttonFrame, text = "Remove",
-            command = self._remove)
+        self.removeButton = ttk.Button(self.buttonFrame, text="Remove", style="Secondary.TButton", command=self._remove)
         self.removeButton.pack(side = tk.LEFT)
         self.editButtons.append(self.removeButton)
 

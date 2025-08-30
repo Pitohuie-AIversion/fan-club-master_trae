@@ -39,6 +39,7 @@ import tkinter.font as fnt
 
 from fc.frontend.gui import guiutils as gus
 from fc import archive as ac, printer as pt, standards as s
+from fc.frontend.gui.theme import BG_ACCENT
 
 ## CLASSES #####################################################################
 class ExternalControlWidget(pt.PrintClient, tk.Frame):
@@ -75,17 +76,17 @@ class ExternalControlWidget(pt.PrintClient, tk.Frame):
             }
         }
 
-        # Build GUI ............................................................
+        # Build GUI ...........................................................
         self.grid_columnconfigure(0, weight = 1)
         row = 0
 
         self.allFrame = tk.Frame(self)
         self.allFrame.grid(row = row, column = 0, sticky = "EW")
-        self.startAllButton = tk.Button(self.allFrame, text = "Start All",
-            command = self._onStartAll, **gus.fontc)
+        self.startAllButton = ttk.Button(self.allFrame, text = "Start All",
+            command = self._onStartAll)
         self.startAllButton.pack(side = tk.LEFT, fill = tk.X, expand = True)
-        self.stopAllButton = tk.Button(self.allFrame, text = "Stop All",
-            command = self._onStopAll, **gus.fontc)
+        self.stopAllButton = ttk.Button(self.allFrame, text = "Stop All",
+            command = self._onStopAll)
         self.stopAllButton.pack(side = tk.LEFT, fill = tk.X, expand = True)
         row += 1
 
@@ -183,16 +184,11 @@ class ECSetupWidget(tk.Frame):
     external control broadcast server.
     """
 
-    DISP_CONFIG_GENERAL = {'font':'TkFixedFont 7 bold', 'relief':tk.SUNKEN,
-        'bd':2}
-    DISP_CONFIG_ACTIVE = {'text' : 'Active',
-        'fg' : s.FOREGROUNDS[s.SS_CONNECTED],
-        'bg' : s.BACKGROUNDS[s.SS_CONNECTED]}
-    DISP_CONFIG_INACTIVE = {'text' : 'Inactive',
-        'fg' : s.FOREGROUNDS[s.SS_DISCONNECTED],
-        'bg' : s.BACKGROUNDS[s.SS_DISCONNECTED]}
-    DISP_CONFIGS = {s.EX_ACTIVE : DISP_CONFIG_ACTIVE,
-        s.EX_INACTIVE : DISP_CONFIG_INACTIVE}
+    # Ttk style-based display configs
+    DISP_CONFIG_ACTIVE = {'text': 'Active', 'style': 'ExternalActive.TLabel'}
+    DISP_CONFIG_INACTIVE = {'text': 'Inactive', 'style': 'ExternalInactive.TLabel'}
+    DISP_CONFIGS = {s.EX_ACTIVE: DISP_CONFIG_ACTIVE,
+        s.EX_INACTIVE: DISP_CONFIG_INACTIVE}
 
     PARAM_IP, PARAM_PORT, PARAM_REPEAT = 0, 1, 2
     PARAMETERS = (PARAM_IP, PARAM_PORT, PARAM_REPEAT)
@@ -254,8 +250,32 @@ class ECSetupWidget(tk.Frame):
         for column in columns:
             self.main.grid_columnconfigure(column, weight = 1)
 
-        # Active display:
-        self.activeDisplay = tk.Label(self.main, **self.DISP_CONFIG_GENERAL)
+        # Active display (ttk + style):
+        _style = ttk.Style(self)
+        _style.configure(
+            "ExternalDisplay.TLabel",
+            font=("TkFixedFont", 7, "bold"),
+            relief='sunken',
+            borderwidth=2
+        )
+        _style.configure(
+            "ExternalActive.TLabel",
+            font=("TkFixedFont", 7, "bold"),
+            relief='sunken',
+            borderwidth=2,
+            foreground=s.FOREGROUNDS[s.SS_CONNECTED],
+            background=s.BACKGROUNDS[s.SS_CONNECTED]
+        )
+        _style.configure(
+            "ExternalInactive.TLabel",
+            font=("TkFixedFont", 7, "bold"),
+            relief='sunken',
+            borderwidth=2,
+            foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
+            background=s.BACKGROUNDS[s.SS_DISCONNECTED]
+        )
+
+        self.activeDisplay = ttk.Label(self.main, text="Inactive", style="ExternalInactive.TLabel")
         self.activeDisplay.grid(row = top, column = left, sticky = "EW")
 
         # Indices:
@@ -290,8 +310,8 @@ class ECSetupWidget(tk.Frame):
 
         # Start and stop button:
         self.startStopFrame = self._gridFrame(self.main, bottom, left)
-        self.startStopButton = tk.Button(self.startStopFrame, text = "Start",
-            command = self._onStart, **gus.fontc)
+        self.startStopButton = ttk.Button(self.startStopFrame, text = "Start",
+            command = self._onStart)
         self.startStopButton.pack(fill = tk.X, expand = True)
 
         self.ssb_configs = {
@@ -301,8 +321,8 @@ class ECSetupWidget(tk.Frame):
 
         # Default button:
         self.defaultFrame = self._gridFrame(self.main, bottom, right)
-        self.defaultButton = tk.Button(self.defaultFrame, text = "Defaults",
-            command = self._onDefault, **gus.fontc)
+        self.defaultButton = ttk.Button(self.defaultFrame, text = "Defaults",
+            command = self._onDefault, style = "Secondary.TButton")
         self.defaultButton.pack(fill = tk.X, expand = True)
         self.activeWidgets.append(self.defaultButton)
 
@@ -407,13 +427,12 @@ class ECSetupWidget(tk.Frame):
         """
 
 
-        label = tk.Label(master, text = text, **gus.fontc, width = 7,
+        label = ttk.Label(master, text = text, **gus.fontc, width = 7,
             anchor = 'e')
         label.pack(side = tk.LEFT)
 
-        entry = tk.Entry(master, **gus.efont, validate = "key",
-            validatecommand = (validator, '%S', '%s', '%d'),
-            disabledforeground = 'black')
+        entry = ttk.Entry(master, validate = "key",
+            validatecommand = (validator, '%S', '%s', '%d'))
         entry.pack(side = tk.LEFT, fill = tk.X, expand = True)
         if active:
             self.activeWidgets.append(entry)

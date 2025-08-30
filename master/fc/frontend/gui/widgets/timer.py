@@ -37,6 +37,7 @@ import tkinter.font as fnt
 from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.widgets import grid as gd
 from fc.frontend.gui.embedded import colormaps as cms
+from fc.frontend.gui.theme import BG_ACCENT
 
 ## GLOBALS #####################################################################
 NOTHING = lambda: None
@@ -79,37 +80,36 @@ class TimerWidget(tk.Frame):
         self.timeTopBar.pack(side = tk.TOP, fill = tk.X, expand = True)
 
         # Start/Stop button:
-        self.startStopButton = tk.Button(self.timeTopBar, text = "Start",
-            state = tk.NORMAL, command = self._start, **gus.fontc)
+        self.startStopButton = ttk.Button(self.timeTopBar, text = "Start",
+            command = self._start, style = "TButton")
         self.startStopButton.pack(side = tk.LEFT)
 
         # Step label:
-        self.stepLabel = tk.Label(self.timeTopBar, text = "   Step: ",
+        self.stepLabel = ttk.Label(self.timeTopBar, text = "   Step: ",
             **gus.fontc)
         self.stepLabel.pack(side = tk.LEFT)
 
         # Step field:
         validateC = self.register(gus._validateN)
-        self.stepEntry = tk.Entry(self.timeTopBar, bg = 'white', width  = 6,
-            **gus.efont, validate = 'key',
-            validatecommand = (validateC, '%S', '%s', '%d'))
+        self.stepEntry = ttk.Entry(self.timeTopBar, width = 6,
+            validate = 'key', validatecommand = (validateC, '%S', '%s', '%d'))
         self.stepEntry.insert(0, self.DEFAULT_STEP_MS)
         self.stepEntry.pack(side = tk.LEFT)
         self.activeWidgets.append(self.stepEntry)
 
         # Unit label:
-        self.unitLabel = tk.Label(self.timeTopBar, text = "(ms)",
+        self.unitLabel = ttk.Label(self.timeTopBar, text = "(ms)",
             **gus.fontc)
         self.unitLabel.pack(side = tk.LEFT)
 
         # End label:
-        self.endLabel = tk.Label(self.timeTopBar, text = "   End: ",
+        self.endLabel = ttk.Label(self.timeTopBar, text = "   End: ",
             **gus.fontc)
         self.endLabel.pack(side = tk.LEFT)
 
         # End field:
-        self.endEntry = tk.Entry(self.timeTopBar, bg = 'white', width  = 6,
-            **gus.efont, validate = 'key',
+        self.endEntry = ttk.Entry(self.timeTopBar, width = 6,
+            validate = 'key',
             validatecommand = (validateC, '%S', '%s', '%d'))
         self.endEntry.pack(side = tk.LEFT)
         self.end = None
@@ -130,26 +130,24 @@ class TimerWidget(tk.Frame):
             pady = 10)
 
         # Index display:
-        self.kLabel = tk.Label(self.timeDisplayBar, text = "  k = ",
+        self.kLabel = ttk.Label(self.timeDisplayBar, text = "  k = ",
             **gus.fontc)
         self.kLabel.pack(side = tk.LEFT)
 
         self.kVar = tk.IntVar()
-        self.indexDisplay = tk.Entry(self.timeDisplayBar, relief = tk.SUNKEN,
-            bd = 1, textvariable = self.kVar, **gus.fontc, justify = 'c',
+        self.indexDisplay = ttk.Entry(self.timeDisplayBar, textvariable = self.kVar, justify = 'c',
             validate = 'key', validatecommand = (validateC, '%S', '%s', '%d'))
         self.indexDisplay.pack(side = tk.LEFT, fill = tk.X, expand = True)
         self.kVar.set(0)
         self.activeWidgets.append(self.indexDisplay)
 
         # Time display:
-        self.tLabel = tk.Label(self.timeDisplayBar, text = "  t = ",
+        self.tLabel = ttk.Label(self.timeDisplayBar, text = "  t = ",
             **gus.fontc)
         self.tLabel.pack(side = tk.LEFT)
 
         self.tVar = tk.DoubleVar()
-        self.timeDisplay = tk.Entry(self.timeDisplayBar, relief = tk.SUNKEN,
-            bd = 1, textvariable = self.tVar, **gus.fontc, justify = 'c',
+        self.timeDisplay = ttk.Entry(self.timeDisplayBar, textvariable = self.tVar, justify = 'c',
             validate = 'key', validatecommand = (validateF, '%S', '%s', '%d'))
         self.timeDisplay.pack(side = tk.LEFT, fill = tk.X, expand = True)
         self.tVar.set(0.0)
@@ -163,8 +161,8 @@ class TimerWidget(tk.Frame):
         self.logVar = tk.BooleanVar()
         self.logVar.set(False)
         self.logButton = tk.Checkbutton(self.timeControlBar,
-            text = "Log Data", variable = self.logVar,
-            indicatoron = False, padx = 10, pady = 5, **gus.fontc)
+            text = "Log Data", variable = self.logVar, indicatoron=False,
+            **gus.cb_primary)
         self.logButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.logButton)
 
@@ -172,19 +170,18 @@ class TimerWidget(tk.Frame):
         self.endDCVar = tk.BooleanVar()
         self.endDCVar.set(False)
         self.endDCButton = tk.Checkbutton(self.timeControlBar,
-            text = "Set DC at end: ", variable = self.endDCVar,
-            indicatoron = False, padx = 10, pady = 5, **gus.fontc)
+            text = "Set DC at end: ", variable = self.endDCVar, indicatoron=False,
+            **gus.cb_primary)
         self.endDCButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.endDCButton)
 
-        self.endDCEntry = tk.Entry(self.timeControlBar, **gus.efont, width = 6,
+        self.endDCEntry = ttk.Entry(self.timeControlBar, width = 6,
             validate = 'key',validatecommand = (validateF, '%S', '%s', '%d'))
         self.endDCEntry.pack(side = tk.LEFT, **gus.padc)
         self.endDCEntry.insert(0, "0")
         self.activeWidgets.append(self.endDCEntry)
 
-        self.endDCLabel = tk.Label(self.timeControlBar, **gus.fontc,
-            fg = "darkgray", text = "[0.0, 100.0]")
+        self.endDCLabel = ttk.Label(self.timeControlBar, text = "[0.0, 100.0]")
         self.endDCLabel.pack(side = tk.LEFT)
 
     def _start(self, *_):

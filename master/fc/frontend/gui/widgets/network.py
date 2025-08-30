@@ -12,7 +12,7 @@
 ## /_/|/   /_/ /_/|/ /_/ /_/|/ |\ ___--|_|  /_____/| |-___-_|/  /____-/|/     ##
 ## |_|/    |_|/|_|/  |_|/|_|/   \|___|-    |_____|/   |___|     |____|/       ##
 ##                   _ _    _    ___   _  _      __  __   __                  ##
-##                  | | |  | |  | T_| | || |    |  ||_ | | _|                 ##
+##                  | | | | |  | T_| | || |    |  ||_ | | _|                 ##
 ##                  | _ |  |T|  |  |  |  _|      ||   \\_//                   ##
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
@@ -42,6 +42,7 @@ import tkinter.font as fnt
 
 from fc.frontend.gui import guiutils as gus
 from fc import standards as s, printer as pt
+from fc.frontend.gui.theme import TEXT_PRIMARY, TEXT_SECONDARY, ERROR_MAIN
 
 ## GLOBALS #####################################################################
 TEST_VECTORS = [
@@ -163,8 +164,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.connectionFrame.pack(**frameconfig)
 
         # Connect button:
-        self.connectButton = tk.Button(self.connectionFrame, text = "Connect",
-            command = self._onConnect, padx = 10, pady = 5, width = 12)
+        self.connectButton = ttk.Button(self.connectionFrame, text = "Connect",
+        command = self._onConnect, width = 12)
         self.connectButton.pack(side = tk.LEFT, padx = 0, fill = tk.Y)
 
         # Displays:
@@ -186,8 +187,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
             bd = 1)
         self.bcipFrame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
 
-        self.bcipLabel = tk.Label(self.bcipFrame, text = name + ":",
-            font = "TkDefaultFont 7")
+        self.bcipLabel = ttk.Label(self.bcipFrame, text = name + ":",
+            font = gus.typography["label_small"]["font"])
         self.bcipLabel.pack(side = tk.TOP, fill = tk.X, padx = 10)
 
         self.bcipDisplay = gus.PromptLabel(self.bcipFrame,
@@ -198,9 +199,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
             "interface, leave the field empty.",
             callback = self._setBroadcastIP,
             starter = self.bcipVar.get,
-            background = "white",
             textvariable = self.bcipVar, width = 15,
-            relief = tk.SUNKEN, font = "Courier 7", padx = 10, pady = 5)
+            relief = tk.SUNKEN, font = gus.typography["code"]["font"], padx = 10, pady = 5)
         self.bcipDisplay.pack(side = tk.TOP, fill = tk.X, pady = 5, padx = 10)
 
         # Broadcast port:
@@ -218,19 +218,20 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         # Connection display:
         self.connectionVar = tk.StringVar()
         self.connectionVar.set("[NO CONNECTION]")
-        self.connectionLabel = tk.Label(self.connectionFrame,
-            textvariable = self.connectionVar, width = 15,
-            relief = tk.SUNKEN, font = "Courier 7 bold", padx = 10, pady = 5)
-        self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 5,
-            padx = 10)
+        self.connectionLabel = ttk.Label(self.connectionFrame,
+            textvariable = self.connectionVar, width = 11,
+            style = "Sunken.TLabel", font = gus.typography["label_small"]["font"])
+        self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 3,
+            padx = 6)
+        self.status = s.SS_DISCONNECTED
 
         self.activeWidgets = []
 
-        # Target ...............................................................
+        # Target ..............................................................
         self.targetFrame = tk.Frame(self)
         self.targetFrame.pack(**frameconfig)
 
-        self.targetLabel = tk.Label(self.targetFrame, text = "Target: ")
+        self.targetLabel = ttk.Label(self.targetFrame, text = "Target: ")
         self.targetLabel.pack(side = tk.LEFT)
         self.target = tk.IntVar()
         self.target.set(0)
@@ -241,7 +242,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.messageFrame = tk.Frame(self)
         self.messageFrame.pack(**frameconfig)
 
-        self.messageLabel = tk.Label(self.messageFrame, text = "Message: ")
+        self.messageLabel = ttk.Label(self.messageFrame, text = "Message: ")
         self.messageLabel.pack(side = tk.LEFT)
         self.message = tk.IntVar()
         self.message.set(0)
@@ -251,8 +252,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         # Send .................................................................
         self.sendFrame = tk.Frame(self)
         self.sendFrame.pack(**frameconfig)
-        self.sendButton = tk.Button(self.sendFrame, text = "Send",
-            command = self._send, padx = 10, pady = 5)
+        self.sendButton = ttk.Button(self.sendFrame, text = "Send",
+            command = self._send)
         self.sendButton.pack(side = tk.LEFT)
         self._sendCallback = network.commandIn
         self.activeWidgets.append(self.sendButton)
@@ -296,8 +297,12 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.connectButton.config(state = tk.NORMAL, text = "Disconnect",
             command = self._onDisconnect)
         self.connectionVar.set("Connected")
-        self.connectionLabel.config(fg = s.FOREGROUNDS[s.SS_CONNECTED],
-            bg = s.BACKGROUNDS[s.SS_CONNECTED])
+        # ttk.Label 不支持直接使用 fg/bg，改为切换样式
+        style = ttk.Style(self.connectionLabel)
+        style.configure('NetworkConnected.TLabel',
+                        foreground=s.FOREGROUNDS[s.SS_CONNECTED],
+                        background=s.BACKGROUNDS[s.SS_CONNECTED])
+        self.connectionLabel.configure(style='NetworkConnected.TLabel')
         self._setWidgetState(tk.NORMAL)
         for client in self.clients:
             client.connected()
@@ -325,8 +330,12 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
             port.set(self.NO_PORT)
         for client in self.clients:
             client.disconnected()
-        self.connectionLabel.config(fg = s.FOREGROUNDS[s.SS_DISCONNECTED],
-            bg = s.BACKGROUNDS[s.SS_DISCONNECTED])
+        # ttk.Label 不支持直接使用 fg/bg，改为切换样式
+        style = ttk.Style(self.connectionLabel)
+        style.configure('NetworkDisconnected.TLabel',
+                        foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
+                        background=s.BACKGROUNDS[s.SS_DISCONNECTED])
+        self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
         self._setWidgetState(tk.DISABLED)
         self.bcipDisplay.disable()
         self.isConnected = False
@@ -384,8 +393,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         Allow the user to specify the target named NAME with the code CODE
         passed to the send callback.
         """
-        button = tk.Radiobutton(self.targetFrame, text = name, value = code,
-            variable = self.target, indicatoron = False, padx = 10, pady = 5)
+        button = ttk.Radiobutton(self.targetFrame, text = name, value = code,
+            variable = self.target)
         button.config(state = tk.NORMAL if self.isConnected else tk.DISABLED)
 
         button.pack(side = tk.LEFT, anchor = tk.W, padx = 5)
@@ -400,8 +409,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         Allow the user to send the message named NAME with the message code CODE
         passed to the send callback.
         """
-        button = tk.Radiobutton(self.messageFrame, text = name, value = code,
-            variable = self.message, indicatoron = False, padx = 10, pady = 5)
+        button = ttk.Radiobutton(self.messageFrame, text = name, value = code,
+            variable = self.message)
         button.config(state = tk.NORMAL if self.isConnected else tk.DISABLED)
 
         button.pack(side = tk.LEFT, anchor = tk.W, padx = 5)
@@ -419,11 +428,11 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         frame = tk.Frame(self.connectionFrame, relief = tk.RIDGE, bd = 1)
         frame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
 
-        label = tk.Label(frame, text = name + ":", font = "TkDefaultFont 7")
+        label = ttk.Label(frame, text = name + ":", font = gus.typography["label_small"]["font"])
         label.pack(side = tk.TOP, fill = tk.X, padx = 10)
 
-        display = tk.Label(frame, textvariable = variable, width = 15,
-            relief = tk.SUNKEN, font = "Courier 7", padx = 10, pady = 5)
+        display = ttk.Label(frame, textvariable = variable, width = 15,
+            style = "Sunken.TLabel", font = gus.typography["code"]["font"])
         display.pack(side = tk.TOP, fill = tk.X, pady = 5, padx = 10)
 
     def _setBroadcastIP(self, ip):
@@ -470,19 +479,18 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         self.fileFrame = tk.Frame(self.main)
         self.fileFrame.pack(fill = tk.X, expand = True)
 
-        self.fileLabel = tk.Label(self.fileFrame, text = "File: ", padx = 10,
-            pady = 5)
-        self.fileLabel.pack(side = tk.LEFT)
+        self.fileLabel = ttk.Label(self.fileFrame, text = "File: ")
+        self.fileLabel.pack(side = tk.LEFT, padx = 10, pady = 5)
 
         self.filename = ""
         self.fileSize = 0
         self.fileVar = tk.StringVar()
-        self.fileEntry = tk.Entry(self.fileFrame, textvariable = self.fileVar)
+        self.fileEntry = ttk.Entry(self.fileFrame, textvariable = self.fileVar)
         self.fileEntry.pack(side = tk.LEFT, fill = tk.X, expand = True,
             padx = 10)
         self.fileEntry.config(state = tk.DISABLED)
 
-        self.fileButton = tk.Button(self.fileFrame, text = "...",
+        self.fileButton = ttk.Button(self.fileFrame, text = "...",
             command = self._chooseFile)
         self.fileButton.pack(side = tk.LEFT)
         self.setupWidgets.append(self.fileButton)
@@ -491,30 +499,52 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         self.bottomFrame = tk.Frame(self.main)
         self.bottomFrame.pack(fill = tk.X, expand = True)
 
-        self.versionLabel = tk.Label(self.bottomFrame, text = "Version Code: ",
-            padx = 10, pady = 5)
-        self.versionLabel.pack(side = tk.LEFT)
+        self.versionLabel = ttk.Label(self.bottomFrame, text = "Version Code: ")
+        self.versionLabel.pack(side = tk.LEFT, padx = 10, pady = 5)
 
         self.version = tk.StringVar()
-        self.versionEntry = tk.Entry(self.bottomFrame, width = 10,
-            textvariable = self.version, font = 'TkFixedFont')
+        self.versionEntry = ttk.Entry(self.bottomFrame, width = 10,
+            textvariable = self.version)
         self.versionEntry.pack(side = tk.LEFT, fill = tk.X, expand = False,
             padx = 10)
         self.setupWidgets.append(self.versionEntry)
 
         # Start ................................................................
-        self.startButton = tk.Button(self.bottomFrame, command = self._start,
-            text = "Start", padx = 10, pady = 5)
+        self.startButton = ttk.Button(self.bottomFrame, command = self._start,
+            text = "Start")
         self.startButton.pack(side = tk.LEFT, padx = 20)
-        self.inactiveLabelConfig = {'text':'(Inactive)', 'fg':'gray',
-            'font':'TkDefaultFont'}
-        self.readyLabelConfig = {'text':'Ready', 'fg':'black',
-            'font':'TkDefaultFont'}
-        self.liveLabelConfig = {'text':'LIVE', 'fg':'red',
-            'font':'TkBoldFont'}
-        self.statusLabel = tk.Label(self.bottomFrame, padx = 10, pady = 5,
-            **self.inactiveLabelConfig)
-        self.statusLabel.pack(side = tk.LEFT)
+        # Firmware update status label styles (use ttk.Style instead of per-widget fg/bg)
+        self.inactiveLabelConfig = {'text': '(Inactive)'}
+        self.readyLabelConfig = {'text': 'Ready'}
+        self.liveLabelConfig = {'text': 'LIVE'}
+
+        self._fu_style = ttk.Style()
+        self._fu_style.configure(
+            "FirmwareInactive.TLabel",
+            foreground = TEXT_SECONDARY,
+            font = gus.typography['label_small']['font']
+        )
+        self._fu_style.configure(
+            "FirmwareReady.TLabel",
+            foreground = TEXT_PRIMARY,
+            font = gus.typography['label_small']['font']
+        )
+        self._fu_style.configure(
+            "FirmwareLive.TLabel",
+            foreground = ERROR_MAIN,
+            font = (
+                gus.typography['label_small']['font'][0],
+                gus.typography['label_small']['font'][1],
+                'bold'
+            )
+        )
+
+        self.statusLabel = ttk.Label(
+            self.bottomFrame,
+            text = self.inactiveLabelConfig['text'],
+            style = "FirmwareInactive.TLabel"
+        )
+        self.statusLabel.pack(side = tk.LEFT, padx = 10, pady = 5)
 
         self.start = network.startBootloader
         self.stop = network.stopBootloader
@@ -616,7 +646,10 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         """
         self.startButton.config(text = "Start", command = self._start,
             state = tk.DISABLED)
-        self.statusLabel.config(**self.inactiveLabelConfig)
+        self.statusLabel.config(
+            text = self.inactiveLabelConfig['text'],
+            style = "FirmwareInactive.TLabel"
+        )
         self._setWidgetState(tk.NORMAL)
         self.status = self.INACTIVE
 
@@ -626,7 +659,10 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         """
         self.startButton.config(text = "Start", command = self._start,
             state = tk.NORMAL)
-        self.statusLabel.config(**self.readyLabelConfig)
+        self.statusLabel.config(
+            text = self.readyLabelConfig['text'],
+            style = "FirmwareReady.TLabel"
+        )
         self._setWidgetState(tk.NORMAL)
         self.status = self.READY
 
@@ -636,7 +672,10 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         """
         self.startButton.config(text = "Stop", command = self._stop,
             state = tk.NORMAL)
-        self.statusLabel.config(**self.liveLabelConfig)
+        self.statusLabel.config(
+            text = self.liveLabelConfig['text'],
+            style = "FirmwareLive.TLabel"
+        )
         self._setWidgetState(tk.DISABLED)
         self.status = self.LIVE
 
@@ -683,30 +722,29 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         self.main.grid_rowconfigure(1, weight = 1)
         self.main.grid_columnconfigure(0, weight = 1)
 
-        bc = {'font':"TkDefaultFont 7"}
+        # Use component style defaults for fonts; avoid mixing extra font kwargs to prevent duplicates
 
         # Options ..............................................................
         self.optionsFrame = tk.Frame(self.main, pady = 5)
         self.optionsFrame.grid(row = 2, sticky = "EW")
 
-        self.sortButton = tk.Button(self.optionsFrame, text = "Sort",
-            padx = 10, pady = 5, command = self.sort, **bc)
+        self.sortButton = ttk.Button(self.optionsFrame, text = "Sort",
+            command = self.sort, style="TButton")
         self.sortButton.pack(side = tk.LEFT, padx = 10)
 
-        self.selectAllButton = tk.Button(self.optionsFrame, text = "Select All",
-            padx = 10, pady = 5, command = self._selectAll, **bc)
+        self.selectAllButton = ttk.Button(self.optionsFrame, text = "Select All",
+            command = self._selectAll, style="TButton")
         self.selectAllButton.pack(side = tk.LEFT, padx = 10)
 
-        self.deselectAllButton = tk.Button(self.optionsFrame,
-            text = "Deselect All", padx = 10, pady = 5,
-            command = self._deselectAll, **bc)
+        self.deselectAllButton = ttk.Button(self.optionsFrame,
+            text = "Deselect All", command = self._deselectAll,
+            style="Secondary.TButton")
         self.deselectAllButton.pack(side = tk.LEFT, padx = 10)
 
         self.autoVar = tk.BooleanVar()
         self.autoVar.set(True)
-        self.autoButton = tk.Checkbutton(self.optionsFrame,
-            text = "Move on Change", variable = self.autoVar,
-            indicatoron = False, padx = 10, pady = 5, **bc)
+        self.autoButton = ttk.Checkbutton(self.optionsFrame,
+            text = "Move on Change", variable = self.autoVar)
         self.autoButton.pack(side = tk.RIGHT, padx = 10)
 
         # Slave list ...........................................................
@@ -717,8 +755,8 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         # Configure row height dynamically
         # See: https://stackoverflow.com/questions/26957845/
         #       ttk-treeview-cant-change-row-height
-        self.listFontSize = 8
-        font = fnt.Font(family = 'TkDefaultFont', size = self.listFontSize)
+        self.listFontSize = gus.typography["label_small"]["font"][1]
+        font = fnt.Font(font=gus.typography["label_small"]["font"])  # base font for row height
         self.style = ttk.Style(self.winfo_toplevel())
         self.style.configure('Treeview',
             rowheight = font.metrics()['linespace'] + 2)
@@ -742,35 +780,38 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         self.slaveList.heading("Version", text = "Version")
 
         # Configure tags:
+        code_font_regular = (gus.typography["code"]["font"][0], self.listFontSize, "normal")
+        code_font_bold = (gus.typography["code"]["font"][0], self.listFontSize, "bold")
+
         self.slaveList.tag_configure(
             s.SS_CONNECTED,
             background = s.BACKGROUNDS[s.SS_CONNECTED],
             foreground = s.FOREGROUNDS[s.SS_CONNECTED],
-            font = 'Courier {} '.format(self.listFontSize))
+            font = code_font_regular)
 
         self.slaveList.tag_configure(
             s.SS_UPDATING,
             background = s.BACKGROUNDS[s.SS_UPDATING],
             foreground = s.FOREGROUNDS[s.SS_UPDATING],
-            font = 'Courier {} bold'.format(self.listFontSize))
+            font = code_font_bold)
 
         self.slaveList.tag_configure(
             s.SS_DISCONNECTED,
             background = s.BACKGROUNDS[s.SS_DISCONNECTED],
             foreground = s.FOREGROUNDS[s.SS_DISCONNECTED],
-            font = 'Courier {} bold'.format(self.listFontSize))
+            font = code_font_bold)
 
         self.slaveList.tag_configure(
             s.SS_KNOWN,
             background = s.BACKGROUNDS[s.SS_KNOWN],
             foreground = s.FOREGROUNDS[s.SS_KNOWN],
-            font = 'Courier {} bold'.format(self.listFontSize))
+            font = code_font_bold)
 
         self.slaveList.tag_configure(
             s.SS_AVAILABLE,
             background = s.BACKGROUNDS[s.SS_AVAILABLE],
             foreground = s.FOREGROUNDS[s.SS_AVAILABLE],
-            font = 'Courier {} '.format(self.listFontSize))
+            font = code_font_regular)
 
         # Save previous selection:
         self.oldSelection = None
@@ -972,7 +1013,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         tk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
-        # Setup ................................................................
+        # Setup ...............................................................
 
         # Status counters ......................................................
         self.statusFrame = tk.Frame(self, relief = tk.SUNKEN, borderwidth = 0)
@@ -990,24 +1031,36 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
             self.statusVars[code] = tk.IntVar()
             self.statusVars[code].set(0)
 
-            self.statusLabels[code] = tk.Label(self.statusFrames[code],
-                text = name, font = "Courier 6 bold", padx = 6, pady = 1,
+            # Create per-status styles for label and display
+            _style = ttk.Style(self)
+            _label_style = f"StatusBarLabel-{code}.TLabel"
+            _display_style = f"StatusBarDisplay-{code}.TLabel"
+            _fg_color = s.FOREGROUNDS[code] if code in s.FOREGROUNDS else TEXT_PRIMARY
+            _style.configure(_label_style, foreground=_fg_color)
+            _style.configure(_display_style, foreground=_fg_color, relief='sunken', borderwidth=1)
+
+            self.statusLabels[code] = ttk.Label(
+                self.statusFrames[code],
+                text = name,
                 width = 14,
-                fg = s.FOREGROUNDS[code] if code in s.FOREGROUNDS else 'black')
+                style = _label_style,
+                font = gus.typography["label_small"]["font"]
+            )
             self.statusLabels[code].pack(side = tk.TOP)
 
-            self.statusDisplays[code] = tk.Label(self.statusFrames[code],
-                textvariable = self.statusVars[code], font = "Courier 6 bold",
-                padx = 6, pady = 1, relief = tk.SUNKEN, bd = 1,
-                fg = s.FOREGROUNDS[code] if code in s.FOREGROUNDS else 'black')
+            self.statusDisplays[code] = ttk.Label(
+                self.statusFrames[code],
+                textvariable = self.statusVars[code],
+                style = _display_style,
+                font = gus.typography["label_small"]["font"]
+            )
             self.statusDisplays[code].pack(side = tk.TOP, fill = tk.X, padx = 2)
 
         self.connectionVar = tk.StringVar()
         self.connectionVar.set("[NO CONNECTION]")
-
-        self.connectionLabel = tk.Label(self.statusFrame,
+        self.connectionLabel = ttk.Label(self.statusFrame,
             textvariable = self.connectionVar, width = 11,
-            relief = tk.SUNKEN, font = "Courier 7 bold", padx = 6, pady = 5)
+            style = "Sunken.TLabel", font = gus.typography["label_small"]["font"])
         self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 3,
             padx = 6)
         self.status = s.SS_DISCONNECTED
@@ -1018,12 +1071,8 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         self.buttonFrame = tk.Frame(self)
         self.buttonFrame.pack(side = tk.RIGHT, fill = tk.Y)
 
-        self.shutdownButton = tk.Button(self.buttonFrame, text = "SHUTDOWN",
-            command = self._onShutdown, padx = 10,
-            font = "Calibri 9 bold",
-            highlightbackground= 'black',
-            activebackground = "#560e0e", activeforeground = "#ffd3d3",
-            foreground ='#560e0e', pady = 0)
+        self.shutdownButton = ttk.Button(self.buttonFrame, text = "SHUTDOWN",
+            command = self._onShutdown, style = "Secondary.TButton")
         self.shutdownButton.pack(side = tk.RIGHT, fill = tk.Y)
 
         # Slave data:
@@ -1066,8 +1115,12 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         Handle network switching to connected.
         """
         self.connectionVar.set(self.CONNECTED_STR)
-        self.connectionLabel.config(fg = s.FOREGROUNDS[s.SS_CONNECTED],
-            bg = s.BACKGROUNDS[s.SS_CONNECTED])
+        style = ttk.Style(self.connectionLabel)
+        style.configure('NetworkConnected.TLabel',
+                        relief='sunken',
+                        foreground=s.FOREGROUNDS[s.SS_CONNECTED],
+                        background=s.BACKGROUNDS[s.SS_CONNECTED])
+        self.connectionLabel.configure(style='NetworkConnected.TLabel')
         self.status = s.SS_CONNECTED
 
     def disconnected(self):
@@ -1076,8 +1129,12 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         """
         self.clear()
         self.connectionVar.set(self.DISCONNECTED_STR)
-        self.connectionLabel.config(fg = s.FOREGROUNDS[s.SS_DISCONNECTED],
-            bg = s.BACKGROUNDS[s.SS_DISCONNECTED])
+        style = ttk.Style(self.connectionLabel)
+        style.configure('NetworkDisconnected.TLabel',
+                        relief='sunken',
+                        foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
+                        background=s.BACKGROUNDS[s.SS_DISCONNECTED])
+        self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
         self.status = s.SS_DISCONNECTED
 
     def setCount(self, status, count):

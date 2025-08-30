@@ -28,6 +28,7 @@
 
 ## IMPORTS #####################################################################
 import tkinter as tk
+from fc.frontend.gui import guiutils as gus
 
 ## AUXILIARY GLOBALS ###########################################################
 # Callback names (for internal use only)
@@ -40,8 +41,8 @@ _RIGHT_RELEASE = 6
 _LEFT_DRAG = 7
 _RIGHT_DRAG = 8
 
-ALT_COLOR_0 = "#e2e2e2"
-ALT_COLOR_1 = "#bfbfbf"
+ALT_COLOR_0 = gus.SURFACE_2
+ALT_COLOR_1 = gus.SURFACE_3
 
 ## MAIN ########################################################################
 class BaseGrid(tk.Frame):
@@ -197,6 +198,12 @@ class BaseGrid(tk.Frame):
             else:
                 raise ValueError("Illegal cellLength {}".format(cellLength))
 
+        # Derived monospace fonts from design system
+        _code_family = gus.typography["code"]["font"][0]
+        _font5 = (_code_family, 5, "normal")
+        _font6 = (_code_family, 6, "normal")
+        _font7 = (_code_family, 7, "normal")
+
         # To get xmargin:
         #   get extra space and divide it by two
         # To get total space get max space and subtract cell length times cells
@@ -209,15 +216,15 @@ class BaseGrid(tk.Frame):
 
         for col in range(self.C):
             self.canvas.create_text(
-                x + l/2, ymargin/2, font = "TkFixedFont 5", text = f"{col + 1}",
-                    fill = "darkgray", angle = 0)
+                x + l/2, ymargin/2, font = _font5, text = f"{col + 1}",
+                    fill = gus.TEXT_SECONDARY, angle = 0)
             x += l
 
         x = xmargin
         for row in range(self.R):
             self.canvas.create_text(
-                xmargin/2, y + l/2, font = "TkFixedFont 5", text = f"{row + 1}",
-                    fill = "darkgray", angle = 0)
+                xmargin/2, y + l/2, font = _font5, text = f"{row + 1}",
+                    fill = gus.TEXT_SECONDARY, angle = 0)
             for col in range(self.C):
                 index = row*self.C + col
                 iid = self.canvas.create_rectangle(
@@ -228,7 +235,7 @@ class BaseGrid(tk.Frame):
 
                 # Create text overlay for debugging/mapping display
                 self._temp_tiids[index] = self.canvas.create_text(
-                    x + l/2, y + l/2, font = "TkFixedFont 7")
+                    x + l/2, y + l/2, font = _font7)
 
                 for key, callback in self.callbacks.items():
                     if callback is not None:
@@ -243,8 +250,8 @@ class BaseGrid(tk.Frame):
         # TODO show variables:
         self.canvas.create_text(
             xmargin + l/2, l*self.R + ymargin*3/2,
-            font = "TkFixedFont 6", text = f"   ",
-            fill = "darkgray", angle = 0)
+            font = _font6, text = f"   ",
+            fill = gus.TEXT_SECONDARY, angle = 0)
 
         self.xmargin = xmargin
         self.ymargin = ymargin
@@ -381,10 +388,10 @@ if __name__ == "__main__":
         g.setCell(r, c, fill='red',outline='blue')
 
     def d(g, r, c):
-        g.setCell(r, c, fill ='yellow',outline='orange')
+        g.setCell(r, c, fill = gus.WARNING_MAIN, outline = gus.WARNING_DARK)
 
     def e(g, r, c):
-        g.setCell(r, c, fill='black')
+        g.setCell(r, c, fill = gus.SURFACE_5)
 
     def dd(g, r, c):
         g.setAll(width = 6 if g.G else 1)
@@ -403,7 +410,7 @@ if __name__ == "__main__":
     g.setLeftDoubleClick(dd)
     g.setDrag(d)
 
-    g.config(bg = 'red')
+    g.config(bg = gus.SURFACE_2)
     g.pack(fill = tk.BOTH, expand = True)
     g.draw(20)
 
