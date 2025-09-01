@@ -225,12 +225,12 @@ class LoaderWidget(Loader):
         self.interactive.append(widget)
 
     def _buildLoadButton(self, text = "Load"):
-        self.loadButton = ttk.Button(self, text=text, command=self._load, style="Secondary.TButton")
+        self.loadButton = tk.Button(self, text=text, **gus.btn_secondary, command=self._load)
         self.loadButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.loadButton)
 
     def _buildSaveButton(self, text = "Save"):
-        self.saveButton = ttk.Button(self, text=text, command=self._save, style="Secondary.TButton")
+        self.saveButton = tk.Button(self, text=text, **gus.btn_secondary, command=self._save)
         self.saveButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.saveButton)
 

@@ -271,7 +271,7 @@ class FCSlave:
             target = routine,
             args = routineArgs + (self,)
             )
-        self.thread.setDaemon(True)
+        self.thread.daemon = True
 
         # End __init__ =========================================================
 

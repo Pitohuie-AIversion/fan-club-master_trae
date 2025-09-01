@@ -55,7 +55,7 @@ from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.embedded import colormaps as cms
 from fc.frontend.gui.widgets import grid as gd, loader as ldr, timer as tmr, \
     external as ex
-from fc.frontend.gui.theme import BG_ACCENT, SURFACE_1, SURFACE_3, TEXT_PRIMARY, TEXT_DISABLED, WARNING_LIGHT, WARNING_DARK
+from fc.frontend.gui.theme import BG_ACCENT, SURFACE_1, SURFACE_3, TEXT_PRIMARY, TEXT_DISABLED, WARNING_LIGHT, WARNING_DARK, SURFACE_2
 
 ## GLOBALS #####################################################################
 P_TIME = 't'
@@ -77,7 +77,7 @@ class ControlWidget(tk.Frame, pt.PrintClient):
 
     def __init__(self, master, network, external, mapper, archive, pqueue,
         setLiveBE, setFBE):
-        tk.Frame.__init__(self, master)
+        tk.Frame.__init__(self, master, bg=SURFACE_3)
         pt.PrintClient.__init__(self, pqueue)
 
         self.archive = archive
@@ -92,10 +92,10 @@ class ControlWidget(tk.Frame, pt.PrintClient):
         self.main = ttk.PanedWindow(self, orient = tk.HORIZONTAL)
         self.main.pack(fill = tk.BOTH, expand = True)
 
-        self.displayFrame = tk.Frame(self.main)
+        self.displayFrame = ttk.Frame(self.main, style="Card.TFrame")
         self.displays = []
 
-        self.controlFrame = tk.Frame(self.main)
+        self.controlFrame = ttk.Frame(self.main, style="Card.TFrame")
         self.control = None
 
         self.isLive = None
@@ -196,7 +196,7 @@ class ControlWidget(tk.Frame, pt.PrintClient):
         self.control = ControlPanelWidget(self.controlFrame, self.mapper,
             self.archive, self.network, self.external, self.display,
             self._setLive, self.pqueue)
-        self.control.pack(fill = tk.BOTH, expand = True)
+        self.control.pack(fill = tk.BOTH, expand = True, padx=6, pady=6)
 
     def _buildDisplays(self):
         """
@@ -1096,12 +1096,11 @@ class ControlPanelWidget(tk.Frame, pt.PrintClient):
         # TODO: Callbacks and validations
 
         # Mode and layer .......................................................
-        self.topFrame = tk.Frame(self)
-        self.topFrame.grid(row = row, sticky = "EW")
+        self.topFrame = ttk.Frame(self)
+        self.topFrame.grid(row = row, sticky = "EW", padx=6, pady=(4, 8))
         row += 1
 
-        self.viewFrame = tk.LabelFrame(self.topFrame, text = "View",**gus.fontc,
-            padx = 10)
+        self.viewFrame = ttk.LabelFrame(self.topFrame, text = "View")
         self.viewFrame.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         self.viewVar = tk.IntVar()
@@ -1117,8 +1116,7 @@ class ControlPanelWidget(tk.Frame, pt.PrintClient):
             expand = True)
 
         # Selection ............................................................
-        self.selectFrame = tk.LabelFrame(self.topFrame, text = "Select",
-            **gus.fontc, padx = 10)
+        self.selectFrame = ttk.LabelFrame(self.topFrame, text = "Select")
         self.selectFrame.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         self.selectAllButton = ttk.Button(self.selectFrame, text = "Select All",
@@ -1168,11 +1166,11 @@ class ControlPanelWidget(tk.Frame, pt.PrintClient):
         self.grid_rowconfigure(row, weight = 0) # FIXME
         row += 1
 
-        self.recordFrame = tk.LabelFrame(self, text = "Record Data", **gus.fontc)
-        self.recordFrame.grid(row = row, sticky = "EW")
+        self.recordFrame = ttk.LabelFrame(self, text = "Record Data")
+        self.recordFrame.grid(row = row, sticky = "EW", padx=6)
         row += 1
 
-        self.fileFrame = tk.Frame(self.recordFrame)
+        self.fileFrame = ttk.Frame(self.recordFrame)
         self.fileFrame.pack(side = tk.TOP, fill = tk.X, expand = True)
 
         self.fileLabel = ttk.Label(self.fileFrame, text = "File: ")
@@ -1616,7 +1614,7 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         self._resetControlBuffer()
 
         # Tools ................................................................
-        self.toolBar = tk.Frame(self)
+        self.toolBar = ttk.Frame(self, style="Topbar.TFrame")
         self.toolBar.grid(row = self.GRID_ROW + 1, sticky = "WE")
 
         # Data type control (RPM vs DC) ........................................
@@ -1624,7 +1622,7 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         self.maxValues = {"RPM" : self.maxRPM, "DC" : 1}
         self.offsets = {"RPM" : 0, "DC" : 1}
         self.offset = self.offsets["RPM"]
-        self.typeFrame = tk.Frame(self.toolBar)
+        self.typeFrame = ttk.Frame(self.toolBar)
         self.typeFrame.pack(side = tk.LEFT, fill = tk.Y)
         self.typeMenuVar = tk.StringVar()
         self.typeMenuVar.trace('w', self._onTypeMenuChange)
@@ -1636,7 +1634,7 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
 
         # Layer control ........................................................
         self.layer = 0
-        self.layerFrame = tk.Frame(self.toolBar)
+        self.layerFrame = ttk.Frame(self.toolBar)
         self.layerFrame.pack(side = tk.LEFT, fill = tk.Y)
         self.layerVar = tk.StringVar()
         self.layerVar.trace('w', self._onLayerChange)
@@ -1957,6 +1955,15 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         """
         self.offset = self.offsets[self.typeMenuVar.get()]
         self.maxValue = self.maxValues[self.typeMenuVar.get()]
+        # Sync color bar scale and unit with selected type
+        if hasattr(self, 'colorBar'):
+            if self.typeMenuVar.get() == 'RPM':
+                self.colorBar.setHigh(self.maxRPM)
+                self.colorBar.setUnit('RPM')
+            else:
+                self.colorBar.setHigh(1)
+                self.colorBar.setUnit('%')
+            self.colorBar.redraw()
 
     def _onSelectModeChange(self, *E):
         """
@@ -2118,22 +2125,20 @@ class ColorBarWidget(tk.Frame):
         self.colors = colors
         self.steps = len(colors)
         self.high, self.low = high, 0
-
+        self.unit = unit
 
         # Widgets ..............................................................
-        self.highLabel = ttk.Label(self, text = "{} {}".format(high, unit),
-            font = gus.typography["label_small"]["font"], style = "Surface3.TLabel")
+        self.highLabel = tk.Label(self, text = "{} {}".format(self.high, self.unit),
+            font = gus.typography["label_small"]["font"], bg = SURFACE_3, fg = TEXT_PRIMARY)
         self.highLabel.grid(row = 0, sticky = "EW")
 
         self.canvas = tk.Canvas(self, bg = self.colors[-1],
-            width = self.highLabel.winfo_width())
+            width = self.highLabel.winfo_width(), highlightthickness=0, bd=0)
         self.canvas.grid(row = 1, sticky = 'NEWS')
 
-        self.lowLabel = ttk.Label(self, text = "{} {}".format(self.low, unit),
-            font = gus.typography["label_small"]["font"], style = "Surface3.TLabel")
+        self.lowLabel = tk.Label(self, text = "{} {}".format(self.low, self.unit),
+            font = gus.typography["label_small"]["font"], bg = SURFACE_3, fg = TEXT_PRIMARY)
         self.lowLabel.grid(row = 2, sticky = "EW")
-
-        print("[REM] Pass MAX RPM to color bar") # FIXME
 
         self._draw()
 
@@ -2150,6 +2155,19 @@ class ColorBarWidget(tk.Frame):
         Set a new high value.
         """
         self.high = new
+        try:
+            self.highLabel.config(text=f"{self.high} {self.unit}")
+        except Exception:
+            pass
+
+    def setUnit(self, unit):
+        """Update the unit label (e.g., 'RPM' or '%') and refresh labels."""
+        self.unit = unit
+        try:
+            self.highLabel.config(text=f"{self.high} {self.unit}")
+            self.lowLabel.config(text=f"{self.low} {self.unit}")
+        except Exception:
+            pass
 
     # Internal methods .........................................................
     def _draw(self, *E):
@@ -2239,7 +2257,7 @@ class LiveTable(pt.PrintClient, tk.Frame):
         self._resetControlBuffer()
 
         # Build menu ...........................................................
-        self.main = tk.Frame(self)
+        self.main = ttk.Frame(self, style="Card.TFrame")
         self.main.pack(fill = tk.BOTH, expand = True)
 
         self.main.grid_rowconfigure(self.TABLE_ROW, weight = 1)
@@ -2248,11 +2266,17 @@ class LiveTable(pt.PrintClient, tk.Frame):
         # Set background from design system:
         self.bg = gus.SURFACE_2
         self.fg = gus.TEXT_PRIMARY
-        self.main.config(bg = self.bg)
+        # ttk frames use style; avoid direct bg config on self.main
 
-        self.topBar = tk.Frame(self.main, bg = self.bg)
+        self.topBar = ttk.Frame(self.main, style="Topbar.TFrame")
         self.topBar.grid(row = self.MENU_ROW, column = self.MENU_COLUMN,
             sticky = "EW")
+        # Subtle divider below the toolbar
+        try:
+            self.toolbarSeparator = ttk.Separator(self.main, orient="horizontal")
+            self.toolbarSeparator.grid(row=self.MENU_ROW+1, column=self.MENU_COLUMN, sticky="EW", pady=(0, 4))
+        except Exception:
+            pass
 
         self.offset = 0
         self.showMenuVar = tk.StringVar()
@@ -2290,9 +2314,9 @@ class LiveTable(pt.PrintClient, tk.Frame):
         self.sentinelWidgets = []
         self._sentinelCheck = lambda x: False
 
-        self.sentinelFrame = tk.Frame(
+        self.sentinelFrame = ttk.Frame(
             self.topBar,
-            bg = self.bg,
+            style="Topbar.TFrame",
         )
 
         self.sentinelLabel = ttk.Label(
@@ -2394,9 +2418,9 @@ class LiveTable(pt.PrintClient, tk.Frame):
         self.sentinelFlag = False
 
         # Build table ..........................................................
-        self.tableFrame = tk.Frame(self.main)
+        self.tableFrame = ttk.Frame(self.main, style="Card.TFrame")
         self.tableFrame.grid(row = self.TABLE_ROW, column = self.TABLE_COLUMN,
-            sticky = "NEWS")
+            sticky = "NEWS", padx=8, pady=8)
         self.table = ttk.Treeview(self.tableFrame,
             height = 32)
         self.table.pack(fill = tk.BOTH, expand = True)
@@ -2751,7 +2775,7 @@ class LiveTable(pt.PrintClient, tk.Frame):
             target = self._printRoutine,
             args = (sentinelValues,)
         )
-        self.printThread.setDaemon(True)
+        self.printThread.daemon = True
         self.printThread.start()
 
         self._printChecker()
@@ -2862,6 +2886,14 @@ class LiveTable(pt.PrintClient, tk.Frame):
             self.offset = 0
         elif self.showMenuVar.get() == "DC":
             self.offset = 1
+        # Sync watchdog unit label with current type
+        try:
+            if self.showMenuVar.get() == "RPM":
+                self.sentinelTerciaryLabel.config(text=" RPM   ")
+            else:
+                self.sentinelTerciaryLabel.config(text=" %   ")
+        except Exception:
+            pass
 
     # Standard interface .......................................................
     def feedbackIn(self, F):

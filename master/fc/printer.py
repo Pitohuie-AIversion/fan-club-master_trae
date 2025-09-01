@@ -52,7 +52,7 @@ ERR = sys.stderr
 OUT = sys.stdout
 
 HEADER = \
-"""
+r"""
 --------------------------------------------------------------------------------
 -- CALIFORNIA INSTITUTE OF TECHNOLOGY -- GRADUATE AEROSPACE LABORATORY        --
 -- CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                             --
@@ -153,10 +153,18 @@ def printers(queue, symbol = "[--]"):
     funcs[S] = prints
 
     def printx(exception, message = ''):
+        # Build a robust traceback string: prefer the exception's own traceback if available
+        try:
+            if isinstance(exception, BaseException) and getattr(exception, "__traceback__", None) is not None:
+                tb_text = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+            else:
+                tb_text = traceback.format_exc()
+        except Exception:
+            tb_text = '(failed to format traceback)'
         queue.put_nowait(
             (E, tm.strftime("[%H:%M:%S]") + symbol + message \
                 + ' "{}"'.format(exception) \
-                + '\nTraceback:\n' + traceback.format_exc()))
+                + '\nTraceback:\n' + tb_text))
     funcs[X] = printx
 
     return funcs
@@ -257,7 +265,7 @@ class PrintServer(PrintClient):
                     traceback.format_exc())
                 self.printx(e, "Exception in print thread:")
         print(self.SYMBOL, "Print thread terminated.")
-        self.printr("Print thread started.")
+        self.printr("Print thread terminated.")
 
     def _checkStarted(self):
         """

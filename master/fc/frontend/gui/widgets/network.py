@@ -84,7 +84,7 @@ class NetworkWidget(tk.Frame, pt.PrintClient):
         tk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
-        self.main = tk.Frame(self)
+        self.main = ttk.Frame(self)
         self.main.pack(fill = tk.BOTH, expand = True, padx = 10, pady = 5)
 
         self.main.grid_columnconfigure(0, weight = 1)
@@ -94,7 +94,7 @@ class NetworkWidget(tk.Frame, pt.PrintClient):
         self.network = network
 
         # ----------------------------------------------------------------------
-        self.firmwareFrame = tk.LabelFrame(self.main, text = "Firmware Update")
+        self.firmwareFrame = ttk.LabelFrame(self.main, text = "Firmware Update")
         self.firmwareFrame.grid(row = 1, sticky = "EW")
         self.firmwareUpdate = FirmwareUpdateWidget(self.firmwareFrame, network,
             pqueue)
@@ -103,7 +103,7 @@ class NetworkWidget(tk.Frame, pt.PrintClient):
         self.slaveList = SlaveListWidget(self.main, network, pqueue)
         self.slaveList.grid(row = 2, sticky = "NEWS")
 
-        self.networkFrame = tk.LabelFrame(self.main, text = "Network Control")
+        self.networkFrame = ttk.LabelFrame(self.main, text = "Network Control")
         self.networkFrame.grid(row = 0, sticky = "EW")
         self.networkControl = NetworkControlWidget(self.networkFrame, network,
             self.slaveList, pqueue)
@@ -160,9 +160,9 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self._connectCallback = network.connect
         self._disconnectCallback = network.disconnect
 
-        self.connectionFrame = tk.Frame(self, relief = tk.RIDGE, bd = 1)
+        self.connectionFrame = ttk.Frame(self)
         self.connectionFrame.pack(**frameconfig)
-
+        
         # Connect button:
         self.connectButton = ttk.Button(self.connectionFrame, text = "Connect",
         command = self._onConnect, width = 12)
@@ -183,10 +183,9 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.bcipVar.set(self.NO_IP)
         self.ips.append(self.bcipVar)
         name = "Broadcast IP"
-        self.bcipFrame = tk.Frame(self.connectionFrame, relief = tk.RIDGE,
-            bd = 1)
+        self.bcipFrame = ttk.Frame(self.connectionFrame)
         self.bcipFrame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
-
+        
         self.bcipLabel = ttk.Label(self.bcipFrame, text = name + ":",
             font = gus.typography["label_small"]["font"])
         self.bcipLabel.pack(side = tk.TOP, fill = tk.X, padx = 10)
@@ -220,7 +219,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.connectionVar.set("[NO CONNECTION]")
         self.connectionLabel = ttk.Label(self.connectionFrame,
             textvariable = self.connectionVar, width = 11,
-            style = "Sunken.TLabel", font = gus.typography["label_small"]["font"])
+            style = "Secondary.TLabel", font = gus.typography["label_small"]["font"])
         self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 3,
             padx = 6)
         self.status = s.SS_DISCONNECTED
@@ -228,7 +227,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.activeWidgets = []
 
         # Target ..............................................................
-        self.targetFrame = tk.Frame(self)
+        self.targetFrame = ttk.Frame(self)
         self.targetFrame.pack(**frameconfig)
 
         self.targetLabel = ttk.Label(self.targetFrame, text = "Target: ")
@@ -239,7 +238,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.targetButtons = []
 
         # Message ..............................................................
-        self.messageFrame = tk.Frame(self)
+        self.messageFrame = ttk.Frame(self)
         self.messageFrame.pack(**frameconfig)
 
         self.messageLabel = ttk.Label(self.messageFrame, text = "Message: ")
@@ -250,7 +249,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.messageButtons = []
 
         # Send .................................................................
-        self.sendFrame = tk.Frame(self)
+        self.sendFrame = ttk.Frame(self)
         self.sendFrame.pack(**frameconfig)
         self.sendButton = ttk.Button(self.sendFrame, text = "Send",
             command = self._send)
@@ -401,7 +400,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.targetButtons.append(button)
         self.activeWidgets.append(button)
 
-        if len(self.targetButtons) is 1:
+        if len(self.targetButtons) == 1:
             self.target.set(code)
 
     def _addMessage(self, name, code):
@@ -417,7 +416,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.messageButtons.append(button)
         self.activeWidgets.append(button)
 
-        if len(self.messageButtons) is 1:
+        if len(self.messageButtons) == 1:
             self.message.set(code)
 
     def __addDisplay(self, name, variable):
@@ -425,7 +424,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         Private method to add labels to display connection status variables.
         """
 
-        frame = tk.Frame(self.connectionFrame, relief = tk.RIDGE, bd = 1)
+        frame = ttk.Frame(self.connectionFrame)
         frame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
 
         label = ttk.Label(frame, text = name + ":", font = gus.typography["label_small"]["font"])
@@ -471,12 +470,10 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         # Setup ................................................................
         self.network = network
 
-        self.main = tk.Frame(self)
+        self.main = ttk.Frame(self)
         self.main.pack(fill = tk.BOTH, expand = True, padx = 10, pady = 5)
-        self.setupWidgets = []
 
-        # File .................................................................
-        self.fileFrame = tk.Frame(self.main)
+        self.fileFrame = ttk.Frame(self.main)
         self.fileFrame.pack(fill = tk.X, expand = True)
 
         self.fileLabel = ttk.Label(self.fileFrame, text = "File: ")
@@ -493,11 +490,12 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         self.fileButton = ttk.Button(self.fileFrame, text = "...",
             command = self._chooseFile)
         self.fileButton.pack(side = tk.LEFT)
+        if not hasattr(self, 'setupWidgets'): self.setupWidgets = []
         self.setupWidgets.append(self.fileButton)
 
         # Version ..............................................................
-        self.bottomFrame = tk.Frame(self.main)
-        self.bottomFrame.pack(fill = tk.X, expand = True)
+        self.bottomFrame = ttk.Frame(self.main)
+        self.bottomFrame.pack(fill = tk.X, expand = True, pady = 5)
 
         self.versionLabel = ttk.Label(self.bottomFrame, text = "Version Code: ")
         self.versionLabel.pack(side = tk.LEFT, padx = 10, pady = 5)
@@ -574,7 +572,7 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         """
         Start a firmware update.
         """
-        if self.status is self.READY:
+        if self.status == self.READY:
             self.startButton.config(text = "Starting", state = tk.DISABLED)
             self._setWidgetState(tk.DISABLED)
             self.start(self.filename, self.version.get(), self.fileSize)
@@ -584,7 +582,7 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         """
         Stop an ongoing firmware update if there is one.
         """
-        if self.status is self.LIVE:
+        if self.status == self.LIVE:
             self.startButton.config(text = "Stopping", state = tk.DISABLED)
             self.stop()
             self._ready()
@@ -687,7 +685,7 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         if len(self.filename) > 0 and len(self.version.get()) > 0 \
             and self.fileSize > 0:
             self._ready()
-        elif self.fileSize is 0 and len(self.filename) > 0:
+        elif self.fileSize == 0 and len(self.filename) > 0:
             self.printx(RuntimeError("Given file \"{}\" is empty".format(
                 self.filename)))
         else:
@@ -712,12 +710,11 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         tk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
-        # Setup ................................................................
+        # Setup ...............................................................
         self.network = network
 
-        self.main = tk.LabelFrame(self, text = "Slave List",
-            padx = 10, pady = 5)
-        self.main.pack(fill = tk.BOTH, expand = True)
+        self.main = ttk.LabelFrame(self, text = "Slave List")
+        self.main.pack(fill = tk.BOTH, expand = True, padx = 10, pady = 5)
 
         self.main.grid_rowconfigure(1, weight = 1)
         self.main.grid_columnconfigure(0, weight = 1)
@@ -725,7 +722,7 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         # Use component style defaults for fonts; avoid mixing extra font kwargs to prevent duplicates
 
         # Options ..............................................................
-        self.optionsFrame = tk.Frame(self.main, pady = 5)
+        self.optionsFrame = ttk.Frame(self.main)
         self.optionsFrame.grid(row = 2, sticky = "EW")
 
         self.sortButton = ttk.Button(self.optionsFrame, text = "Sort",
@@ -1016,7 +1013,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         # Setup ...............................................................
 
         # Status counters ......................................................
-        self.statusFrame = tk.Frame(self, relief = tk.SUNKEN, borderwidth = 0)
+        self.statusFrame = ttk.Frame(self, relief = tk.SUNKEN, borderwidth = 0)
         self.statusFrame.pack(side = tk.LEFT)
 
         self.statusFrames = {}
@@ -1024,8 +1021,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
 
         for code, name in ((self.TOTAL, "Total"),) \
             + tuple(s.SLAVE_STATUSES.items()):
-            self.statusFrames[code] = tk.Frame(self.statusFrame,
-                relief = tk.RIDGE, bd = 1)
+            self.statusFrames[code] = ttk.Frame(self.statusFrame)
             self.statusFrames[code].pack(side = tk.LEFT, padx = 5, pady = 1)
 
             self.statusVars[code] = tk.IntVar()
@@ -1068,7 +1064,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         # Buttons ..............................................................
         self._shutdownCallback = shutdown
 
-        self.buttonFrame = tk.Frame(self)
+        self.buttonFrame = ttk.Frame(self)
         self.buttonFrame.pack(side = tk.RIGHT, fill = tk.Y)
 
         self.shutdownButton = ttk.Button(self.buttonFrame, text = "SHUTDOWN",
@@ -1195,3 +1191,4 @@ if __name__ == "__main__":
     print("FCMkIV Network GUI demo started")
     print("[No Network GUI demo implemented]")
     print("FCMkIV Network GUI demo finished")
+

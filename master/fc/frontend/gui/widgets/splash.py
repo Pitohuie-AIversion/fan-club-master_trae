@@ -79,8 +79,8 @@ class FCSplashWidget(tk.Frame):
 
         self.image = tk.PhotoImage(data = stp.SPLASH)
         self.image = self.image.subsample(2)
-        self.label = ttk.Label(self, image = self.image, anchor = tk.CENTER,
-            style = "Surface1.TLabel")
+        self.label = tk.Label(self, image = self.image, anchor = tk.CENTER,
+            bg = SURFACE_1)
         self.label.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
 class SerialSplash:

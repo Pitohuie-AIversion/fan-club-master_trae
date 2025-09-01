@@ -108,6 +108,25 @@ if __name__ == '__main__':
 
     # Execution ................................................................
     pqueue = mp.Queue()
+
+    # Install global thread exception hook to capture full stack traces
+    import threading as th, traceback as tb, faulthandler as fh
+    fh.enable()
+    def _thread_excepthook(args):
+        try:
+            tb.print_exception(args.exc_type, args.exc_value, args.exc_traceback)
+        except Exception:
+            pass
+        try:
+            P = pt.printers(pqueue, "[TH]")
+            P[pt.X](args.exc_value, "Unhandled exception in thread: {}".format(getattr(args.thread, "name", "unknown")))
+        except Exception:
+            pass
+    try:
+        th.excepthook = _thread_excepthook
+    except Exception:
+        pass
+
     archive = ac.FCArchive(pqueue, VERSION, btp.PROFILES[init_profile])
     interface = tkg.FCGUI(archive, pqueue)
     interface.run()

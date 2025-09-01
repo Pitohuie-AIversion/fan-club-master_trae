@@ -78,8 +78,8 @@ class Mapper:
             """
         g = l*self.RC + r*self.C + c
         k = self.GK[g]
-        s = k//n_f
-        f = k%n_f
+        s = k//self.maxFans
+        f = k%self.maxFans
         return s, f
 
     def profileChange(self):
@@ -97,7 +97,7 @@ class Mapper:
         """
         return [0]*(2*self.getSize_K())
 
-    def getZero_K(self):
+    def getZero_G(self):
         """
         Return a zero-vector of size G*2.
         """

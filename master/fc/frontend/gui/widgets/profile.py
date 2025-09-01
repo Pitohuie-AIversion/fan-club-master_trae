@@ -60,7 +60,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         # - means by which to automatically update values here if the archive
         #   is modified elsewhere (should this be allowed?)
 
-        # Core setup ...........................................................
+        # Core setup ..........................................................
         self.archive = archive
         self.callback = callback
         self.map = {}
@@ -394,14 +394,14 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.editor.preset(current)
 
 
-class PythonEditor(tk.Frame):
+class PythonEditor(ttk.Frame):
 
     OUTPUT_ERROR_CONFIG = {'bg' : "#510000", 'fg' : "red"}
     OUTPUT_NORMAL_CONFIG = {'bg' : "white", 'fg' : "black"}
 
     def __init__(self, master, add_callback, edit_callback, remove_callback,
         printr, printx):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
 
         self.add_callback = add_callback
         self.edit_callback = edit_callback
@@ -435,7 +435,7 @@ class PythonEditor(tk.Frame):
         # For scrollbar, see:
         # https://www.python-course.eu/tkinter_text_widget.php
 
-        self.input_scrollbar = tk.Scrollbar(self)
+        self.input_scrollbar = ttk.Scrollbar(self)
         self.input_scrollbar.grid(row = row, column = 2, rowspan = 1,
             sticky = "NS")
         self.input_scrollbar.config(command = self.input.yview)
@@ -443,7 +443,7 @@ class PythonEditor(tk.Frame):
         row += 1
 
         # Buttons ..............................................................
-        self.buttonFrame = tk.Frame(self)
+        self.buttonFrame = ttk.Frame(self)
         self.buttonFrame.grid(row = row, column = 0, columnspan = 2,
             sticky = "WE")
         self.editButtons = []
@@ -472,7 +472,7 @@ class PythonEditor(tk.Frame):
         # For scrollbar, see:
         # https://www.python-course.eu/tkinter_text_widget.php
 
-        self.output_scrollbar = tk.Scrollbar(self)
+        self.output_scrollbar = ttk.Scrollbar(self)
         self.output_scrollbar.grid(row = row, column = 2, rowspan = 1,
             sticky = "NS")
         self.output_scrollbar.config(command = self.output.yview)

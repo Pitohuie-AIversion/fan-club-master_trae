@@ -42,13 +42,13 @@ from fc import printer as pt, utils as us
 # Import theme colors
 from fc.frontend.gui.theme import (
     BG_CT, BG_ACCENT, BG_ERROR, FG_ERROR, BG_SUCCESS, BG_WARNING,
-    BG_LIGHT, FG_PRIMARY, FG_SECONDARY
+    BG_LIGHT, FG_PRIMARY, FG_SECONDARY, SURFACE_2
 )
 
 NOPE = lambda m: print("[SILENCED]: ", m)
 
 ## MAIN ########################################################################
-class Base(tk.Frame, pt.PrintClient):
+class Base(ttk.Frame, pt.PrintClient):
 
     ERROR_MESSAGE = \
         "[There are error messages in the console. Click here.]"
@@ -78,7 +78,7 @@ class Base(tk.Frame, pt.PrintClient):
         - setF: Method to set feedback vector
         - pqueue: Queue object for inter-process printing
         """
-        tk.Frame.__init__(self, master = master)
+        ttk.Frame.__init__(self, master = master)
         pt.PrintClient.__init__(self, pqueue, self.SYMBOL)
 
         # Streamlined GUI printing setup
@@ -100,6 +100,12 @@ class Base(tk.Frame, pt.PrintClient):
 
         self.winfo_toplevel().title(title)
         
+        # Modern base background to match theme surfaces
+        try:
+            self.configure(background=SURFACE_2)
+        except Exception:
+            pass
+        
         # Set window icon
         try:
             self.icon = tk.PhotoImage(data=icn.ICON)
@@ -119,18 +125,14 @@ class Base(tk.Frame, pt.PrintClient):
         # Containers -----------------------------------------------------------
 
         # Top bar ..............................................................
-        self.topBar = tk.Frame(self, relief='flat', borderwidth=0, bg=BG_CT)
+        self.topBar = ttk.Frame(self, style="Topbar.TFrame", padding=(12, 8))
         self.topBar.grid(row = 0, sticky = 'EW')
 
         self.caltechImage = tk.PhotoImage(data = cte.CALTECH)
         self.caltechImage = self.caltechImage.subsample(15)
-        self.caltechLabel = tk.Label(self.topBar, image = self.caltechImage,
-            bg = self.topBar['bg'])
-
-        self.caltechLabel.pack(side = tk.LEFT, ipady = 4, padx = 6)
-
-        self.errorLabel = tk.Label(self.topBar, text=self.ERROR_MESSAGE,
-            **gus.btn_error)
+        self.caltechLabel = ttk.Label(self.topBar, image=self.caltechImage, style="Topbar.TLabel")
+        self.caltechLabel.pack(side = tk.LEFT, ipady = 6, padx = 10)
+        self.errorLabel = ttk.Label(self.topBar, text=self.ERROR_MESSAGE, style="ErrorBanner.TLabel")
         self.errorLabel.bind("<Button-1>", self.focusConsole)
         self.warning = False
 
@@ -141,8 +143,15 @@ class Base(tk.Frame, pt.PrintClient):
         #     command=self._helpCallback, **gus.btn_primary)
         self.helpButton = ttk.Button(self.topBar, text=" Help ",
             command=self._helpCallback, style="Secondary.TButton")
-        self.helpButton.pack(side=tk.RIGHT, padx=10, pady=5)
+        self.helpButton.pack(side=tk.RIGHT, padx=12, pady=8)
         self.topWidgets.append(self.helpButton)
+
+        # Subtle divider at the bottom of top bar for hierarchy
+        try:
+            self.topSeparator = ttk.Separator(self.topBar, orient="horizontal")
+            self.topSeparator.pack(side=tk.BOTTOM, fill=tk.X)
+        except Exception:
+            pass
 
         # Notebook .............................................................
         self.notebook = ttk.Notebook(self)
@@ -156,20 +165,27 @@ class Base(tk.Frame, pt.PrintClient):
         self.consoleTab = ttk.Frame(self.notebook)
 
         # Profile tab:
-        self.profileWidget = pro.ProfileDisplay(self.profileTab, archive,
+        self.profileCard = ttk.Frame(self.profileTab, style="Card.TFrame")
+        self.profileCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.profileCard, text="Profile", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.profileWidget = pro.ProfileDisplay(self.profileCard, archive,
             profileCallback, pqueue)
-        self.profileWidget.pack(fill = tk.BOTH, expand = True, padx = 20,
-            pady = 20)
+        self.profileWidget.pack(fill = tk.BOTH, expand = True)
 
         # Network tab:
-        self.networkWidget = ntw.NetworkWidget(self.networkTab,
+        self.networkCard = ttk.Frame(self.networkTab, style="Card.TFrame")
+        self.networkCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.networkCard, text="Network", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.networkWidget = ntw.NetworkWidget(self.networkCard,
             network = network, archive = archive, networkAdd = self.networkAdd,
             slavesAdd = self.slavesAdd, pqueue = pqueue)
-        self.networkWidget.pack(fill = tk.BOTH, expand = True, padx = 20,
-            pady = 20)
+        self.networkWidget.pack(fill = tk.BOTH, expand = True)
 
         # Control tab:
-        self.controlWidget = ctr.ControlWidget(self.controlTab,
+        self.controlCard = ttk.Frame(self.controlTab, style="Card.TFrame")
+        self.controlCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.controlCard, text="Control", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.controlWidget = ctr.ControlWidget(self.controlCard,
             network = network,
             external = external,
             mapper = mapper,
@@ -178,17 +194,18 @@ class Base(tk.Frame, pt.PrintClient):
             setFBE = self.setF,
             pqueue = pqueue)
 
-        self.controlWidget.pack(fill = tk.BOTH, expand = True, padx = 20,
-            pady = 20)
+        self.controlWidget.pack(fill = tk.BOTH, expand = True)
         self.feedbackAdd(self.controlWidget)
         self.slavesAdd(self.controlWidget)
         self.networkAdd(self.controlWidget)
 
         # Console tab:
-        self.consoleWidget = csl.ConsoleWidget(self.consoleTab,
+        self.consoleCard = ttk.Frame(self.consoleTab, style="Card.TFrame")
+        self.consoleCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.consoleCard, text="Console", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.consoleWidget = csl.ConsoleWidget(self.consoleCard,
             self._consoleWarning)
-        self.consoleWidget.pack(fill = tk.BOTH, expand = True, padx = 20,
-            pady = 20)
+        self.consoleWidget.pack(fill = tk.BOTH, expand = True)
         self.consoleTab.bind("<Visibility>", self._consoleCalm)
 
         self.notebook.add(self.profileTab, text = "Profile")
@@ -199,13 +216,12 @@ class Base(tk.Frame, pt.PrintClient):
         self.notebook.grid(row = 1, sticky = 'NWES')
 
         # Bottom bar ...........................................................
-        self.bottomBar = tk.Frame(self, relief='flat', borderwidth=0,
-            bg=BG_CT)
+        self.bottomBar = ttk.Frame(self, style="Bottombar.TFrame", padding=(12, 6))
         self.bottomBar.grid(row=2, sticky='EW')
         self.bottomWidget = ntw.StatusBarWidget(self.bottomBar,
             network.shutdown, pqueue)
         self.bottomWidget.pack(side = tk.LEFT, fill = tk.X, expand = True,
-            pady = 3, padx = 3)
+            pady = 6, padx = 8)
         self.networkAdd(self.bottomWidget)
         self.slavesAdd(self.bottomWidget)
 
@@ -258,7 +274,7 @@ For more information, contact support."""
         """
         To be used by the console to warn the user of errors.
         """
-        self.errorLabel.pack(side = tk.LEFT, padx = 100, fill = tk.Y)
+        self.errorLabel.pack(side = tk.LEFT, padx = 100, pady=4, fill = tk.Y)
         self.warning = True
 
     def _consoleCalm(self, *E):

@@ -73,10 +73,10 @@ class TimerWidget(tk.Frame):
         validateF = self.register(gus._validateF)
         validateC = self.register(gus._validateN)
 
-        self.timeFrame = tk.Frame(self)
+        self.timeFrame = ttk.Frame(self)
         self.timeFrame.pack(fill = tk.BOTH, expand = True)
 
-        self.timeTopBar = tk.Frame(self.timeFrame)
+        self.timeTopBar = ttk.Frame(self.timeFrame, style="Topbar.TFrame")
         self.timeTopBar.pack(side = tk.TOP, fill = tk.X, expand = True)
 
         # Start/Stop button:
@@ -118,14 +118,13 @@ class TimerWidget(tk.Frame):
         self.ends = {"Step (k)":self.END_STEP, "Time (s)":self.END_TIME}
         self.endMenuVar = tk.StringVar()
         self.endMenuVar.set(tuple(self.ends.keys())[0])
-        self.endMenu = tk.OptionMenu(self.timeTopBar, self.endMenuVar,
-            *list(self.ends.keys()))
-        self.endMenu.config(width = 10, **gus.fontc)
+        self.endMenu = ttk.OptionMenu(self.timeTopBar, self.endMenuVar, self.endMenuVar.get(), *list(self.ends.keys()))
+        self.endMenu.configure(width = 10)
         self.endMenu.pack(side = tk.LEFT)
         self.activeWidgets.append(self.endMenu)
 
         # Timing display bar:
-        self.timeDisplayBar = tk.Frame(self.timeFrame)
+        self.timeDisplayBar = ttk.Frame(self.timeFrame)
         self.timeDisplayBar.pack(side = tk.TOP, fill = tk.X, expand = True,
             pady = 10)
 
@@ -154,24 +153,22 @@ class TimerWidget(tk.Frame):
         self.activeWidgets.append(self.timeDisplay)
 
         # Timing control bar:
-        self.timeControlBar = tk.Frame(self.timeFrame)
+        self.timeControlBar = ttk.Frame(self.timeFrame)
         self.timeControlBar.pack(side = tk.TOP, fill = tk.X, expand = True)
 
         # Control logging:
         self.logVar = tk.BooleanVar()
         self.logVar.set(False)
-        self.logButton = tk.Checkbutton(self.timeControlBar,
-            text = "Log Data", variable = self.logVar, indicatoron=False,
-            **gus.cb_primary)
+        self.logButton = ttk.Checkbutton(self.timeControlBar,
+            text = "Log Data", variable = self.logVar, style="TCheckbutton")
         self.logButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.logButton)
 
         # End DC:
         self.endDCVar = tk.BooleanVar()
         self.endDCVar.set(False)
-        self.endDCButton = tk.Checkbutton(self.timeControlBar,
-            text = "Set DC at end: ", variable = self.endDCVar, indicatoron=False,
-            **gus.cb_primary)
+        self.endDCButton = ttk.Checkbutton(self.timeControlBar,
+            text = "Set DC at end: ", variable = self.endDCVar, style="TCheckbutton")
         self.endDCButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.endDCButton)
 
@@ -181,7 +178,9 @@ class TimerWidget(tk.Frame):
         self.endDCEntry.insert(0, "0")
         self.activeWidgets.append(self.endDCEntry)
 
-        self.endDCLabel = ttk.Label(self.timeControlBar, text = "[0.0, 100.0]")
+        self.endDCLabel = ttk.Label(self.timeControlBar,
+            text = "[0.0, 100.0]",
+            style = "Secondary.TLabel")
         self.endDCLabel.pack(side = tk.LEFT)
 
     def _start(self, *_):

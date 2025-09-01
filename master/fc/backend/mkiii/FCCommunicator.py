@@ -391,7 +391,7 @@ class FCCommunicator(pt.PrintClient):
             self.flashServerThread = mt.Thread(
                 target = self.httpd.serve_forever
             )
-            self.flashServerThread.setDaemon(True)
+            self.flashServerThread.daemon = True
             self.flashServerThread.start()
             self.httpPort = self.httpd.socket.getsockname()[1]
             self.printr("\tHTTP Server initialized on {}".format(
@@ -416,7 +416,7 @@ class FCCommunicator(pt.PrintClient):
 
 
             # Set thread as daemon (background task for automatic closure):
-            self.broadcastThread.setDaemon(True)
+            self.broadcastThread.daemon = True
 
             # INITIALIZE LISTENER THREAD ---------------------------------------
             self.listenerThread = mt.Thread(
@@ -424,18 +424,18 @@ class FCCommunicator(pt.PrintClient):
                 target = self._listenerRoutine)
 
             # Set thread as daemon (background task for automatic closure):
-            self.listenerThread.setDaemon(True)
+            self.listenerThread.daemon = True
 
             # INITIALIZE INPUT AND OUTPUT THREADS ------------------------------
             self.outputThread  = mt.Thread(
                 name = "FCMkII_output",
                 target = self._outputRoutine)
-            self.outputThread.setDaemon(True)
+            self.outputThread.daemon = True
 
             self.inputThread = mt.Thread(
                 name = "FCMkII_input",
                 target = self._inputRoutine)
-            self.inputThread.setDaemon(True)
+            self.inputThread.daemon = True
 
             # SET UP LIST OF KNOWN SLAVES  =====================================
 
@@ -1172,7 +1172,7 @@ class FCCommunicator(pt.PrintClient):
                                 self._send(MHSK, slave, 1, True)
                                 tries -= 1
 
-                            elif failedHSKs is 0:
+                            elif failedHSKs == 0:
                                 # Disconnect Slave:
                                 self._send("X", slave, 2)
                                 #slave.setStatus(sv.DISCONNECTED, lock = False)

@@ -36,7 +36,7 @@ import tkinter.ttk as ttk
 import tkinter.font as fnt
 
 from fc.frontend.gui import guiutils as gus
-from fc.frontend.gui.theme import TEXT_ON_DARK, SUCCESS_MAIN, WARNING_MAIN, ERROR_MAIN, INFO_MAIN
+from fc.frontend.gui.theme import TEXT_ON_DARK, SUCCESS_MAIN, WARNING_MAIN, ERROR_MAIN, INFO_MAIN, TEXT_PRIMARY, SURFACE_1
 from fc import printer as pt
 
 ## GLOBALS #####################################################################
@@ -106,37 +106,68 @@ class ConsoleWidget(tk.Frame):
             foreground = FG_ERROR, background = BG_ERROR)
         self.screen.tag_config(TAG_DEBUG, foreground = FG_DEBUG)
 
-        # Build buttons:
-        self.controlFrame = tk.Frame(self)
-        self.controlFrame.grid(row = 1, column = 0, columnspan = 2,
+        # Build toolbar separator and toolbar frame (modern look):
+        try:
+            self.toolbarSeparator = ttk.Separator(self, orient="horizontal")
+            self.toolbarSeparator.grid(row = 1, column = 0, columnspan = 2, sticky = "EW")
+        except Exception:
+            pass
+
+        # Build buttons (use ttk styles for cohesive UI):
+        self.controlFrame = ttk.Frame(self, style="Topbar.TFrame")
+        self.controlFrame.grid(row = 2, column = 0, columnspan = 2,
             sticky = "EW")
 
-        # Print out button:
-        self.saveButton = ttk.Button(self.controlFrame, text = "Print to File",
+        # Save log button:
+        self.saveButton = ttk.Button(self.controlFrame, text = "Save Log",
             command = self._save)
-        self.saveButton.pack(side = tk.RIGHT)
+        self.saveButton.pack(side = tk.RIGHT, padx=6, pady=4)
 
         # Clear functionality:
         self.clearButton = ttk.Button(self.controlFrame, text = "Clear",
-            command = self._clear, style = "Secondary.TButton")
-        self.clearButton.pack(side = tk.RIGHT)
+            command = self._clear, style="Secondary.TButton")
+        self.clearButton.pack(side = tk.RIGHT, padx=6, pady=4)
 
-        # Debug button:
+        # Copy button (copies selection, or all if none selected):
+        self.copyButton = ttk.Button(self.controlFrame, text = "Copy",
+            command = self._copy, style="Secondary.TButton")
+        self.copyButton.pack(side = tk.RIGHT, padx=6, pady=4)
+
+        # Debug toggle:
         self.debugVar = tk.IntVar()
         self.debugVar.set(0)
-
-        self.debugButton = tk.Checkbutton(self.controlFrame,
+        self.debugButton = ttk.Checkbutton(self.controlFrame,
             text ="Debug prints", variable = self.debugVar,
-            command = self._debug, **gus.cb_primary)
-        self.debugButton.pack(side = tk.RIGHT)
+            command = self._debug)
+        self.debugButton.pack(side = tk.RIGHT, padx=6, pady=4)
 
-        # Autoscroll button:
+        # Autoscroll toggle:
         self.autoscrollVar = tk.IntVar()
         self.autoscrollVar.set(1)
-        self.autoscrollButton = tk.Checkbutton(self.controlFrame,
-            text ="Autoscroll", variable = self.autoscrollVar, **gus.cb_primary)
-        self.autoscrollButton.pack(side = tk.RIGHT)
+        self.autoscrollButton = ttk.Checkbutton(self.controlFrame,
+            text ="Autoscroll", variable = self.autoscrollVar)
+        self.autoscrollButton.pack(side = tk.RIGHT, padx=6, pady=4)
 
+        # Max lines cap:
+        self.maxLinesVar = tk.IntVar()
+        self.maxLinesVar.set(5000)
+        try:
+            self.maxLinesSpin = ttk.Spinbox(self.controlFrame, from_=500, to=200000,
+                increment=500, width=7, textvariable=self.maxLinesVar)
+            self.maxLinesLabel = ttk.Label(self.controlFrame, text=" Max Lines:")
+            self.maxLinesSpin.pack(side=tk.RIGHT, padx=6, pady=4)
+            self.maxLinesLabel.pack(side=tk.RIGHT, padx=0, pady=4)
+        except Exception:
+            # Fallback without crashing if ttk.Spinbox unavailable
+            try:
+                self.maxLinesSpin = tk.Spinbox(self.controlFrame, from_=500, to=200000,
+                    increment=500, width=7, textvariable=self.maxLinesVar)
+                self.maxLinesLabel = ttk.Label(self.controlFrame, text=" Max Lines:")
+                self.maxLinesSpin.pack(side=tk.RIGHT, padx=6, pady=4)
+                self.maxLinesLabel.pack(side=tk.RIGHT, padx=0, pady=4)
+            except Exception:
+                self.maxLinesVar.set(5000)
+        
     # API ----------------------------------------------------------------------
     def printr(self, message):
         self._print(TAG_REGULAR, message)
@@ -165,15 +196,20 @@ class ConsoleWidget(tk.Frame):
         try:
 
             # Switch focus to this tab in case of errors of warnings:
-            if tag is TAG_ERROR and not self.winfo_ismapped():
+            if tag == TAG_ERROR and not self.winfo_ismapped():
                 self.warn()
+
+            # Determine if we are currently at bottom before insertion
+            was_at_bottom = self._is_at_bottom()
 
             self.screen.config(state = tk.NORMAL)
             self.screen.insert(tk.END, text + "\n", tag)
+            # Trim to max lines after insertion
+            self._trim_to_max_lines()
             self.screen.config(state = tk.DISABLED)
 
-            # Check for auto scroll:
-            if self.autoscrollVar.get() == 1:
+            # Check for auto scroll: scroll if Autoscroll enabled or we were at bottom
+            if self.autoscrollVar.get() == 1 or was_at_bottom:
                 self.screen.see("end")
         except Exception as e:
             gus.popup_exception("FCMkIV Error", "Exception in console printer",
@@ -212,8 +248,49 @@ class ConsoleWidget(tk.Frame):
         self.screen.config(state = tk.DISABLED)
         self.printr(self.symbol + " Console cleared")
 
+    def _copy(self, *E):
+        try:
+            selection = None
+            try:
+                selection = self.screen.get(tk.SEL_FIRST, tk.SEL_LAST)
+            except Exception:
+                # No selection
+                selection = self.screen.get(1.0, tk.END)
+            if selection:
+                self.clipboard_clear()
+                self.clipboard_append(selection)
+                self.printd(self.symbol + " Copied to clipboard")
+        except Exception as e:
+            gus.popup_exception("FCMKIV Error",
+                "Exception in Console copy-to-clipboard", e)
+
     def _debug(self, *E):
         if self.debugVar.get() == 1:
             pt.DEBUGP = True
         else:
             pt.DEBUGP = False
+
+    # Utilities ----------------------------------------------------------------
+    def _is_at_bottom(self):
+        try:
+            lo, hi = self.screen.yview()
+            # hi == 1.0 indicates bottom; use tolerance for floating errors
+            return abs(hi - 1.0) < 1e-3
+        except Exception:
+            return True
+
+    def _trim_to_max_lines(self):
+        try:
+            max_lines = int(self.maxLinesVar.get()) if self.maxLinesVar else 0
+            if max_lines and max_lines > 0:
+                # Total number of lines (end index is one past last char)
+                end_index = self.screen.index('end-1c')  # exclude trailing newline
+                total_lines = int(end_index.split('.')[0]) if end_index else 1
+                if total_lines > max_lines:
+                    # Compute how many lines to delete from the top
+                    excess = total_lines - max_lines
+                    # Delete from line 1.0 up to (excess+1).0 to remove full lines
+                    self.screen.delete('1.0', f'{excess + 1}.0')
+        except Exception:
+            # Do not crash on trimming errors
+            pass

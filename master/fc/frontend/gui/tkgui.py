@@ -36,7 +36,7 @@ from fc.frontend import frontend as fe
 from fc.frontend.gui.widgets import splash as spl, base as bas
 import fc.frontend.gui.embedded.icon as icn
 from fc.frontend.gui import guiutils as gus
-from fc.frontend.gui.theme import SURFACE_2, TEXT_PRIMARY, SURFACE_1, SURFACE_3, PRIMARY_500, PRIMARY_600, TEXT_SECONDARY
+from fc.frontend.gui.theme import SURFACE_2, TEXT_PRIMARY, SURFACE_1, SURFACE_3, PRIMARY_500, PRIMARY_600, TEXT_SECONDARY, TEXT_ON_DARK
 
 ## GLOBALS #####################################################################
 TITLE = "FC MkIV"
@@ -151,6 +151,20 @@ class FCGUI(fe.FCFrontend):
             style.configure("TFrame", background=base_bg)
             style.configure("TPanedwindow", background=base_bg)
 
+            # Topbar & Bottombar styles
+            style.configure("Topbar.TFrame", background=SURFACE_3)
+            style.configure("Topbar.TLabel", background=SURFACE_3, foreground=fg)
+            style.configure("Bottombar.TFrame", background=SURFACE_3)
+
+            # Error banner label style (clickable)
+            style.configure(
+                "ErrorBanner.TLabel",
+                background=gus.ERROR_MAIN,
+                foreground=TEXT_ON_DARK,
+                padding=(10, 6),
+                font=gus.typography["label_large"]["font"]
+            )
+
             # New: secondary label style for muted text
             style.configure("Secondary.TLabel", background=base_bg, foreground=fg_muted)
 
@@ -160,11 +174,23 @@ class FCGUI(fe.FCFrontend):
             # New: label style with Surface 3 background
             style.configure("Surface3.TLabel", background=SURFACE_3, foreground=fg)
 
-            # New: label style with Surface 1 background
-            style.configure("Surface1.TLabel", background=SURFACE_1, foreground=fg)
+            # NEW: Card container for page content
+            style.configure(
+                "Card.TFrame",
+                background=card_bg,
+                padding=(16, 12)
+            )
 
-            # New: sunken label style for status displays
-            style.configure("Sunken.TLabel", background=base_bg, foreground=fg, relief="sunken", borderwidth=1, padding=(6, 5))
+            # NEW: Toolbar frame style for inner toolbars under tabs
+            style.configure("Toolbar.TFrame", background=SURFACE_3)
+
+            # NEW: Title label style for section headers
+            style.configure(
+                "TitleLabel.TLabel",
+                background=card_bg,
+                foreground=fg,
+                font=gus.typography["title_large"]["font"]
+            )
 
             # Buttons
             style.configure(
@@ -202,9 +228,9 @@ class FCGUI(fe.FCFrontend):
             # Focus/disabled mapping for Entry
             style.map(
                 "TEntry",
-                fieldbackground=[("focus", card_bg)],
-                foreground=[("disabled", fg_muted)],
-                bordercolor=[("focus", accent)] if hasattr(ttk, "Style") else []
+                fieldbackground=[["focus", card_bg]],
+                foreground=[["disabled", fg_muted]],
+                bordercolor=[["focus", accent]] if hasattr(ttk, "Style") else []
             )
 
             # Treeview
@@ -226,8 +252,8 @@ class FCGUI(fe.FCFrontend):
             # Selection colors for Treeview rows
             style.map(
                 "Treeview",
-                background=[("selected", accent)],
-                foreground=[("selected", gus.btn_primary.get("fg", "white"))]
+                background=[["selected", accent]],
+                foreground=[["selected", gus.btn_primary.get("fg", "white")]]
             )
 
             # Notebook (tabs)
@@ -240,12 +266,12 @@ class FCGUI(fe.FCFrontend):
                 "TNotebook.Tab",
                 background=base_bg,
                 foreground=fg_muted,
-                padding=(12, 6)
+                padding=(16, 10)
             )
             style.map(
                 "TNotebook.Tab",
-                background=[("selected", card_bg)],
-                foreground=[("selected", fg)]
+                background=[["selected", card_bg]],
+                foreground=[["selected", fg]]
             )
 
             # Checkbutton

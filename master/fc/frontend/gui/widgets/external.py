@@ -76,11 +76,11 @@ class ExternalControlWidget(pt.PrintClient, tk.Frame):
             }
         }
 
-        # Build GUI ...........................................................
+        # Build GUI .............................................................
         self.grid_columnconfigure(0, weight = 1)
         row = 0
 
-        self.allFrame = tk.Frame(self)
+        self.allFrame = ttk.Frame(self)
         self.allFrame.grid(row = row, column = 0, sticky = "EW")
         self.startAllButton = ttk.Button(self.allFrame, text = "Start All",
             command = self._onStartAll)
@@ -184,11 +184,16 @@ class ECSetupWidget(tk.Frame):
     external control broadcast server.
     """
 
-    # Ttk style-based display configs
-    DISP_CONFIG_ACTIVE = {'text': 'Active', 'style': 'ExternalActive.TLabel'}
-    DISP_CONFIG_INACTIVE = {'text': 'Inactive', 'style': 'ExternalInactive.TLabel'}
-    DISP_CONFIGS = {s.EX_ACTIVE: DISP_CONFIG_ACTIVE,
-        s.EX_INACTIVE: DISP_CONFIG_INACTIVE}
+    DISP_CONFIG_GENERAL = {'font':'TkFixedFont 7 bold', 'relief':tk.SUNKEN,
+        'bd':2}
+    DISP_CONFIG_ACTIVE = {'text' : 'Active',
+        'fg' : s.FOREGROUNDS[s.SS_CONNECTED],
+        'bg' : s.BACKGROUNDS[s.SS_CONNECTED]}
+    DISP_CONFIG_INACTIVE = {'text' : 'Inactive',
+        'fg' : s.FOREGROUNDS[s.SS_DISCONNECTED],
+        'bg' : s.BACKGROUNDS[s.SS_DISCONNECTED]}
+    DISP_CONFIGS = {s.EX_ACTIVE : DISP_CONFIG_ACTIVE,
+        s.EX_INACTIVE : DISP_CONFIG_INACTIVE}
 
     PARAM_IP, PARAM_PORT, PARAM_REPEAT = 0, 1, 2
     PARAMETERS = (PARAM_IP, PARAM_PORT, PARAM_REPEAT)
@@ -240,7 +245,7 @@ class ECSetupWidget(tk.Frame):
 
         # GUI ..................................................................
         # Main Layout:
-        self.main = tk.LabelFrame(self, text = title, **gus.fontc)
+        self.main = ttk.LabelFrame(self, text = title)
         self.main.pack(fill = tk.BOTH, expand = True)
         rows, columns = (0, 1, 2, 3), (0, 1)
 
@@ -250,32 +255,28 @@ class ECSetupWidget(tk.Frame):
         for column in columns:
             self.main.grid_columnconfigure(column, weight = 1)
 
-        # Active display (ttk + style):
-        _style = ttk.Style(self)
-        _style.configure(
-            "ExternalDisplay.TLabel",
-            font=("TkFixedFont", 7, "bold"),
-            relief='sunken',
-            borderwidth=2
-        )
-        _style.configure(
-            "ExternalActive.TLabel",
-            font=("TkFixedFont", 7, "bold"),
-            relief='sunken',
-            borderwidth=2,
-            foreground=s.FOREGROUNDS[s.SS_CONNECTED],
-            background=s.BACKGROUNDS[s.SS_CONNECTED]
-        )
-        _style.configure(
-            "ExternalInactive.TLabel",
-            font=("TkFixedFont", 7, "bold"),
-            relief='sunken',
-            borderwidth=2,
-            foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
-            background=s.BACKGROUNDS[s.SS_DISCONNECTED]
-        )
+        # Prepare styles for active/inactive status display
+        try:
+            _style = ttk.Style(self)
+            _style.configure(
+                "ECStatusActive.TLabel",
+                foreground = s.FOREGROUNDS[s.SS_CONNECTED],
+                background = s.BACKGROUNDS[s.SS_CONNECTED],
+                padding = (6, 3),
+                relief = "sunken"
+            )
+            _style.configure(
+                "ECStatusInactive.TLabel",
+                foreground = s.FOREGROUNDS[s.SS_DISCONNECTED],
+                background = s.BACKGROUNDS[s.SS_DISCONNECTED],
+                padding = (6, 3),
+                relief = "sunken"
+            )
+        except Exception:
+            pass
 
-        self.activeDisplay = ttk.Label(self.main, text="Inactive", style="ExternalInactive.TLabel")
+        # Active display:
+        self.activeDisplay = ttk.Label(self.main)
         self.activeDisplay.grid(row = top, column = left, sticky = "EW")
 
         # Indices:
@@ -325,6 +326,12 @@ class ECSetupWidget(tk.Frame):
             command = self._onDefault, style = "Secondary.TButton")
         self.defaultButton.pack(fill = tk.X, expand = True)
         self.activeWidgets.append(self.defaultButton)
+
+        # Build display config mapping using ttk styles
+        self.DISP_CONFIGS = {
+            s.EX_ACTIVE:    {'text': 'Active',   'style': 'ECStatusActive.TLabel'},
+            s.EX_INACTIVE:  {'text': 'Inactive', 'style': 'ECStatusInactive.TLabel'},
+        }
 
         # Wrap up ..............................................................
         self.setDefaults()
