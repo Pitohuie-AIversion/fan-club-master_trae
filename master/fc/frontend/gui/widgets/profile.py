@@ -42,7 +42,7 @@ TAG_PRIMITIVE = "P"
 TAG_LIST = "L"
 
 ## MAIN ########################################################################
-class ProfileDisplay(tk.Frame, pt.PrintClient):
+class ProfileDisplay(ttk.Frame, pt.PrintClient):
     SYMBOL = "[PD]"
 
     def __init__(self, master, archive, callback, pqueue):
@@ -53,7 +53,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         - callback := method to call without arguments to apply profile changes
         - pqueue := Queue object to use for I-P printing
         """
-        tk.Frame.__init__(self, master = master)
+        ttk.Frame.__init__(self, master = master)
         pt.PrintClient.__init__(self, pqueue, self.SYMBOL)
 
         # TODO:
@@ -81,7 +81,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.loader = ldr.Loader(self, (("Fan Club Profile",".fcp"),))
 
         # Build top bar ........................................................
-        self.topBar = tk.Frame(self)
+        self.topBar = ttk.Frame(self)
         self.topBar.grid(row = 0, columnspan = self.numcolumns, sticky = "EW")
 
         self.topLabel = ttk.Label(self.topBar, text = "Profile:   ",
@@ -103,7 +103,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         # Built-in menu:
         self.builtin = btp.PROFILES
         builtinkeys = ("N/A",) + tuple(self.builtin.keys())
-        self.builtinFrame = tk.Frame(self.topBar)
+        self.builtinFrame = ttk.Frame(self.topBar)
         self.builtinFrame.pack(side = tk.RIGHT)
         self.builtinLabel = ttk.Label(self.builtinFrame,
             text = "Built-in: ")
@@ -111,12 +111,12 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
         self.builtinMenuVar = tk.StringVar()
         self.builtinMenuVar.trace('w', self._onBuiltinMenuChange)
         self.builtinMenuVar.set(builtinkeys[0])
-        self.builtinMenu = tk.OptionMenu(self.builtinFrame, self.builtinMenuVar,
-            *builtinkeys)
+        self.builtinMenu = ttk.Combobox(self.builtinFrame, textvariable=self.builtinMenuVar,
+            values=builtinkeys, state="readonly")
         self.builtinMenu.pack(side = tk.LEFT, expand = True)
 
         # Build display ........................................................
-        self.displayFrame = tk.Frame(self)
+        self.displayFrame = ttk.Frame(self)
         self.displayFrame.grid(row = 2, column = 0, sticky = "NEWS", pady = 10)
 
         self.font = tk.font.Font(font = gus.typography["headline_large"]["font"])
@@ -142,7 +142,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
             self.display.bind(event, self._on_double)
 
         # Build editor ........................................................
-        self.editorFrame = tk.Frame(self, relief = tk.RIDGE, bd = 1)
+        self.editorFrame = ttk.Frame(self, relief = tk.RIDGE, style="Card.TFrame")
         self.editorFrame.grid(row = 2, column = 2, sticky = "NEWS", pady = 10)
 
         self.editor = PythonEditor(self.editorFrame,
@@ -153,7 +153,7 @@ class ProfileDisplay(tk.Frame, pt.PrintClient):
 
 
         # Scrollbar:
-        self.scrollbar = tk.Scrollbar(self)
+        self.scrollbar = ttk.Scrollbar(self)
         self.scrollbar.grid(row = 2, column = 1, pady = 10, sticky = "NS")
         self.scrollbar.config(command = self.display.yview)
         self.display.config(yscrollcommand = self.scrollbar.set)

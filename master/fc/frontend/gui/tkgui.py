@@ -147,9 +147,18 @@ class FCGUI(fe.FCFrontend):
             fg_muted = TEXT_SECONDARY
 
             # Global element sizes
-            style.configure("TLabel", background=base_bg, foreground=fg)
+            style.configure("TLabel", background=base_bg, foreground=fg, font=gus.typography["body_medium"]["font"])
             style.configure("TFrame", background=base_bg)
             style.configure("TPanedwindow", background=base_bg)
+
+            # LabelFrame styles (container + title)
+            style.configure("TLabelframe", background=base_bg, padding=(gus.spacing["sm"], gus.spacing["sm"]))
+            style.configure(
+                "TLabelframe.Label",
+                background=base_bg,
+                foreground=fg,
+                font=gus.typography["title_small"]["font"]
+            )
 
             # Topbar & Bottombar styles
             style.configure("Topbar.TFrame", background=SURFACE_3)

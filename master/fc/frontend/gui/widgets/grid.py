@@ -28,6 +28,7 @@
 
 ## IMPORTS #####################################################################
 import tkinter as tk
+import tkinter.ttk as ttk
 from fc.frontend.gui import guiutils as gus
 
 ## AUXILIARY GLOBALS ###########################################################
@@ -45,7 +46,7 @@ ALT_COLOR_0 = gus.SURFACE_2
 ALT_COLOR_1 = gus.SURFACE_3
 
 ## MAIN ########################################################################
-class BaseGrid(tk.Frame):
+class BaseGrid(ttk.Frame):
     """ Interactive 2D grid widget that supports clicking, dragging, and live
         cell color changes. """
 
@@ -101,13 +102,13 @@ class BaseGrid(tk.Frame):
         """
         # TODO: Implement everything above
 
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.config(cursor = cursor)
 
         self.grid_rowconfigure(self.GRID_ROW, weight = self.GRID_WEIGHT)
         self.grid_columnconfigure(self.GRID_COLUMN, weight = self.GRID_WEIGHT)
 
-        self.canvasFrame = tk.Frame(self)
+        self.canvasFrame = ttk.Frame(self)
         self.canvasFrame.grid(row = self.GRID_ROW, column = self.GRID_COLUMN,
             sticky = "NEWS")
 

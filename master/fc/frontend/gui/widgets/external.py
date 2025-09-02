@@ -42,7 +42,7 @@ from fc import archive as ac, printer as pt, standards as s
 from fc.frontend.gui.theme import BG_ACCENT
 
 ## CLASSES #####################################################################
-class ExternalControlWidget(pt.PrintClient, tk.Frame):
+class ExternalControlWidget(pt.PrintClient, ttk.Frame):
     """
     Front end for external control.
     """
@@ -58,7 +58,7 @@ class ExternalControlWidget(pt.PrintClient, tk.Frame):
         - vertical := bool, whether the widget will be taller than it is wide.
         - pqueue := Queue instance for printing (see fc.utils).
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.archive = archive
@@ -178,7 +178,7 @@ class ExternalControlWidget(pt.PrintClient, tk.Frame):
     def _onStopAll(self, *_):
         self.stopAll()
 
-class ECSetupWidget(tk.Frame):
+class ECSetupWidget(ttk.Frame):
     """
     General front end for either the external control listener server or the
     external control broadcast server.
@@ -213,7 +213,7 @@ class ECSetupWidget(tk.Frame):
         - default* := default value for the corresponding parameter.
         - editIP := bool, whether the IP address is user-editable.
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.startf, self.stopf = startf, stopf
         self.title = title
         self.defaultIP = defaultIP
@@ -414,7 +414,7 @@ class ECSetupWidget(tk.Frame):
         Repetitive behavior to build a frame in one of the grid containers. The
         frame is constructed and "gridded" before being returned.
         """
-        frame =  tk.Frame(master)
+        frame =  ttk.Frame(master)
         frame.grid(row = row, column = column, sticky = "NEWS",
             columnspan = columnspan)
         return frame
@@ -434,8 +434,7 @@ class ECSetupWidget(tk.Frame):
         """
 
 
-        label = ttk.Label(master, text = text, **gus.fontc, width = 7,
-            anchor = 'e')
+        label = ttk.Label(master, text = text, width = 7, anchor = 'e')
         label.pack(side = tk.LEFT)
 
         entry = ttk.Entry(master, validate = "key",

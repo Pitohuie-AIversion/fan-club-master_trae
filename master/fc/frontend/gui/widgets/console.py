@@ -67,7 +67,7 @@ BG_DEBUG = BG_DEFAULT
 
 
 ## WIDGET ######################################################################
-class ConsoleWidget(tk.Frame):
+class ConsoleWidget(ttk.Frame):
     """
     Simple terminal-like interface for text output. Mimics fc.utils print
     functions.
@@ -75,7 +75,7 @@ class ConsoleWidget(tk.Frame):
     symbol = "[CS]"
 
     def __init__(self, master, warnMethod):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.master = master
         self.warn = warnMethod
 
@@ -90,7 +90,7 @@ class ConsoleWidget(tk.Frame):
         screen_conf["selectbackground"] = BG_SELECT
         screen_conf["state"] = tk.DISABLED
         self.screen = tk.Text(self, **screen_conf)
-        self.scrollbar = tk.Scrollbar(self)
+        self.scrollbar = ttk.Scrollbar(self)
         self.scrollbar.grid(row = 0, column = 1, sticky = "NS")
         self.scrollbar.config(command=self.screen.yview)
         self.screen.config(yscrollcommand = self.scrollbar.set)
