@@ -25,7 +25,7 @@
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  + Repository of built-in profiles.
  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
-from master.fc import archive as ac
+import fc.archive as ac
 
 MODULE = {
     ac.name : "Single CAST Module",
