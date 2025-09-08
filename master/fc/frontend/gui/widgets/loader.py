@@ -44,7 +44,7 @@ from fc.frontend.gui.theme import BG_ACCENT
 NOTHING = lambda: None
 
 ## WIDGETS #####################################################################
-class Loader(tk.Frame):
+class Loader(ttk.Frame):
     """
     Base class to handle file I/O for a given file extension (both read and
     write).
@@ -59,7 +59,7 @@ class Loader(tk.Frame):
         pairs where each "ext" (extension) starts with a dot and has at least
         length 2.
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
 
         # Validate input:
         self.filetypes = []
@@ -225,12 +225,12 @@ class LoaderWidget(Loader):
         self.interactive.append(widget)
 
     def _buildLoadButton(self, text = "Load"):
-        self.loadButton = tk.Button(self, text=text, **gus.btn_secondary, command=self._load)
+        self.loadButton = ttk.Button(self, text=text, command=self._load, style="Secondary.TButton")
         self.loadButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.loadButton)
 
     def _buildSaveButton(self, text = "Save"):
-        self.saveButton = tk.Button(self, text=text, **gus.btn_secondary, command=self._save)
+        self.saveButton = ttk.Button(self, text=text, command=self._save, style="Secondary.TButton")
         self.saveButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.saveButton)
 

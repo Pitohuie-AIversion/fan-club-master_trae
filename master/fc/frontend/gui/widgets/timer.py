@@ -43,14 +43,14 @@ from fc.frontend.gui.theme import BG_ACCENT
 NOTHING = lambda: None
 
 ## CLASS #######################################################################
-class TimerWidget(tk.Frame):
+class TimerWidget(ttk.Frame):
     DEFAULT_STEP_MS = 100
     DEFAULT_END = 0
 
     END_STEP, END_TIME = 0, 1
 
     def __init__(self, master, startF, stopF, stepF, endDCF,logstartF,logstopF):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
 
         # Setup:
         self.startF = startF
@@ -85,8 +85,7 @@ class TimerWidget(tk.Frame):
         self.startStopButton.pack(side = tk.LEFT)
 
         # Step label:
-        self.stepLabel = ttk.Label(self.timeTopBar, text = "   Step: ",
-            **gus.fontc)
+        self.stepLabel = ttk.Label(self.timeTopBar, text = "   Step: ")
         self.stepLabel.pack(side = tk.LEFT)
 
         # Step field:
@@ -103,8 +102,7 @@ class TimerWidget(tk.Frame):
         self.unitLabel.pack(side = tk.LEFT)
 
         # End label:
-        self.endLabel = ttk.Label(self.timeTopBar, text = "   End: ",
-            **gus.fontc)
+        self.endLabel = ttk.Label(self.timeTopBar, text = "   End: ")
         self.endLabel.pack(side = tk.LEFT)
 
         # End field:
@@ -129,8 +127,7 @@ class TimerWidget(tk.Frame):
             pady = 10)
 
         # Index display:
-        self.kLabel = ttk.Label(self.timeDisplayBar, text = "  k = ",
-            **gus.fontc)
+        self.kLabel = ttk.Label(self.timeDisplayBar, text = "  k = ")
         self.kLabel.pack(side = tk.LEFT)
 
         self.kVar = tk.IntVar()
@@ -141,8 +138,7 @@ class TimerWidget(tk.Frame):
         self.activeWidgets.append(self.indexDisplay)
 
         # Time display:
-        self.tLabel = ttk.Label(self.timeDisplayBar, text = "  t = ",
-            **gus.fontc)
+        self.tLabel = ttk.Label(self.timeDisplayBar, text = "  t = ")
         self.tLabel.pack(side = tk.LEFT)
 
         self.tVar = tk.DoubleVar()

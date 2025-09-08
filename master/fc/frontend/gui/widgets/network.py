@@ -62,7 +62,7 @@ TEST_VECTORS = [
 ]
 
 ## BASE ########################################################################
-class NetworkWidget(tk.Frame, pt.PrintClient):
+class NetworkWidget(ttk.Frame, pt.PrintClient):
     """
     Container for all the FC network GUI front-end widgets, except the FC
     status bar.
@@ -81,7 +81,7 @@ class NetworkWidget(tk.Frame, pt.PrintClient):
         PQUEUE is the Queue object to be used for I-P printing.
         """
         # Core setup -----------------------------------------------------------
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.main = ttk.Frame(self)
@@ -119,7 +119,7 @@ class NetworkWidget(tk.Frame, pt.PrintClient):
 ## WIDGETS #####################################################################
 
 # Network control ==============================================================
-class NetworkControlWidget(tk.Frame, pt.PrintClient):
+class NetworkControlWidget(ttk.Frame, pt.PrintClient):
     """
     GUI front-end for the FC network control tools (such as adding and removing
     Slaves).
@@ -138,7 +138,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         PQUEUE := Queue instance to use for I-P printing
         """
 
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.network = network
@@ -185,11 +185,8 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         name = "Broadcast IP"
         self.bcipFrame = ttk.Frame(self.connectionFrame)
         self.bcipFrame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
-        
-        self.bcipLabel = ttk.Label(self.bcipFrame, text = name + ":",
-            font = gus.typography["label_small"]["font"])
+        self.bcipLabel = ttk.Label(self.bcipFrame, text = name + ":")
         self.bcipLabel.pack(side = tk.TOP, fill = tk.X, padx = 10)
-
         self.bcipDisplay = gus.PromptLabel(self.bcipFrame,
             title = "Edit broadcast IP",
             prompt = "Enter a valid IP address (IPv4) to which to send "
@@ -219,7 +216,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         self.connectionVar.set("[NO CONNECTION]")
         self.connectionLabel = ttk.Label(self.connectionFrame,
             textvariable = self.connectionVar, width = 11,
-            style = "Secondary.TLabel", font = gus.typography["label_small"]["font"])
+            style = "Secondary.TLabel")
         self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 3,
             padx = 6)
         self.status = s.SS_DISCONNECTED
@@ -427,7 +424,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
         frame = ttk.Frame(self.connectionFrame)
         frame.pack(side = tk.RIGHT, fill = tk.Y, pady = 5, padx = 10)
 
-        label = ttk.Label(frame, text = name + ":", font = gus.typography["label_small"]["font"])
+        label = ttk.Label(frame, text = name + ":")
         label.pack(side = tk.TOP, fill = tk.X, padx = 10)
 
         display = ttk.Label(frame, textvariable = variable, width = 15,
@@ -448,7 +445,7 @@ class NetworkControlWidget(tk.Frame, pt.PrintClient):
             self.printr("Sent broadcast IP change request (\"{}\")".format(ip))
 
 # Firmware update ==============================================================
-class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
+class FirmwareUpdateWidget(ttk.Frame, pt.PrintClient):
     """
     GUI front-end for the FC firmware update tools, i.e the Mark III
     "Bootloader."
@@ -464,10 +461,10 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
         NETWORK := NetworkAbstraction being used
         PQUEUE := Queue instance for I-P printing
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
-        # Setup ................................................................
+        # Setup ...............................................................
         self.network = network
 
         self.main = ttk.Frame(self)
@@ -692,7 +689,7 @@ class FirmwareUpdateWidget(tk.Frame, pt.PrintClient):
             self._inactive()
 
 # Slave list ===================================================================
-class SlaveListWidget(tk.Frame, pt.PrintClient):
+class SlaveListWidget(ttk.Frame, pt.PrintClient):
     """
     GUI front-end for the FC Slave List display.
     """
@@ -707,7 +704,7 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         PQUEUE := Queue object for I-P printing
         """
 
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         # Setup ...............................................................
@@ -988,7 +985,7 @@ class SlaveListWidget(tk.Frame, pt.PrintClient):
         self.testi += 1
 
 # Network status bar ===========================================================
-class StatusBarWidget(tk.Frame, pt.PrintClient):
+class StatusBarWidget(ttk.Frame, pt.PrintClient):
     """
     GUI front-end for the FC "status bar."
     """
@@ -1007,7 +1004,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         SHUTDOWN := Method to call when the shutdown button is pressed
         PQUEUE := Queue object to be used for I-P printing
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         # Setup ...............................................................
@@ -1040,7 +1037,6 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
                 text = name,
                 width = 14,
                 style = _label_style,
-                font = gus.typography["label_small"]["font"]
             )
             self.statusLabels[code].pack(side = tk.TOP)
 
@@ -1048,7 +1044,6 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
                 self.statusFrames[code],
                 textvariable = self.statusVars[code],
                 style = _display_style,
-                font = gus.typography["label_small"]["font"]
             )
             self.statusDisplays[code].pack(side = tk.TOP, fill = tk.X, padx = 2)
 
@@ -1056,7 +1051,7 @@ class StatusBarWidget(tk.Frame, pt.PrintClient):
         self.connectionVar.set("[NO CONNECTION]")
         self.connectionLabel = ttk.Label(self.statusFrame,
             textvariable = self.connectionVar, width = 11,
-            style = "Sunken.TLabel", font = gus.typography["label_small"]["font"])
+            style = "Sunken.TLabel")
         self.connectionLabel.pack(side = tk.RIGHT, fill = tk.Y, pady = 3,
             padx = 6)
         self.status = s.SS_DISCONNECTED

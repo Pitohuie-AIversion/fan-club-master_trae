@@ -45,7 +45,7 @@ from fc.frontend.gui.theme import SURFACE_1, PRIMARY_500
 DEFAULT_TIMEOUT = 3
 
 ## MAIN ########################################################################
-class SplashFrame(tk.Frame):
+class SplashFrame(ttk.Frame):
     """
     Borderless container for arbitrary widgets to be displayed in the FC splash
     screen.
@@ -53,7 +53,7 @@ class SplashFrame(tk.Frame):
 
     def __init__(self, widget, master=None, width=750, height=500, ratio=False):
 
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.pack(side = tk.TOP, fill = tk.BOTH, expand = tk.YES)
 
         # Screen size
@@ -73,12 +73,13 @@ class SplashFrame(tk.Frame):
         self.master.overrideredirect(True)
         self.lift()
 
-class FCSplashWidget(tk.Frame):
+class FCSplashWidget(ttk.Frame):
     def __init__(self, master):
-        tk.Frame.__init__(self, master, bg=SURFACE_1)
+        ttk.Frame.__init__(self, master)
 
         self.image = tk.PhotoImage(data = stp.SPLASH)
         self.image = self.image.subsample(2)
+        # use tk.Label for image; place over ttk frame
         self.label = tk.Label(self, image = self.image, anchor = tk.CENTER,
             bg = SURFACE_1)
         self.label.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
