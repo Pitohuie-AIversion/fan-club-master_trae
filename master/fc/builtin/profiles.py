@@ -25,7 +25,7 @@
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  + Repository of built-in profiles.
  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
-from fc import archive as ac
+from master.fc import archive as ac
 
 MODULE = {
     ac.name : "Single CAST Module",
@@ -8817,7 +8817,7 @@ TENX10 = {
     ac.description : "10x10 grid using five 21-connector boards; each maps 20 positions (2x10).",
     ac.platform : ac.UNKNOWN,
 
-    ac.broadcastIP : "192.168.1.255",
+    ac.broadcastIP : "192.168.0.255",
     ac.broadcastPort  : 65000,
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
@@ -8871,7 +8871,7 @@ TENX10 = {
     ac.savedSlaves : (
         {
             ac.SV_name : "Rows 1 & 2",
-            ac.SV_mac : "None",
+            ac.SV_mac : "00:80:e1:46:00:38",   # 来自 SEVENSQ
             ac.SV_index : -1,
             ac.SV_fanModel : "Unknown",
             ac.SV_fanMode : ac.SINGLE,
@@ -8896,7 +8896,7 @@ TENX10 = {
         },
         {
             ac.SV_name : "Rows 3 & 4",
-            ac.SV_mac : "None",
+            ac.SV_mac : "00:80:e1:49:00:22",   # 来自 SEVENSQ
             ac.SV_index : -1,
             ac.SV_fanModel : "Unknown",
             ac.SV_fanMode : ac.SINGLE,
@@ -8921,7 +8921,7 @@ TENX10 = {
         },
         {
             ac.SV_name : "Rows 5 & 6",
-            ac.SV_mac : "None",
+            ac.SV_mac : "00:80:e1:25:00:44",   # 来自 SEVENSQ
             ac.SV_index : -1,
             ac.SV_fanModel : "Unknown",
             ac.SV_fanMode : ac.SINGLE,
