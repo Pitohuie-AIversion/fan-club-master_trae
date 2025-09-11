@@ -807,6 +807,17 @@ class SlaveListWidget(ttk.Frame, pt.PrintClient):
             foreground = s.FOREGROUNDS[s.SS_AVAILABLE],
             font = code_font_regular)
 
+        # Configure striped rows for better readability
+        stripe_bg = gus.SURFACE_2 if hasattr(gus, 'SURFACE_2') else "#f8f9fa"
+        self.slaveList.tag_configure(
+            "stripe_even",
+            background = gus.SURFACE_1 if hasattr(gus, 'SURFACE_1') else "#ffffff"
+        )
+        self.slaveList.tag_configure(
+            "stripe_odd", 
+            background = stripe_bg
+        )
+
         # Save previous selection:
         self.oldSelection = None
 
@@ -861,11 +872,16 @@ class SlaveListWidget(ttk.Frame, pt.PrintClient):
                 slave[s.SD_STATUS]))
         else:
             index = slave[s.SD_INDEX]
-            iid = self.slaveList.insert('', 0,
+            # Determine stripe tag based on current row count
+            stripe_tag = "stripe_even" if len(self.slaves) % 2 == 0 else "stripe_odd"
+            # Combine status tag with stripe tag
+            tags = (slave[s.SD_STATUS], stripe_tag)
+            
+            iid = self.slaveList.insert('', 'end',  # Insert at end for proper ordering
                 values = (index + 1, slave[s.SD_NAME], slave[s.SD_MAC],
                     s.SLAVE_STATUSES[slave[s.SD_STATUS]], slave[s.SD_FANS],
                     slave[s.SD_VERSION]),
-                tag = slave[s.SD_STATUS])
+                tags = tags)
             self.slaves[index] = slave + (iid,)
             self.indices.append(index)
 

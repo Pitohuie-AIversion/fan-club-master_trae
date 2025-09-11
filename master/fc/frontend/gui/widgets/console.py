@@ -83,12 +83,20 @@ class ConsoleWidget(ttk.Frame):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
 
-        # Build output text field:
+        # Build output text field - keeping tk.Text as ttk doesn't have Text equivalent
+        # But applying modern styling
         screen_conf = dict(gus.text_conf)
         screen_conf["fg"] = FG_DEFAULT
         screen_conf["bg"] = self.background
         screen_conf["selectbackground"] = BG_SELECT
         screen_conf["state"] = tk.DISABLED
+        screen_conf["insertbackground"] = FG_DEFAULT  # Cursor color
+        screen_conf["selectforeground"] = TEXT_PRIMARY  # Selection text color
+        screen_conf["relief"] = tk.FLAT
+        screen_conf["borderwidth"] = 0
+        screen_conf["highlightthickness"] = 0
+        
+        # Note: tk.Text is kept as ttk doesn't provide Text widget
         self.screen = tk.Text(self, **screen_conf)
         self.scrollbar = ttk.Scrollbar(self)
         self.scrollbar.grid(row = 0, column = 1, sticky = "NS")

@@ -32,6 +32,7 @@ import os
 import traceback
 
 import tkinter as tk
+import tkinter.ttk as ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 
@@ -299,7 +300,7 @@ def popup_exception(title, message, exception):
         message = message + "\n\nException:\"{}\"".format(
             traceback.format_exc()))
 
-class PromptLabel(tk.Label):
+class PromptLabel(ttk.Label):
     """
     A Tkinter Label that creates a popup window requesting a value when
     it is clicked. Besides its required arguments upon construction, it may
@@ -328,10 +329,13 @@ class PromptLabel(tk.Label):
         - starter := method that returns a String when called without arguments;
             the String is to be used as a starting value for the text entry.
             Defaults to a method that returns an empty String.
-        Additionally, all optional keyword arguments accepted by Tkinter
-        Labels may be used.
+        Additionally, all optional keyword arguments accepted by ttk.Label
+        may be used.
         """
-        tk.Label.__init__(self, master, **kwargs)
+        # Filter out tk-specific options that ttk.Label doesn't support
+        ttk_kwargs = {k: v for k, v in kwargs.items() 
+                     if k not in ['padx', 'pady', 'bg', 'fg', 'activebackground', 'activeforeground']}
+        ttk.Label.__init__(self, master, **ttk_kwargs)
 
         self.title = title
         self.prompt = prompt
@@ -356,14 +360,16 @@ class PromptLabel(tk.Label):
         Enable the widget's interactive behavior. This is the default state.
         """
         self.enabled = True
-        self.config(bg = self.ACTIVE_BG)
+        # ttk.Label doesn't support bg option, use style instead
+        self.config(style="Active.TLabel")
 
     def disable(self):
         """
         Disable the widget's interactive behavior.
         """
         self.enabled = False
-        self.config(bg = self.INACTIVE_BG)
+        # ttk.Label doesn't support bg option, use style instead
+        self.config(style="Inactive.TLabel")
 
 
 def _validateN(newCharacter, textBeforeCall, action):

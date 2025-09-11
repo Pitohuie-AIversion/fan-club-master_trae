@@ -111,6 +111,10 @@ class BaseGrid(ttk.Frame):
         self.canvasFrame = ttk.Frame(self)
         self.canvasFrame.grid(row = self.GRID_ROW, column = self.GRID_COLUMN,
             sticky = "NEWS")
+        
+        # Configure canvas frame for scrollbars
+        self.canvasFrame.grid_rowconfigure(0, weight=1)
+        self.canvasFrame.grid_columnconfigure(0, weight=1)
 
         self.master = master
         self.R = R
@@ -153,11 +157,15 @@ class BaseGrid(ttk.Frame):
 
     def _temp_setmap(self, i, s, f):
         """Set temporary mapping display for debugging purposes."""
-        if self.canvas and i < len(self._temp_tiids):
-            self.canvas.itemconfig(
-                self._temp_tiids[i], text = "{}\ns{}f{}".format(i, s, f),
-                    fill = "white")
-            self._temp_tmaps[i] = [s, f]
+        if self.canvas and i < len(self._temp_tiids) and self.winfo_exists():
+            try:
+                self.canvas.itemconfig(
+                    self._temp_tiids[i], text = "{}\ns{}f{}".format(i, s, f),
+                        fill = "white")
+                self._temp_tmaps[i] = [s, f]
+            except tk.TclError:
+                # Canvas or widget has been destroyed, ignore the update
+                pass
 
     def draw(self, cellLength = None, margin = 1):
         """
@@ -167,9 +175,26 @@ class BaseGrid(ttk.Frame):
 
         if self.canvas != None:
             self.canvas.destroy()
+        
+        # Destroy existing scrollbars if they exist
+        if hasattr(self, 'h_scrollbar'):
+            self.h_scrollbar.destroy()
+        if hasattr(self, 'v_scrollbar'):
+            self.v_scrollbar.destroy()
 
+        # Create canvas with scrollbar support
         self.canvas = tk.Canvas(self.canvasFrame)
-        self.canvas.pack(fill = tk.BOTH, expand = True)
+        self.canvas.grid(row=0, column=0, sticky="NEWS")
+        
+        # Create scrollbars
+        self.v_scrollbar = ttk.Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
+        self.h_scrollbar = ttk.Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
+        
+        # Configure canvas scrolling
+        self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
+        
+        # Initially hide scrollbars (will show them if needed)
+        self.scrollbars_visible = False
 
         self.winfo_toplevel().update_idletasks()
         self.margin = margin
@@ -184,18 +209,33 @@ class BaseGrid(ttk.Frame):
             self.maxWidth = self.winfo_reqwidth() - self.margin*2
             self.maxHeight = self.winfo_reqheight() - self.margin*2
 
-        self.cellLength = cellLength if cellLength is not None else int(
-            min(self.maxHeight/self.R, self.maxWidth/self.C))
+        if cellLength is not None:
+            self.cellLength = cellLength
+        else:
+            # Calculate optimal cell size with minimum constraints
+            calculated_cell = int(min(self.maxHeight/self.R, self.maxWidth/self.C))
+            # Ensure minimum cell size for visibility
+            self.cellLength = max(calculated_cell, self.minCell)
+            
+            # If calculated size is too small, use minimum and allow scrolling
+            if calculated_cell < self.minCell:
+                # Adjust canvas size to accommodate minimum cell size
+                required_width = self.minCell * self.C + self.margin * 2
+                required_height = self.minCell * self.R + self.margin * 2
+                
+                # Update canvas to required size
+                self.canvas.config(scrollregion=(0, 0, required_width, required_height))
+                
+                # Update max dimensions for drawing
+                self.maxWidth = required_width - self.margin * 2
+                self.maxHeight = required_height - self.margin * 2
 
-        if cellLength is None and (self.maxWidth <= 0 or self.maxHeight <= 0):
-            raise RuntimeError("Margin too large for available size: "
-                + "Have {} width and {} height.".format(
-                    self.maxWidth, self.maxHeight))
+        # Validate final cell length
         if self.cellLength <= 0:
             if cellLength is None:
-                raise RuntimeError("Not enough pixels to display grid. "
-                    + "Have {}x{} pixels for {}x{} cells.".format(
-                        self.maxHeight, self.maxWidth, self.R, self.C))
+                # Fallback to absolute minimum
+                self.cellLength = 3
+                print(f"Warning: Grid cells very small ({self.cellLength}px). Consider reducing grid size.")
             else:
                 raise ValueError("Illegal cellLength {}".format(cellLength))
 
@@ -256,6 +296,33 @@ class BaseGrid(ttk.Frame):
 
         self.xmargin = xmargin
         self.ymargin = ymargin
+        
+        # Configure scrolling based on content size
+        total_width = self.C * l + 2 * xmargin
+        total_height = self.R * l + 2 * ymargin
+        
+        # Set scroll region
+        self.canvas.configure(scrollregion=(0, 0, total_width, total_height))
+        
+        # Show/hide scrollbars based on content size
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+        
+        # Show horizontal scrollbar if content is wider than canvas
+        if total_width > canvas_width and canvas_width > 1:
+            self.h_scrollbar.grid(row=1, column=0, sticky="EW")
+            if not self.scrollbars_visible:
+                self.scrollbars_visible = True
+        else:
+            self.h_scrollbar.grid_remove()
+        
+        # Show vertical scrollbar if content is taller than canvas
+        if total_height > canvas_height and canvas_height > 1:
+            self.v_scrollbar.grid(row=0, column=1, sticky="NS")
+            if not self.scrollbars_visible:
+                self.scrollbars_visible = True
+        else:
+            self.v_scrollbar.grid_remove()
 
         self.is_built = True
 
@@ -263,10 +330,14 @@ class BaseGrid(ttk.Frame):
         """
         Set the cell at 'index' I to color FILL.
         """
-        if self.canvas:
-            self.fills[i] = fill
-            self.canvas.itemconfig(
-                self.iids[i], fill = fill)
+        if self.canvas and self.winfo_exists():
+            try:
+                self.fills[i] = fill
+                self.canvas.itemconfig(
+                    self.iids[i], fill = fill)
+            except tk.TclError:
+                # Canvas or widget has been destroyed, ignore the update
+                pass
 
     def fillc(self, r, c, fill):
         """
@@ -279,11 +350,15 @@ class BaseGrid(ttk.Frame):
         Set the border of the cell at 'index' I to color OUTLINE and width
         WIDTH.
         """
-        if self.canvas:
-            self.outlines[i] = outline
-            self.widths[i] = width
-            self.canvas.itemconfig(
-                self.iids[i], outline = outline, width = width)
+        if self.canvas and self.winfo_exists():
+            try:
+                self.outlines[i] = outline
+                self.widths[i] = width
+                self.canvas.itemconfig(
+                    self.iids[i], outline = outline, width = width)
+            except tk.TclError:
+                # Canvas or widget has been destroyed, ignore the update
+                pass
 
     def outlinec(self, r, c, outline, width):
         """

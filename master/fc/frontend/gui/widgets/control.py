@@ -54,7 +54,7 @@ from fc.backend import mapper as mr
 from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.embedded import colormaps as cms
 from fc.frontend.gui.widgets import grid as gd, loader as ldr, timer as tmr, \
-    external as ex
+    external as ex, icon_button as ib
 from fc.frontend.gui.theme import BG_ACCENT, SURFACE_1, SURFACE_3, TEXT_PRIMARY, TEXT_DISABLED, WARNING_LIGHT, WARNING_DARK
 
 ## GLOBALS #####################################################################
@@ -69,7 +69,7 @@ P_INDICES, P_FANS = 'S', 'F'
 P_STEP = 'k'
 
 ## MAIN WIDGET #################################################################
-class ControlWidget(tk.Frame, pt.PrintClient):
+class ControlWidget(ttk.Frame, pt.PrintClient):
     """
     Container for all the FC control GUI front-end widgets.
     """
@@ -77,7 +77,7 @@ class ControlWidget(tk.Frame, pt.PrintClient):
 
     def __init__(self, master, network, external, mapper, archive, pqueue,
         setLiveBE, setFBE):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.archive = archive
@@ -253,7 +253,7 @@ class ControlWidget(tk.Frame, pt.PrintClient):
         self._build()
 
 ## WIDGETS #####################################################################
-class PythonInputWidget(tk.Frame):
+class PythonInputWidget(ttk.Frame):
     """
     Base class for a widget for Python code input.
     """
@@ -277,7 +277,7 @@ class PythonInputWidget(tk.Frame):
         CALLBACK is a method to which to pass the resulting Python function
         after being parsed and instantiated, as well as the current time step.
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.parameters = self.PARAMETERS
@@ -334,8 +334,9 @@ class PythonInputWidget(tk.Frame):
             sticky = "WE")
 
         # TODO
-        self.runButton = ttk.Button(self.buttonFrame, text = "Apply Statically",
+        self.runButton = ib.create_apply_button(self.buttonFrame, 
             command = self._run)
+        self.runButton.config_text("Apply Statically")
         self.runButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.runButton)
 
@@ -456,7 +457,7 @@ class PythonInputWidget(tk.Frame):
         """
         print("[WARNING] _help not implemented ")
 
-class MainControlWidget(tk.Frame, pt.PrintClient):
+class MainControlWidget(ttk.Frame, pt.PrintClient):
     """
     Container for the steady flow control tools.
     """
@@ -476,7 +477,7 @@ class MainControlWidget(tk.Frame, pt.PrintClient):
 
 
     def __init__(self, master, network, display, logstart, logstop,  pqueue):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         # Setup ................................................................
@@ -815,7 +816,7 @@ class MainControlWidget(tk.Frame, pt.PrintClient):
         """
         pass
 
-class FunctionControlWidget(tk.Frame, pt.PrintClient):
+class FunctionControlWidget(ttk.Frame, pt.PrintClient):
     """
     Container for the dynamic flow control tools.
     """
@@ -824,7 +825,7 @@ class FunctionControlWidget(tk.Frame, pt.PrintClient):
     DEFAULT_END = ""
 
     def __init__(self, master, display, logstart, logstop, pqueue):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         self.display = display
@@ -924,13 +925,13 @@ class BuiltinFlow:
         self.name, self.description = name, description
         self.source, self.ptype, self.attributes = source, ptype, attributes
 
-class FlowLibraryWidget(tk.Frame, pt.PrintClient):
+class FlowLibraryWidget(ttk.Frame, pt.PrintClient):
     """
     Container for built-in flows.
     """
 
     def __init__(self, master, flows, display, pqueue):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
         # Setup:
         self.flows = flows
@@ -1054,7 +1055,7 @@ class FlowLibraryWidget(tk.Frame, pt.PrintClient):
             widget.config(state = state)
     # FIXME
 
-class ControlPanelWidget(tk.Frame, pt.PrintClient):
+class ControlPanelWidget(ttk.Frame, pt.PrintClient):
     """
     Container for the control GUI tools and peripherals.
     """
@@ -1066,7 +1067,7 @@ class ControlPanelWidget(tk.Frame, pt.PrintClient):
 
     def __init__(self, master, mapper, archive, network, external, display,
         setLive, pqueue):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         # Setup ................................................................
@@ -1377,7 +1378,7 @@ class ControlPanelWidget(tk.Frame, pt.PrintClient):
         for widget in self.activeWidgets:
             widget.config(state = state)
 
-class DisplayMaster(tk.Frame, pt.PrintClient):
+class DisplayMaster(ttk.Frame, pt.PrintClient):
     """
     Wrapper around interactive control widgets such as the grid or the live
     table. Allows the user to switch between them and abstracts their specifics
@@ -1417,7 +1418,7 @@ class DisplayMaster(tk.Frame, pt.PrintClient):
 
         See fc.standards.
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
         self.displays = {}
         self.selected = tk.IntVar()
@@ -2098,7 +2099,7 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
             return dc
         return g
 
-class ColorBarWidget(tk.Frame):
+class ColorBarWidget(ttk.Frame):
     """
     Draw a vertical color gradient for color-coding reference.
     """
@@ -2106,7 +2107,7 @@ class ColorBarWidget(tk.Frame):
 
     def __init__(self, master, colors, pqueue, high = 100, unit = "[?]"):
 
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
         # Setup ................................................................
@@ -2169,7 +2170,7 @@ class ColorBarWidget(tk.Frame):
         self.canvas.create_line(left, y, right, y, width = 4)
         self.canvas.create_line(left, y, right, y, width = 2, fill = 'white')
 
-class LiveTable(pt.PrintClient, tk.Frame):
+class LiveTable(pt.PrintClient, ttk.Frame):
     """
     Another interactive control widget. This one displays all slaves and fans
     in a tabular fashion and hence needs no mapping.
@@ -2195,7 +2196,7 @@ class LiveTable(pt.PrintClient, tk.Frame):
             pqueue := Queue instance for I-P printing
 
         """
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
         self.archive = archive
         self.mapper = mapper
@@ -2257,11 +2258,9 @@ class LiveTable(pt.PrintClient, tk.Frame):
         self.showMenu.pack(side = tk.LEFT, **gus.padc)
 
         self.playPauseFlag = True
-        self.playPauseButton = ttk.Button(
+        self.playPauseButton = ib.create_pause_button(
             self.topBar,
-            text = "Pause",
-            command = self._playPause,
-            style = "Secondary.TButton",
+            command = self._playPause
         )
         self.bind("<space>", self._playPause)
         self.master.bind("<space>",self._playPause)
@@ -2270,10 +2269,12 @@ class LiveTable(pt.PrintClient, tk.Frame):
 
         self.printThread = None
         self.donePrinting = False
-        self.printMatrixButton = ttk.Button(
+        self.printMatrixButton = ib.create_icon_button(
             self.topBar,
             text = "Print",
+            icon = "print",
             command = self._printMatrix,
+            style = "Secondary"
         )
         self.master.bind("<Control-P>",self._printMatrix)
         self.master.bind("<Control-p>",self._printMatrix)
@@ -2447,6 +2448,19 @@ class LiveTable(pt.PrintClient, tk.Frame):
         self.table.tag_configure(
             "N", # Normal
             background= SURFACE_1,
+            foreground = TEXT_PRIMARY,
+            font = self.boldFontSettings
+        )
+
+        # Configure striped rows for better readability
+        stripe_bg = gus.SURFACE_2 if hasattr(gus, 'SURFACE_2') else "#f8f9fa"
+        self.table.tag_configure(
+            "stripe_even",
+            background = SURFACE_1
+        )
+        self.table.tag_configure(
+            "stripe_odd",
+            background = stripe_bg,
             foreground = TEXT_PRIMARY,
             font = (gus.typography["code"]["font"][0], gus.typography["code"]["font"][1], "normal")
         )
@@ -2848,10 +2862,14 @@ class LiveTable(pt.PrintClient, tk.Frame):
 
         if self.playPauseFlag or force is False:
             self.playPauseFlag = False
-            self.playPauseButton.config(text = "Play", **gus.btn_primary)
+            self.playPauseButton.config_text("Play")
+            self.playPauseButton.config_icon("play")
+            self.playPauseButton.config_style("Primary")
         elif not self.playPauseFlag or force is True:
             self.playPauseFlag = True
-            self.playPauseButton.config(text = "Pause", **gus.btn_secondary)
+            self.playPauseButton.config_text("Pause")
+            self.playPauseButton.config_icon("pause")
+            self.playPauseButton.config_style("Secondary")
 
     def _showMenuCallback(self, *event):
         if self.showMenuVar.get() == "RPM":
@@ -2868,8 +2886,11 @@ class LiveTable(pt.PrintClient, tk.Frame):
 
             if N > self.numSlaves:
                 for index in range(self.numSlaves, N):
+                    # Determine stripe tag based on row index
+                    stripe_tag = "stripe_even" if index % 2 == 0 else "stripe_odd"
+                    tags = ('N', stripe_tag)
                     self.slaves[index] = self.table.insert('', 'end',
-                        values = (index + 1,) + self.zeroes, tag = 'N')
+                        values = (index + 1,) + self.zeroes, tags = tags)
                     self.numSlaves += 1
 
             slave_i, vector_i = 0, L*self.offset
@@ -2880,8 +2901,10 @@ class LiveTable(pt.PrintClient, tk.Frame):
 
                 if std.RIP in values:
                     # This slave is disconnected
+                    stripe_tag = "stripe_even" if slave_i % 2 == 0 else "stripe_odd"
+                    tags = ("D", stripe_tag)
                     self.table.item(self.slaves[slave_i],
-                        values = (slave_i + 1,), tag = "D")
+                        values = (slave_i + 1,), tags = tags)
                 elif std.PAD not in values:
                     # This slave is active
                     if self.sentinelFlag:
@@ -2889,9 +2912,11 @@ class LiveTable(pt.PrintClient, tk.Frame):
                             if self._sentinelCheck(values):
                                 tag = "H"
                                 self._executeSentinel(slave_i, fan, value)
+                    stripe_tag = "stripe_even" if slave_i % 2 == 0 else "stripe_odd"
+                    tags = (tag, stripe_tag)
                     self.table.item(self.slaves[slave_i],
                         values = (slave_i + 1, max(values), min(values)) \
-                            + values, tag = tag)
+                            + values, tags = tags)
                 slave_i += 1
                 vector_i += self.maxFans
 
