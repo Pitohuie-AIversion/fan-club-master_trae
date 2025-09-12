@@ -293,7 +293,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self.connectButton.config(state = tk.NORMAL, text = "Disconnect",
             command = self._onDisconnect)
         self.connectionVar.set("Connected")
-        # ttk.Label 不支持直接使用 fg/bg，改为切换样式
+        # ttk.Label doesn't support direct fg/bg usage, switch to style instead
         style = ttk.Style(self.connectionLabel)
         style.configure('NetworkConnected.TLabel',
                         foreground=s.FOREGROUNDS[s.SS_CONNECTED],
@@ -326,7 +326,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             port.set(self.NO_PORT)
         for client in self.clients:
             client.disconnected()
-        # ttk.Label 不支持直接使用 fg/bg，改为切换样式
+        # ttk.Label doesn't support direct fg/bg usage, switch to style instead
         style = ttk.Style(self.connectionLabel)
         style.configure('NetworkDisconnected.TLabel',
                         foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],

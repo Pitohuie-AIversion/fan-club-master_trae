@@ -33,7 +33,7 @@ import tkinter.ttk as ttk
 
 from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.widgets import network as ntw, control as ctr, \
-    profile as pro, console as csl
+    profile as pro, console as csl, monitoring as mon, filter_config as flt
 # from fc.frontend.gui.embedded import caltech_white as cte
 from fc.frontend.gui.embedded import brand_zd as bzd
 import fc.frontend.gui.embedded.icon as icn
@@ -123,6 +123,16 @@ class Base(ttk.Frame, ResponsiveMixin):
         
         # Initialize UI density setting
         self._ui_density = 'comfortable'  # Default to comfortable density
+        
+        # Initialize signal acquisition engine for hardware control
+        try:
+            from fc.backend.signal_acquisition import SignalAcquisitionEngine, AcquisitionConfig
+            self.acquisition_engine = SignalAcquisitionEngine(pqueue)
+            self.acquisition_config = AcquisitionConfig()
+            self.acquisition_engine.configure(self.acquisition_config)
+        except Exception as e:
+            print(f"[DEBUG] Failed to initialize acquisition engine: {e}")
+            self.acquisition_engine = None
 
         self.screenWidth = self.master.winfo_screenwidth()
         self.screenHeight = self.master.winfo_screenheight()
@@ -212,6 +222,8 @@ class Base(ttk.Frame, ResponsiveMixin):
         self.networkTab = ttk.Frame(self.notebook)
         self.controlTab = ttk.Frame(self.notebook)
         self.consoleTab = ttk.Frame(self.notebook)
+        self.monitoringTab = ttk.Frame(self.notebook)
+        self.filterTab = ttk.Frame(self.notebook)
 
         # Profile tab:
         self.profileCard = ttk.Frame(self.profileTab, style="Card.TFrame")
@@ -257,10 +269,28 @@ class Base(ttk.Frame, ResponsiveMixin):
         self.consoleWidget.pack(fill = tk.BOTH, expand = True)
         self.consoleTab.bind("<Visibility>", self._consoleCalm)
 
+        # Monitoring tab:
+        self.monitoringCard = ttk.Frame(self.monitoringTab, style="Card.TFrame")
+        self.monitoringCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.monitoringCard, text="Data Monitoring", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.monitoringWidget = mon.MonitoringWidget(self.monitoringCard,
+            archive = archive, pqueue = pqueue)
+        self.monitoringWidget.pack(fill = tk.BOTH, expand = True)
+
+        # Filter Configuration tab:
+        self.filterCard = ttk.Frame(self.filterTab, style="Card.TFrame")
+        self.filterCard.pack(fill = tk.BOTH, expand = True, padx = 20, pady = 20)
+        ttk.Label(self.filterCard, text="Filter Configuration", style="TitleLabel.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        self.filterWidget = flt.FilterConfigWidget(self.filterCard,
+            archive = archive, pqueue = pqueue, monitoring_widget = self.monitoringWidget)
+        self.filterWidget.pack(fill = tk.BOTH, expand = True)
+
         self.notebook.add(self.profileTab, text = "Profile")
         self.notebook.add(self.networkTab, text = "Network")
         self.notebook.add(self.controlTab, text = "Control")
         self.notebook.add(self.consoleTab, text = "Console")
+        self.notebook.add(self.monitoringTab, text = "Monitoring")
+        self.notebook.add(self.filterTab, text = "Filter Config")
 
         self.notebook.grid(row = 1, sticky = 'NWES')
 
@@ -285,6 +315,8 @@ class Base(ttk.Frame, ResponsiveMixin):
         self.responsive_manager.register_widget(self.networkWidget, "network")
         self.responsive_manager.register_widget(self.controlWidget, "control")
         self.responsive_manager.register_widget(self.consoleWidget, "console")
+        self.responsive_manager.register_widget(self.monitoringWidget, "monitoring")
+        self.responsive_manager.register_widget(self.filterWidget, "filter_config")
 
     def focusProfile(self, *_):
         self.notebook.select(0)
@@ -300,6 +332,12 @@ class Base(ttk.Frame, ResponsiveMixin):
 
     def focusConsole(self, *_):
         self.notebook.select(3)
+
+    def focusMonitoring(self, *_):
+        self.notebook.select(4)
+
+    def focusFilterConfig(self, *_):
+        self.notebook.select(5)
 
     def getConsoleMethods(self):
         c = self.consoleWidget
@@ -424,6 +462,136 @@ class Base(ttk.Frame, ResponsiveMixin):
         compact_radio = ttk.Radiobutton(density_radio_frame, text="Compact", 
                                        variable=density_var, value="compact")
         compact_radio.pack(anchor=tk.W, pady=2)
+        
+        # Hardware tab
+        hardware_tab = ttk.Frame(notebook)
+        notebook.add(hardware_tab, text="Hardware")
+        
+        # Hardware type selection section
+        hardware_section = ttk.LabelFrame(hardware_tab, text="Signal Source")
+        hardware_section.pack(fill=tk.X, padx=10, pady=10)
+        
+        # Get current hardware status
+        try:
+            from fc.backend.signal_acquisition import SignalAcquisitionEngine, AcquisitionConfig
+            if hasattr(self, 'acquisition_engine'):
+                hardware_status = self.acquisition_engine.get_hardware_status()
+                current_hardware_type = hardware_status.get('config_type', 'simulated')
+                hardware_connected = hardware_status.get('connected', False)
+                hardware_running = hardware_status.get('running', False)
+            else:
+                current_hardware_type = 'simulated'
+                hardware_connected = False
+                hardware_running = False
+        except Exception as e:
+            current_hardware_type = 'simulated'
+            hardware_connected = False
+            hardware_running = False
+            print(f"[DEBUG] Error getting hardware status: {e}")
+        
+        # Hardware status display
+        status_frame = ttk.Frame(hardware_section)
+        status_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        ttk.Label(status_frame, text="Current source:").pack(side=tk.LEFT)
+        hardware_status_label = ttk.Label(status_frame, 
+                                         text=f"{current_hardware_type.title()} Hardware", 
+                                         font=("Segoe UI", 9, "bold"))
+        hardware_status_label.pack(side=tk.LEFT, padx=(10, 0))
+        
+        # Connection status indicator
+        if current_hardware_type == 'real':
+            status_color = "🟢" if hardware_connected else "🔴"
+            status_text = "Connected" if hardware_connected else "Disconnected"
+        else:
+            status_color = "🟡"
+            status_text = "Simulated"
+        
+        status_indicator = ttk.Label(status_frame, text=f"{status_color} {status_text}")
+        status_indicator.pack(side=tk.LEFT, padx=(20, 0))
+        
+        # Hardware type selection
+        hardware_var = tk.StringVar(value=current_hardware_type)
+        hardware_radio_frame = ttk.Frame(hardware_section)
+        hardware_radio_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        simulated_radio = ttk.Radiobutton(hardware_radio_frame, 
+                                         text="🖥️ Simulated Hardware (Virtual signals for testing)", 
+                                         variable=hardware_var, value="simulated")
+        simulated_radio.pack(anchor=tk.W, pady=2)
+        
+        real_radio = ttk.Radiobutton(hardware_radio_frame, 
+                                    text="⚡ Real Hardware (Physical signal acquisition)", 
+                                    variable=hardware_var, value="real")
+        real_radio.pack(anchor=tk.W, pady=2)
+        
+        auto_radio = ttk.Radiobutton(hardware_radio_frame, 
+                                    text="🔄 Auto Detect (Try real hardware, fallback to simulated)", 
+                                    variable=hardware_var, value="auto")
+        auto_radio.pack(anchor=tk.W, pady=2)
+        
+        # Hardware switching callback
+        def on_hardware_change():
+            new_hardware_type = hardware_var.get()
+            if new_hardware_type != current_hardware_type and not hardware_running:
+                try:
+                    if hasattr(self, 'acquisition_engine'):
+                        success = self.acquisition_engine.switch_hardware_type(new_hardware_type)
+                        if success:
+                            # Update status display
+                            hardware_status_label.config(text=f"{new_hardware_type.title()} Hardware")
+                            
+                            # Update connection status
+                            new_status = self.acquisition_engine.get_hardware_status()
+                            new_connected = new_status.get('connected', False)
+                            
+                            if new_hardware_type == 'real':
+                                status_color = "🟢" if new_connected else "🔴"
+                                status_text = "Connected" if new_connected else "Disconnected"
+                            else:
+                                status_color = "🟡"
+                                status_text = "Simulated"
+                            
+                            status_indicator.config(text=f"{status_color} {status_text}")
+                            
+                            # Show success message
+                            import tkinter.messagebox as msgbox
+                            msgbox.showinfo("Hardware Switch", 
+                                          f"Successfully switched to {new_hardware_type} hardware")
+                        else:
+                            # Revert selection on failure
+                            hardware_var.set(current_hardware_type)
+                            import tkinter.messagebox as msgbox
+                            msgbox.showerror("Hardware Switch Failed", 
+                                           f"Failed to switch to {new_hardware_type} hardware")
+                    else:
+                        import tkinter.messagebox as msgbox
+                        msgbox.showwarning("No Acquisition Engine", 
+                                         "Signal acquisition engine not available")
+                        hardware_var.set(current_hardware_type)
+                except Exception as e:
+                    # Revert selection on error
+                    hardware_var.set(current_hardware_type)
+                    import tkinter.messagebox as msgbox
+                    msgbox.showerror("Error", f"Error switching hardware: {str(e)}")
+        
+        # Bind hardware change callback to radio buttons
+        for radio in [simulated_radio, real_radio, auto_radio]:
+            radio.configure(command=on_hardware_change)
+        
+        # Warning message for hardware switching
+        warning_frame = ttk.Frame(hardware_section)
+        warning_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        if hardware_running:
+            warning_text = "⚠️ Stop signal acquisition before changing hardware type"
+            ttk.Label(warning_frame, text=warning_text, foreground="orange").pack(anchor=tk.W)
+            # Disable radio buttons when acquisition is running
+            for radio in [simulated_radio, real_radio, auto_radio]:
+                radio.configure(state="disabled")
+        else:
+            info_text = "💡 Hardware changes take effect immediately"
+            ttk.Label(warning_frame, text=info_text, foreground="blue").pack(anchor=tk.W)
         
         # General tab
         general_tab = ttk.Frame(notebook)
@@ -636,7 +804,7 @@ class Base(ttk.Frame, ResponsiveMixin):
     
     def _setup_ux_callbacks(self):
         """
-        设置用户体验增强的回调函数
+        Setup user experience enhancement callback functions
         """
         callbacks = {
             'toggle_density': self._toggle_density_shortcut,
@@ -645,12 +813,12 @@ class Base(ttk.Frame, ResponsiveMixin):
         }
         self.ux_manager.set_app_callbacks(callbacks)
         
-        # 为主要控件添加工具提示
+        # Add tooltips for main controls
         self._add_tooltips()
     
     def _toggle_density_shortcut(self):
         """
-        密度切换快捷键回调
+        Density toggle shortcut callback
         """
         current_density = getattr(self, '_ui_density', 'comfortable')
         new_density = 'compact' if current_density == 'comfortable' else 'comfortable'
@@ -659,7 +827,7 @@ class Base(ttk.Frame, ResponsiveMixin):
     
     def _switch_tab_shortcut(self, tab_index: int):
         """
-        标签页切换快捷键回调
+        Tab switching shortcut callback
         """
         try:
             if hasattr(self, 'notebook') and 0 <= tab_index < self.notebook.index('end'):
@@ -669,31 +837,31 @@ class Base(ttk.Frame, ResponsiveMixin):
     
     def _add_tooltips(self):
         """
-        为主要控件添加工具提示
+        Add tooltips for main controls
         """
         try:
-            # 为标签页添加工具提示
+            # Add tooltips for tabs
             if hasattr(self, 'notebook'):
                 tab_tooltips = [
-                    "Profile - 配置文件管理和显示 (Ctrl+1)",
-                    "Network - 网络设置和连接管理 (Ctrl+2)", 
-                    "Control - 风扇控制和监控 (Ctrl+3)",
-                    "Console - 系统日志和调试信息 (Ctrl+4)"
+                    "Profile - Configuration file management and display (Ctrl+1)",
+                    "Network - Network settings and connection management (Ctrl+2)", 
+                    "Control - Fan control and monitoring (Ctrl+3)",
+                    "Console - System logs and debug information (Ctrl+4)"
                 ]
                 
                 for i, tooltip_text in enumerate(tab_tooltips):
                     try:
                         tab_id = self.notebook.tabs()[i]
-                        # 注意：ttk.Notebook的标签页工具提示需要特殊处理
-                        # 这里我们为整个notebook添加一个通用提示
-                        if i == 0:  # 只为第一个标签添加，避免重复
+                        # Note: ttk.Notebook tab tooltips require special handling
+                        # Here we add a general tooltip for the entire notebook
+                        if i == 0:  # Only add for the first tab to avoid duplication
                             self.ux_manager.add_tooltip(self.notebook, 
-                                "使用 Ctrl+1-4 快速切换标签页")
+                                "Use Ctrl+1-4 to quickly switch tabs")
                     except (IndexError, tk.TclError):
                         continue
             
-            # 为其他重要控件添加工具提示（如果存在的话）
-            # 这些控件可能在子类中定义，所以使用hasattr检查
+            # Add tooltips for other important controls (if they exist)
+            # These controls may be defined in subclasses, so use hasattr to check
             
         except Exception as e:
             print(f"Error adding tooltips: {e}")

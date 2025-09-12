@@ -47,6 +47,8 @@ class KeyboardShortcuts:
         self.register_shortcut('Control-2', lambda: self._switch_tab(1), '切换到Network标签页')
         self.register_shortcut('Control-3', lambda: self._switch_tab(2), '切换到Control标签页')
         self.register_shortcut('Control-4', lambda: self._switch_tab(3), '切换到Console标签页')
+        self.register_shortcut('Control-5', lambda: self._switch_tab(4), '切换到Monitoring标签页')
+        self.register_shortcut('Control-6', lambda: self._switch_tab(5), '切换到Filter Config标签页')
     
     def register_shortcut(self, key_sequence: str, callback: Callable, description: str = ""):
         """注册快捷键"""
