@@ -37,6 +37,7 @@ from fc.frontend.gui.widgets import splash as spl, base as bas
 import fc.frontend.gui.embedded.icon as icn
 from fc.frontend.gui import guiutils as gus
 from fc.frontend.gui.theme import SURFACE_2, TEXT_PRIMARY, SURFACE_1, SURFACE_3, PRIMARY_500, PRIMARY_600, TEXT_SECONDARY, TEXT_ON_DARK
+from fc.frontend.gui.theme_manager import theme_manager
 
 ## GLOBALS #####################################################################
 TITLE = "FC MkIV"
@@ -138,13 +139,16 @@ class FCGUI(fe.FCFrontend):
             except Exception:
                 pass
 
-            # Base palette
-            base_bg = SURFACE_2
-            card_bg = SURFACE_1
-            accent = PRIMARY_500
-            accent_hover = PRIMARY_600
-            fg = TEXT_PRIMARY
-            fg_muted = TEXT_SECONDARY
+            # Base palette - use theme manager for dynamic colors
+            base_bg = theme_manager.get_color('SURFACE_2')
+            card_bg = theme_manager.get_color('SURFACE_1')
+            accent = theme_manager.get_color('PRIMARY_500')
+            accent_hover = theme_manager.get_color('PRIMARY_600')
+            fg = theme_manager.get_color('TEXT_PRIMARY')
+            fg_muted = theme_manager.get_color('TEXT_SECONDARY')
+            
+            # Apply theme to ttk styles
+            theme_manager.apply_ttk_theme(style)
 
             # Global element sizes
             style.configure("TLabel", background=base_bg, foreground=fg, font=gus.typography["body_medium"]["font"])
@@ -242,27 +246,52 @@ class FCGUI(fe.FCFrontend):
                 bordercolor=[["focus", accent]] if hasattr(ttk, "Style") else []
             )
 
-            # Treeview
+            # Treeview - Enhanced with striped rows and hover effects
             style.configure(
                 "Treeview",
                 background=card_bg,
                 fieldbackground=card_bg,
                 foreground=fg,
-                rowheight=22,
-                borderwidth=0
+                rowheight=24,  # Slightly taller for better readability
+                borderwidth=0,
+                relief="flat"
             )
+            
+            # Treeview headings - improved typography and alignment
             style.configure(
                 "Treeview.Heading",
                 background=base_bg,
                 foreground=fg,
                 relief="flat",
-                padding=(8, 6)
+                padding=(12, 8),  # More generous padding
+                font=("Segoe UI", 9, "bold"),  # Bold headers for better hierarchy
+                anchor="center"  # Center-align headers
             )
-            # Selection colors for Treeview rows
+            
+            # Enhanced selection and hover states
             style.map(
                 "Treeview",
-                background=[["selected", accent]],
-                foreground=[["selected", gus.btn_primary.get("fg", "white")]]
+                background=[
+                    ["selected", "focus", accent],
+                    ["selected", "!focus", gus.PRIMARY_200],  # Softer selection when not focused
+                    ["active", gus.SURFACE_3]  # Hover effect
+                ],
+                foreground=[
+                    ["selected", "focus", gus.btn_primary.get("fg", "white")],
+                    ["selected", "!focus", fg],
+                    ["active", fg]
+                ]
+            )
+            
+            # Configure striped rows using tags (will be applied in widgets)
+            # Alternating row colors for better readability
+            stripe_bg = gus.SURFACE_2 if theme_manager.current_theme == "dark" else "#f8f9fa"
+            
+            # Map hover effects for better interactivity
+            style.map(
+                "Treeview.Heading",
+                background=[["active", gus.SURFACE_3]],  # Hover effect on headers
+                relief=[["pressed", "sunken"]]
             )
 
             # Notebook (tabs)
@@ -294,6 +323,61 @@ class FCGUI(fe.FCFrontend):
             # Scrollbar & Separator for cleaner look
             style.configure("TScrollbar", background=card_bg)
             style.configure("TSeparator", background=SURFACE_3)
+
+            # Radiobuttons
+            style.configure(
+                "TRadiobutton",
+                background=base_bg,
+                foreground=fg,
+                padding=(6, 4)
+            )
+            style.map(
+                "TRadiobutton",
+                foreground=[["disabled", fg_muted]]
+            )
+
+            # Combobox
+            style.configure(
+                "TCombobox",
+                fieldbackground=card_bg,
+                background=card_bg,
+                foreground=fg
+            )
+            style.map(
+                "TCombobox",
+                fieldbackground=[["readonly", card_bg], ["focus", SURFACE_1]],
+                foreground=[["disabled", fg_muted]]
+            )
+
+            # OptionMenu / Menubutton
+            style.configure(
+                "TMenubutton",
+                background=card_bg,
+                foreground=fg,
+                padding=(10, 6)
+            )
+            style.map(
+                "TMenubutton",
+                background=[["active", SURFACE_3], ["pressed", SURFACE_3]]
+            )
+
+            # Scale
+            style.configure("TScale", background=base_bg)
+            style.configure("Horizontal.TScale", background=base_bg)
+            style.configure("Vertical.TScale", background=base_bg)
+
+            # Progressbar
+            style.configure(
+                "TProgressbar",
+                background=accent,
+                troughcolor=SURFACE_3
+            )
+
+            # Secondary button hover/pressed mapping
+            style.map(
+                "Secondary.TButton",
+                background=[["active", SURFACE_3], ["pressed", SURFACE_3]]
+            )
         except Exception:
             # Fail silently to avoid blocking UI due to styling errors
             pass

@@ -51,37 +51,72 @@ class SplashFrame(ttk.Frame):
     screen.
     """
 
-    def __init__(self, widget, master=None, width=750, height=500, ratio=False):
+    def __init__(self, widget, master=None, width=None, height=None, ratio=False):
 
-        ttk.Frame.__init__(self, master)
+        # Style to ensure no white borders/padding and unified background
+        style = ttk.Style(master)
+        style.configure("Splash.TFrame", background=SURFACE_1, borderwidth=0, padding=0)
+        ttk.Frame.__init__(self, master, style="Splash.TFrame")
         self.pack(side = tk.TOP, fill = tk.BOTH, expand = tk.YES)
+
+        # Ensure root background matches splash background to avoid white edge
+        try:
+            self.master.configure(bg=SURFACE_1, highlightthickness=0)
+        except tk.TclError:
+            pass
+
+        # Build content first so we can size the window to fit content exactly
+        self.widget = widget(self)
+        self.widget.pack(fill = tk.BOTH, expand = True)
+
+        # Compute size based on content if not explicitly provided
+        self.master.update_idletasks()
 
         # Screen size
         ws = self.master.winfo_screenwidth()
         hs = self.master.winfo_screenheight()
-        w = (ratio and ws*width) or width
-        h = (ratio and ws*height) or height
 
-        # Position
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
-        self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        content_w = self.widget.winfo_reqwidth()
+        content_h = self.widget.winfo_reqheight()
 
-        self.widget = widget(self)
-        self.widget.pack(fill = tk.BOTH, expand = True)
+        if ratio and width:
+            w = int(ws * width)
+        else:
+            w = int(width) if width else content_w
+
+        if ratio and height:
+            h = int(hs * height)
+        else:
+            h = int(height) if height else content_h
+
+        # Position centered on screen
+        x = int((ws - w) / 2)
+        y = int((hs - h) / 2)
+        self.master.geometry(f"{w}x{h}+{x}+{y}")
 
         self.master.overrideredirect(True)
+        # Keep on top during splash to avoid visual artifacts
+        try:
+            self.master.attributes('-topmost', True)
+        except tk.TclError:
+            pass
         self.lift()
 
 class FCSplashWidget(ttk.Frame):
     def __init__(self, master):
-        ttk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master, style="Splash.TFrame")
 
         self.image = tk.PhotoImage(data = stp.SPLASH)
-        self.image = self.image.subsample(2)
-        # use tk.Label for image; place over ttk frame
-        self.label = tk.Label(self, image = self.image, anchor = tk.CENTER,
-            bg = SURFACE_1)
+        # Make the splash image larger by using its native resolution (remove subsample)
+        # If further scaling is needed in the future, consider PhotoImage.zoom(...)
+
+        # use ttk.Label for image; place over ttk frame for consistent theming
+        self.label = ttk.Label(
+            self,
+            image = self.image,
+            anchor = tk.CENTER,
+            style = "Splash.TLabel"
+        )
         self.label.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
 class SerialSplash:
@@ -101,6 +136,11 @@ class SerialSplash:
         defaults to DEFAULT_TIMEOUT.
         """
         root = tk.Tk()
+        # Match root background to splash background to avoid any visible border
+        try:
+            root.configure(background=SURFACE_1)
+        except tk.TclError:
+            pass
         root.bind("<Button-1>", lambda e: root.destroy())
         splash = SplashFrame(master = root, widget = self.widget, **self.kwargs)
         start = tm.time()
@@ -120,6 +160,11 @@ class ParallelSplash:
         To be executed by the separate process that displays the splash screen.
         """
         root = tk.Tk()
+        # Match root background to splash background to avoid any visible border
+        try:
+            root.configure(background=SURFACE_1)
+        except tk.TclError:
+            pass
         root.bind("<Button-1>", lambda e: root.destroy())
         splash = SplashFrame(master = root, widget = widget, **kwargs)
         start = tm.time()

@@ -206,6 +206,11 @@ class FCCommunicator(pt.PrintClient):
         To be executed when the network switches to disconnected.
         """
         # Send disconnected status vector
-        self.networkPipeSend.send((False, None, None, None, None))
+        try:
+            if self.networkPipeSend and not self.networkPipeSend.closed:
+                self.networkPipeSend.send((False, None, None, None, None))
+        except (OSError, BrokenPipeError) as e:
+            # Pipe is already closed, ignore the error
+            self.printd(f"Network pipe already closed: {e}")
 
 

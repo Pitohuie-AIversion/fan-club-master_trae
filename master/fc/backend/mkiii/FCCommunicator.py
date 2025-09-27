@@ -677,6 +677,21 @@ class FCCommunicator(pt.PrintClient):
                     return True
             except:
                 return False
+    
+    def get_rpm_data(self):
+        """
+        Get current RPM data from all connected slaves.
+        Returns a list of RPM values for all fans.
+        """
+        try:
+            F_r = []
+            for slave in self.slaves:
+                rpms, dcs = slave.getMISO()
+                F_r += rpms
+            return F_r
+        except Exception as e:
+            self.printx(e, "Exception getting RPM data:")
+            return []
 
     def __handle_input_CTL_DC_SINGLE(self, C):
         """

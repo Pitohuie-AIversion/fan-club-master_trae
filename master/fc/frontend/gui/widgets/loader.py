@@ -36,7 +36,7 @@ import tkinter.ttk as ttk
 import tkinter.font as fnt
 
 from fc.frontend.gui import guiutils as gus
-from fc.frontend.gui.widgets import grid as gd
+from fc.frontend.gui.widgets import grid as gd, icon_button as ib
 from fc.frontend.gui.embedded import colormaps as cms
 from fc.frontend.gui.theme import BG_ACCENT
 
@@ -225,12 +225,12 @@ class LoaderWidget(Loader):
         self.interactive.append(widget)
 
     def _buildLoadButton(self, text = "Load"):
-        self.loadButton = ttk.Button(self, text=text, command=self._load, style="Secondary.TButton")
+        self.loadButton = ib.create_icon_button(self, text=text, icon="load", command=self._load, style="Secondary")
         self.loadButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.loadButton)
 
     def _buildSaveButton(self, text = "Save"):
-        self.saveButton = ttk.Button(self, text=text, command=self._save, style="Secondary.TButton")
+        self.saveButton = ib.create_icon_button(self, text=text, icon="save", command=self._save, style="Secondary")
         self.saveButton.pack(side = tk.LEFT, **gus.padc)
         self.interactive.append(self.saveButton)
 
