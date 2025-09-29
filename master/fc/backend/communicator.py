@@ -1,24 +1,25 @@
 ################################################################################
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##                            WESTLAKE UNIVERSITY                            ##
+##                      ADVANCED SYSTEMS LABORATORY                         ##
 ##----------------------------------------------------------------------------##
-##      ____      __      __  __      _____      __      __    __    ____     ##
-##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
-##    / /_ |/  / /  /|  /  // /|/ / /|__| _|   / /|    / /|  / /|/ /   --||   ##
-##   / __/|/ _/    /|/ /   / /|/ / /|    __   / /|    / /|  / /|/ / _  \|/    ##
-##  / /|_|/ /  /  /|/ / // //|/ / /|__- / /  / /___  / -|_ - /|/ /     /|     ##
-## /_/|/   /_/ /_/|/ /_/ /_/|/ |\ ___--|_|  /_____/| |-___-_|/  /____-/|/     ##
-## |_|/    |_|/|_|/  |_|/|_|/   \|___|-    |_____|/   |___|     |____|/       ##
-##                   _ _    _    ___   _  _      __  __   __                  ##
-##                  | | |  | |  | T_| | || |    |  ||_ | | _|                 ##
-##                  | _ |  |T|  |  |  |  _|      ||   \\_//                   ##
-##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
+##  ███████╗██╗  ██╗ █████╗  ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗ ██████╗     ##
+##  ╚══███╔╝██║  ██║██╔══██╗██╔═══██╗╚██╗ ██╔╝██╔══██╗████╗  ██║██╔════╝     ##
+##    ███╔╝ ███████║███████║██║   ██║ ╚████╔╝ ███████║██╔██╗ ██║██║  ███╗    ##
+##   ███╔╝  ██╔══██║██╔══██║██║   ██║  ╚██╔╝  ██╔══██║██║╚██╗██║██║   ██║    ##
+##  ███████╗██║  ██║██║  ██║╚██████╔╝   ██║   ██║  ██║██║ ╚████║╚██████╔╝    ##
+##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
+##                                                                            ##
+##  ██████╗  █████╗ ███████╗██╗  ██╗██╗   ██╗ █████╗ ██╗                     ##
+##  ██╔══██╗██╔══██╗██╔════╝██║  ██║██║   ██║██╔══██╗██║                     ##
+##  ██║  ██║███████║███████╗███████║██║   ██║███████║██║                     ##
+##  ██║  ██║██╔══██║╚════██║██╔══██║██║   ██║██╔══██║██║                     ##
+##  ██████╔╝██║  ██║███████║██║  ██║╚██████╔╝██║  ██║██║                     ##
+##  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝                     ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com> ##                 ##
+## dashuai                    ## <dschen2018@gmail.com>    ##                 ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -173,6 +174,60 @@ class FCCommunicator(pt.PrintClient):
             "<broadcast>"
         """
         self.commandIn(s.CMD_BIP, ip)
+    
+    def get_performance_stats(self):
+        """
+        Get performance statistics from the backend communicator.
+        Returns a dictionary with performance metrics or None if not available.
+        """
+        if hasattr(self, 'process') and self.process and self.process.is_alive():
+            try:
+                # Send a command to get performance stats
+                self.commandIn(s.CMD_PERF_STATS)
+                return True
+            except Exception as e:
+                self.printw(f"Failed to request performance stats: {e}")
+                return False
+        return False
+    
+    def reset_performance_stats(self):
+        """
+        Reset performance statistics in the backend communicator.
+        """
+        if hasattr(self, 'process') and self.process and self.process.is_alive():
+            try:
+                self.commandIn(s.CMD_PERF_RESET)
+                return True
+            except Exception as e:
+                self.printw(f"Failed to reset performance stats: {e}")
+                return False
+        return False
+    
+    def enable_performance_monitoring(self):
+        """
+        Enable performance monitoring in the backend.
+        """
+        if hasattr(self, 'process') and self.process and self.process.is_alive():
+            try:
+                self.commandIn(s.CMD_PERF_ENABLE)
+                return True
+            except Exception as e:
+                self.printw(f"Failed to enable performance monitoring: {e}")
+                return False
+        return False
+    
+    def disable_performance_monitoring(self):
+        """
+        Disable performance monitoring in the backend.
+        """
+        if hasattr(self, 'process') and self.process and self.process.is_alive():
+            try:
+                self.commandIn(s.CMD_PERF_DISABLE)
+                return True
+            except Exception as e:
+                self.printw(f"Failed to disable performance monitoring: {e}")
+                return False
+        return False
 
     # Internal methods .........................................................
     @staticmethod

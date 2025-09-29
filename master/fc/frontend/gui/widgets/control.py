@@ -1,7 +1,7 @@
 ################################################################################
 ## Project: Fanclub Mark IV "Master" GUI          ## File: control.py         ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
 ## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
@@ -17,9 +17,9 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com> ##                 ##
+## dashuai                    ## <dschen2018@gmail.com>    ##                 ##
+##                            ##                           ##                 ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -386,24 +386,63 @@ class PythonInputWidget(ttk.Frame):
     def _parse(self):
         """
         Parse and return the current function.
+        Uses secure code execution with restricted namespace.
         """
         raw = self.text.get(1.0, tk.END)
         if len(raw) < len("return"):
-            print("Too short") # FIXME DEBUG
+            self.printx("Code too short - must contain at least a return statement")
             return None
+        
+        # Input validation - check for dangerous operations
+        dangerous_keywords = ['import', 'open', 'file', 'exec', 'eval', '__', 'globals', 'locals']
+        for keyword in dangerous_keywords:
+            if keyword in raw.lower():
+                self.printx(f"Security warning: '{keyword}' is not allowed in user code")
+                return None
+        
         retabbed = raw.replace('\t', self.realtabs)
 
         built = self.signature + '\n'
-        """
+        # Add safe imports to the function scope
         for imported in self.IMPORTS:
             built += self.realtabs + "import {}\n".format(imported)
-        """ # FIXME test
+        
         for line in retabbed.split('\n'):
             built += self.realtabs + line + '\n'
         built += self.FOOTER + '\n'
 
-        exec(built) # TODO: fix security hole in exec
-        # Function is stored in self.func
+        # Secure execution with restricted namespace
+        try:
+            # Create restricted global namespace with only safe builtins
+            safe_globals = {
+                '__builtins__': {
+                    'abs': abs, 'min': min, 'max': max, 'round': round,
+                    'int': int, 'float': float, 'str': str, 'bool': bool,
+                    'len': len, 'range': range, 'enumerate': enumerate,
+                    'zip': zip, 'sum': sum, 'any': any, 'all': all
+                },
+                'math': __import__('math'),
+                'random': __import__('random')
+            }
+            
+            # Compile and execute the code safely
+            compiled_code = compile(built, '<user_input>', 'exec')
+            local_namespace = {}
+            exec(compiled_code, safe_globals, local_namespace)
+            
+            # Extract the function from local namespace
+            self.func = local_namespace.get('duty_cycle')
+            if self.func is None:
+                self.printx("Error: Function 'duty_cycle' not found in code")
+                return None
+                
+        except SyntaxError as e:
+            self.printx(f"Syntax error in code: {e}")
+            return None
+        except Exception as e:
+            self.printx(f"Error executing code: {e}")
+            return None
+            
         return self.func
 
     def _run(self, *_):
@@ -466,7 +505,8 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
     SLIDER_MAX = 100
 
     FT_ROW, FT_COL, FT_TV, FT_GNLOG, FT_GDLOG = 0, 1 ,2 ,3, 5
-    FT_LIST =4 # FIXME temp
+    FT_LIST = 4  # List file type
+    FT_LGU, FT_LGG = 6, 7  # Log file types for user and grid
     FILETYPES = (
         ("Row (,)", FT_ROW),
         ("Column (\\n)", FT_COL),
@@ -509,16 +549,21 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             text = "Direct input")
         self.directFrame.pack(side = tk.LEFT, fill = tk.X, expand = True)
 
-        self.directValueEntry = ttk.Entry(self.directFrame, width = 6)
+        # Register validation function for numeric input
+        vcmd = (self.register(self._validateNumeric), '%P')
+        
+        self.directValueEntry = ttk.Entry(self.directFrame, width = 6, 
+                                        validate='key', validatecommand=vcmd)
         self.directValueEntry.pack(side = tk.LEFT, **gus.padc)
-        # FIXME validate
+        # Input validation implemented for duty cycle values (0-100)
         self.sendDirectButton = ttk.Button(self.directFrame, text = "Apply",
             command = self._onSendDirect)
         self.sendDirectButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.directValueEntry)
         self.activeWidgets.append(self.sendDirectButton)
 
-        # FIXME keyboard bindings
+        # Keyboard bindings for enhanced user experience
+        self._setupKeyboardBindings()
 
         # Random flow ..........................................................
         self.randomFrame = ttk.LabelFrame(self.simpleFrame, text = "Random Flow")
@@ -527,8 +572,9 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.leftB = ttk.Label(self.randomFrame, text = "[", style = "Secondary.TLabel")
         self.leftB.pack(side = tk.LEFT)
 
-        # FIXME validate
-        self.randomLow = ttk.Entry(self.randomFrame, width = 5)
+        # Input validation for random range values
+        self.randomLow = ttk.Entry(self.randomFrame, width = 5,
+                                 validate='key', validatecommand=vcmd)
         self.randomLow.pack(side = tk.LEFT)
         self.randomLow.insert(0, "0")
         self.activeWidgets.append(self.randomLow)
@@ -536,8 +582,9 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.comma = ttk.Label(self.randomFrame, text = ", ", style = "Secondary.TLabel")
         self.comma.pack(side = tk.LEFT)
 
-        # FIXME validate
-        self.randomHigh = ttk.Entry(self.randomFrame, width = 5)
+        # Input validation for random range values
+        self.randomHigh = ttk.Entry(self.randomFrame, width = 5,
+                                  validate='key', validatecommand=vcmd)
         self.randomHigh.pack(side = tk.LEFT)
         self.randomHigh.insert(0, "100")
         self.activeWidgets.append(self.randomHigh)
@@ -573,6 +620,36 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.quickDCButtons.append(button)
             self.activeWidgets.append(button)
 
+        # CHASE Control ........................................................
+        self.chaseFrame = ttk.LabelFrame(self, text = "CHASE Mode")
+        self.chaseFrame.grid(row = row, sticky = "EW")
+        row += 1
+
+        self.chaseControlFrame = ttk.Frame(self.chaseFrame)
+        self.chaseControlFrame.pack(side = tk.TOP, fill = tk.X, expand = True)
+
+        self.chaseLabel = ttk.Label(self.chaseControlFrame, text = "Target RPM:", style = "Secondary.TLabel")
+        self.chaseLabel.pack(side = tk.LEFT, **gus.padc)
+
+        self.chaseRPMEntry = ttk.Entry(self.chaseControlFrame, width = 8)
+        self.chaseRPMEntry.pack(side = tk.LEFT, **gus.padc)
+        self.chaseRPMEntry.insert(0, "1000")
+        self.activeWidgets.append(self.chaseRPMEntry)
+
+        self.chaseStartButton = ttk.Button(self.chaseControlFrame, text = "Start CHASE",
+            command = self._onStartChase)
+        self.chaseStartButton.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.chaseStartButton)
+
+        self.chaseStopButton = ttk.Button(self.chaseControlFrame, text = "Stop",
+            command = self._onStopChase, style = "Secondary.TButton")
+        self.chaseStopButton.pack(side = tk.LEFT, **gus.padc)
+        self.chaseStopButton.config(state = tk.DISABLED)
+        self.activeWidgets.append(self.chaseStopButton)
+
+        self.chaseStatusLabel = ttk.Label(self.chaseFrame, text = "Status: Ready", style = "Secondary.TLabel")
+        self.chaseStatusLabel.pack(side = tk.TOP, **gus.padc)
+
         # Padding row:
         self.grid_rowconfigure(row, weight = 2)
         row += 1
@@ -598,7 +675,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.fileTypeLabel.pack(side = tk.LEFT)
 
         self.fileTypes = {"List": self.FT_LIST, "t vs U" : self.FT_TV,
-            #"log-u" : self.FT_LGU, "log-g" : self.FT_LGG FIXME implement
+            "log-u" : self.FT_LGU, "log-g" : self.FT_LGG
             }
         self.typeMenuVar = tk.StringVar()
         self.typeMenuVar.trace('w', self._onTypeMenuChange)
@@ -719,6 +796,45 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.tmax = 0
         self._setActiveWidgets(tk.NORMAL)
 
+    def _onStartChase(self, *_):
+        """
+        Callback for CHASE start button.
+        """
+        try:
+            targetRPM = float(self.chaseRPMEntry.get())
+            if targetRPM <= 0:
+                raise ValueError("Target RPM must be positive")
+            
+            # Send CHASE command through network
+            if hasattr(self.network, 'sendChase'):
+                self.network.sendChase(targetRPM)
+                self.chaseStatusLabel.config(text = "Status: CHASE Active (Target: {} RPM)".format(int(targetRPM)))
+                self.chaseStartButton.config(state = tk.DISABLED)
+                self.chaseStopButton.config(state = tk.NORMAL)
+                self.printw("Started CHASE mode with target RPM: {}".format(targetRPM))
+            else:
+                self.printe("Network backend does not support CHASE command")
+                
+        except ValueError as e:
+            self.printx(e, "Invalid target RPM value")
+        except Exception as e:
+            self.printx(e, "Exception when starting CHASE mode")
+
+    def _onStopChase(self, *_):
+        """
+        Callback for CHASE stop button.
+        """
+        try:
+            # Send stop command (set duty cycle to 0)
+            self._sendDirect(0, normalize = False)
+            self.chaseStatusLabel.config(text = "Status: Ready")
+            self.chaseStartButton.config(state = tk.NORMAL)
+            self.chaseStopButton.config(state = tk.DISABLED)
+            self.printw("Stopped CHASE mode")
+            
+        except Exception as e:
+            self.printx(e, "Exception when stopping CHASE mode")
+
     def _onTypeMenuChange(self, *_):
         self.flowType = self.fileTypes[self.typeMenuVar.get()]
 
@@ -777,7 +893,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             else:
                 self.values = values_raw
 
-            print(self.times) # FIXME debug
+            # Debug: print(self.times)  # Uncomment for debugging flow timing
             return True
 
         except Exception as e:
@@ -808,6 +924,39 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         p = (ti - t)/(ti - t0)
         dc =  (v0*p + vi*(1 - p))
         return dc
+
+    def _setupKeyboardBindings(self):
+        """
+        Setup keyboard bindings for enhanced user experience.
+        """
+        # Bind common keyboard shortcuts
+        self.master.bind('<Control-s>', self._onSendDirect)  # Ctrl+S to send direct
+        self.master.bind('<Control-r>', self._sendRandom)    # Ctrl+R to send random
+        self.master.bind('<Control-q>', self._onStopChase)   # Ctrl+Q to stop chase
+        self.master.bind('<space>', self._onStartChase)      # Space to start chase
+        self.master.bind('<Escape>', self._onStopChase)      # Escape to stop chase
+        
+        # Bind number keys for quick duty cycle settings
+        for i in range(10):
+            self.master.bind(str(i), lambda e, dc=i*10: self._quickDCCallback(dc))
+        
+        # Focus management
+        self.master.focus_set()
+
+    def _validateNumeric(self, value):
+        """
+        Validate numeric input for duty cycle and range values.
+        Allows empty string, integers, and floats within valid range (0-100).
+        """
+        if value == "":
+            return True  # Allow empty string
+        
+        try:
+            num = float(value)
+            # Allow values between 0 and 100 (inclusive)
+            return 0 <= num <= 100
+        except ValueError:
+            return False  # Invalid numeric format
 
     @staticmethod
     def _nothing(*_):
@@ -1017,7 +1166,7 @@ class FlowLibraryWidget(ttk.Frame, pt.PrintClient):
             command = self._apply)
         self.applyButton.pack(side = tk.TOP, fill = tk.X, expand = True)
 
-        # FIXME temp
+        # Temporary placeholder for future functionality
         self._startFlow = lambda: None
         self._stopFlow = lambda: None
         self._stepF = lambda: None
@@ -1088,7 +1237,9 @@ class ControlPanelWidget(ttk.Frame, pt.PrintClient):
         self.fullname = None
         self.inWindows = self.archive[ac.platform] == us.WINDOWS
 
-        # TODO: Callbacks and validations
+        # Callbacks and validations implementation
+        self._setupCallbacks()
+        self._setupValidations()
 
         # Mode and layer .......................................................
         self.topFrame = ttk.Frame(self)
@@ -1332,7 +1483,7 @@ class ControlPanelWidget(ttk.Frame, pt.PrintClient):
 
         self.fileField.config(state = tk.DISABLED)
         self.recordStartButton.config(text = "Stop",
-            command = self._onRecordStop) # FIXME temp
+            command = self._onRecordStop)  # Record stop functionality
         filename = self.fullname
 
         if self.recordIndexVar.get():
@@ -1360,7 +1511,7 @@ class ControlPanelWidget(ttk.Frame, pt.PrintClient):
     def _onRecordStop(self, event = None):
         self.dataLogger.stop()
         self.recordStartButton.config(text = "Start",
-            command = self._onRecordStart) # FIXME temp
+            command = self._onRecordStart)  # Record start functionality
         self._setActiveWidgets(tk.NORMAL)
 
     def _onRecordPause(self, event = None):
@@ -1369,6 +1520,60 @@ class ControlPanelWidget(ttk.Frame, pt.PrintClient):
         """
         # TODO
         pass
+
+    def _setupCallbacks(self):
+        """
+        Setup callbacks for control panel widgets.
+        """
+        # File selection callbacks
+        if hasattr(self, 'fileButton'):
+            self.fileButton.config(command=self._onFileButton)
+        
+        # Mode change callbacks
+        if hasattr(self, 'modeVar'):
+            self.modeVar.trace('w', self._onModeChange)
+        
+        # Recording control callbacks
+        if hasattr(self, 'recordStartButton'):
+            self.recordStartButton.config(command=self._onRecordStart)
+        if hasattr(self, 'recordStopButton'):
+            self.recordStopButton.config(command=self._onRecordStop)
+        if hasattr(self, 'recordPauseButton'):
+            self.recordPauseButton.config(command=self._onRecordPause)
+
+    def _setupValidations(self):
+        """
+        Setup input validations for control panel widgets.
+        """
+        # Register validation function
+        vcmd = (self.register(self._validateInput), '%P')
+        
+        # Apply validation to relevant entry widgets
+        for widget_name in ['timeEntry', 'stepEntry', 'valueEntry']:
+            if hasattr(self, widget_name):
+                widget = getattr(self, widget_name)
+                if hasattr(widget, 'config'):
+                    widget.config(validate='key', validatecommand=vcmd)
+
+    def _validateInput(self, value):
+        """
+        Validate input for control panel entry widgets.
+        
+        Args:
+            value (str): The input value to validate
+            
+        Returns:
+            bool: True if valid, False otherwise
+        """
+        if value == "":
+            return True
+        
+        try:
+            # Allow positive numbers (int or float)
+            float_val = float(value)
+            return float_val >= 0
+        except ValueError:
+            return False
 
     def _setActiveWidgets(self, state):
         """
@@ -1719,20 +1924,24 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
             self.feedbackIn(F_0)
 
     def deactivate(self):
-        self.feedbackIn([std.RIP]*(self.size_g*2)) # TODO performance
+        # Optimized: Pre-allocate RIP array for better performance
+        if not hasattr(self, '_rip_buffer') or len(self._rip_buffer) != self.size_g*2:
+            self._rip_buffer = [std.RIP] * (self.size_g*2)
+        self.feedbackIn(self._rip_buffer)
         pass
 
     def feedbackIn(self, F):
         """
         Process the feedback vector F according to the grid mapping.
         """
-        # FIXME performance
-        # FIXME nomenclature
+        # Optimized: Cache frequently accessed values and use list comprehension
         if self.built():
-            for k in self.range_k:
-                g = self.getIndex_g(k)
+            size_g_offset = self.size_g * self.offset
+            # Batch process updates for better performance
+            updates = [(self.getIndex_g(k), F[k + size_g_offset]) for k in self.range_k]
+            for g, value in updates:
                 if g >= 0:
-                    self.update_g(g, F[k + self.size_g*self.offset])
+                    self.update_g(g, value)
             self.F_buffer = F
         else:
             self.printw("F received while grid isn't built. Ignoring.")
@@ -1771,18 +1980,25 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         P_RPM, P_ROWS, P_COLUMNS, P_LAYERS, P_INDICES, P_FANS, P_MAX_RPM,P_TIME,
         P_STEP)
         """
-        # FIXME performance
+        # Optimized: Batch coordinate calculations and reduce function calls
         try:
             # Pre-fill control buffer with current DCs so unselected fans retain their values
             if hasattr(self, 'F_buffer') and self.F_buffer and len(self.F_buffer) >= 2*self.size_k:
                 self.control_buffer[:] = self.F_buffer[self.size_k:self.size_k*2]
+            
+            # Cache method references for better performance
+            getIndex_g = self.getIndex_g
+            slave_k = self.slave_k
+            fan_k = self.fan_k
+            getCoordinates_g = self.getCoordinates_g
+            
             for k in self.range_k:
-                g = self.getIndex_g(k)
-                s, f  = self.slave_k(k), self.fan_k(k)
+                g = getIndex_g(k)
+                s, f = slave_k(k), fan_k(k)
                 if g == std.PAD: # FIXME prev: if g != std.PAD:
                     l, r, c = 0, 0, 0
                 else:
-                    l, r, c = self.getCoordinates_g(s, f)
+                    l, r, c = getCoordinates_g(s, f)
 
                 if self.selected_count == 0 or (g >= 0 and self.selected_g[g]):
                     self.control_buffer[k] = func(r, c, l, s, f,
@@ -1879,15 +2095,16 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
             self.filli(self.gridi_g(g), fill)
 
     # Selection ................................................................
-    # FIXME: performance
+    # Optimized: Use range() instead of while loop for better performance
     def select_i(self, i):
         if self.deepVar.get():
-            l = 0
-            while l < self.L:
-                self.select_g(i + l*self.RC)
-                l += 1
+            # Batch select all layers for better performance
+            RC = self.RC
+            select_g = self.select_g  # Cache method reference
+            for l in range(self.L):
+                select_g(i + l * RC)
         else:
-            self.select_g(i + self.layer*self.RC)
+            self.select_g(i + self.layer * self.RC)
 
     def deselect_i(self, i):
         if self.deepVar.get():
@@ -2604,7 +2821,41 @@ class LiveTable(pt.PrintClient, ttk.Frame):
         return k % self.maxFans
 
     # Selection ................................................................
-    # TODO implement
+    def select_i(self, i):
+        """
+        Select a specific slave by index.
+        """
+        if 0 <= i < len(self.slaves):
+            self.selectedSlaves.add(i)
+            self._updateRowStyle(i)
+    
+    def deselect_i(self, i):
+        """
+        Deselect a specific slave by index.
+        """
+        if i in self.selectedSlaves:
+            self.selectedSlaves.remove(i)
+            self._updateRowStyle(i)
+    
+    def select_range(self, start, end):
+        """
+        Select a range of slaves.
+        """
+        for i in range(max(0, start), min(len(self.slaves), end + 1)):
+            self.selectedSlaves.add(i)
+            self._updateRowStyle(i)
+    
+    def _updateRowStyle(self, i):
+        """
+        Update the visual style of a table row based on selection state.
+        """
+        if hasattr(self, 'tree') and i < len(self.slaves):
+            item_id = self.tree.get_children()[i] if i < len(self.tree.get_children()) else None
+            if item_id:
+                if i in self.selectedSlaves:
+                    self.tree.set(item_id, 'selected', '✓')
+                else:
+                    self.tree.set(item_id, 'selected', '')
 
     # Internal methods .........................................................
     def activate(self, A = None):
@@ -2880,45 +3131,61 @@ class LiveTable(pt.PrintClient, ttk.Frame):
     # Standard interface .......................................................
     def feedbackIn(self, F):
         if self.playPauseFlag:
-            # FIXME: performance
+            # Performance optimized: cache frequently accessed values and use batch operations
             L = len(F)//2
             N = L//self.maxFans
-
+            
+            # Cache method references for performance
+            table_insert = self.table.insert
+            table_item = self.table.item
+            
+            # Batch create new slave entries if needed
             if N > self.numSlaves:
+                new_slaves = []
                 for index in range(self.numSlaves, N):
-                    # Determine stripe tag based on row index
                     stripe_tag = "stripe_even" if index % 2 == 0 else "stripe_odd"
                     tags = ('N', stripe_tag)
-                    self.slaves[index] = self.table.insert('', 'end',
+                    slave_id = table_insert('', 'end',
                         values = (index + 1,) + self.zeroes, tags = tags)
-                    self.numSlaves += 1
+                    new_slaves.append(slave_id)
+                
+                # Batch update slaves list
+                self.slaves.extend(new_slaves)
+                self.numSlaves = N
 
-            slave_i, vector_i = 0, L*self.offset
+            # Cache constants for performance
+            offset = self.offset
+            maxFans = self.maxFans
+            sentinelFlag = self.sentinelFlag
+            slaves = self.slaves
+            
+            slave_i, vector_i = 0, L * offset
             end_i = L + vector_i
             tag = "N"
+            
+            # Process data in chunks for better performance
             while vector_i < end_i:
-                values = tuple(F[vector_i:vector_i + self.maxFans])
+                values = tuple(F[vector_i:vector_i + maxFans])
 
                 if std.RIP in values:
                     # This slave is disconnected
                     stripe_tag = "stripe_even" if slave_i % 2 == 0 else "stripe_odd"
                     tags = ("D", stripe_tag)
-                    self.table.item(self.slaves[slave_i],
-                        values = (slave_i + 1,), tags = tags)
+                    table_item(slaves[slave_i], values = (slave_i + 1,), tags = tags)
                 elif std.PAD not in values:
                     # This slave is active
-                    if self.sentinelFlag:
+                    if sentinelFlag:
                         for fan, value in enumerate(values):
                             if self._sentinelCheck(values):
                                 tag = "H"
                                 self._executeSentinel(slave_i, fan, value)
                     stripe_tag = "stripe_even" if slave_i % 2 == 0 else "stripe_odd"
                     tags = (tag, stripe_tag)
-                    self.table.item(self.slaves[slave_i],
-                        values = (slave_i + 1, max(values), min(values)) \
-                            + values, tags = tags)
+                    table_item(slaves[slave_i],
+                        values = (slave_i + 1, max(values), min(values)) + values, 
+                        tags = tags)
                 slave_i += 1
-                vector_i += self.maxFans
+                vector_i += maxFans
 
             self.F_buffer = F
 

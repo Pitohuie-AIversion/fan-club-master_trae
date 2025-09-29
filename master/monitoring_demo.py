@@ -1,28 +1,43 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-监控功能演示脚本
-展示main.py启动后的持续监控能力
-"""
+#!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
+################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + Monitoring capabilities demonstration script.
+ + Shows monitoring abilities after main.py startup.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
 
 import sys
 import os
 import time
 import threading
 from datetime import datetime
+import multiprocessing as mp
 
-# 添加fc模块路径
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc', 'backend'))
+# 添加项目路径
+sys.path.append(os.path.dirname(__file__))
 
-try:
-    import fc.archive as ac
-    import fc.printer as pt
-    import fc.builtin.profiles as btp
-    import multiprocessing as mp
-except ImportError as e:
-    print(f"导入错误: {e}")
-    sys.exit(1)
+# 导入FC模块
+import fc.archive as ac
+import fc.printer as pt
+import fc.builtin.profiles as btp
 
 def demo_monitoring_capabilities():
     """演示监控功能"""

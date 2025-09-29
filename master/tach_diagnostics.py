@@ -1,17 +1,35 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Tach信号诊断工具
-用于诊断和分析风机转速反馈信号的问题
-"""
+#!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
+################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + Tach signal diagnostic tool for analyzing fan speed feedback signal issues.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
 
 import time
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
-from typing import List, Dict, Optional, Tuple
-from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
+from collections import deque
 import os
 
 @dataclass

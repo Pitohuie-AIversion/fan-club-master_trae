@@ -1,9 +1,28 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-信号处理系统测试脚本
-用于验证信号采集与滤波功能的集成
-"""
+#!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
+################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + Signal processing system test script.
+ + Verifies signal acquisition and filtering integration.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
 
 import sys
 import os
@@ -11,19 +30,14 @@ import time
 import numpy as np
 from datetime import datetime
 
-# 添加fc模块路径
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc', 'backend'))
+# 添加项目路径
+sys.path.append(os.path.dirname(__file__))
 
-try:
-    from fc.signal_processing_system import SignalProcessingSystem, SystemConfig
-    from fc.backend.signal_acquisition import AcquisitionConfig
-    from fc.backend.digital_filtering import FilterConfig, FilterType, FilterMethod
-    from fc.backend.data_storage import StorageConfig, DataFormat
-except ImportError as e:
-    print(f"导入错误: {e}")
-    print("请确保所有模块文件都已正确创建")
-    sys.exit(1)
+# 导入信号处理系统模块
+from fc.signal_processing_system import SignalProcessingSystem
+from fc.backend.signal_acquisition import SimulatedHardware, AcquisitionConfig, ChannelConfig
+from fc.backend.digital_filtering import FilterConfig, FilterType
+from fc.backend.data_storage import StorageConfig
 
 def create_test_config():
     """创建测试配置"""

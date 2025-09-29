@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 ################################################################################
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+## WESTLAKE UNIVERSITY                                                        ##
+## ADVANCED SYSTEMS LABORATORY                                                ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
 ##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
@@ -16,9 +18,9 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## AUTHORS: zhaoyang (mzymuzhaoyang@gmail.com)                               ##
+##          dashuai (dschen2018@gmail.com)                                   ##
+##----------------------------------------------------------------------------##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -29,21 +31,37 @@
 
 # Network:
 import socket       # Networking
-import http.server  # For bootloader
-import socketserver # For bootloader
+try:
+    import http.server  # For bootloader (Python 3)
+except ImportError:
+    import BaseHTTPServer  # For bootloader (Python 2)
+    import sys
+    sys.modules['http.server'] = BaseHTTPServer
+try:
+    import socketserver # For bootloader (Python 3)
+except ImportError:
+    import SocketServer  # For bootloader (Python 2)
+    sys.modules['socketserver'] = SocketServer
 
 # System:
 import sys          # Exception handling
 import traceback    # More exception handling
 import threading as mt  # Multitasking
-import _thread      # thread.error
+try:
+    import _thread      # thread.error (Python 3)
+except ImportError:
+    import thread as _thread  # thread.error (Python 2)
 import multiprocessing as mp # The big guns
 
 import platform # Check OS and Python version
 
 # Data:
 import time         # Timing
-import queue
+try:
+    import queue  # Python 3
+except ImportError:
+    import Queue  # Python 2
+    sys.modules['queue'] = Queue
 import numpy as np  # Fast arrays and matrices
 import random as rd # For random names
 
@@ -56,94 +74,121 @@ import fc.backend.mkiii.names as nm
 import fc.archive as ac
 import fc.standards as s
 import fc.printer as pt
+import fc.backend.mkiii.exceptions as fcex
+import psutil  # For system performance monitoring
 
 ## CONSTANT DEFINITIONS ########################################################
 
-# TODO: Erase all these obsolete codes
-""" OBSOLETE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# Communicator status codes:
-CONNECTED = 31
-CONNECTING = 32
-DISCONNECTED = 33
-DISCONNECTING = 34
-
-
-# Slave data tuple indices:
-# Expected form: (INDEX, MAC, STATUS, FANS, VERSION) + IID
-#                   0       1   2       3       4       5
-INDEX = 0
-MAC = 1
-STATUS = 2
-FANS = 3
-VERSION = 4
-IID = 5
-
-# Commands: ------------------------------------
-
-ADD = 51
-DISCONNECT = 52
-REBOOT = 53
-
-# NOTE: Array command e.g.:
-#       (COMMUNICATOR, SET_DC, DC, FANS, ALL)
-#       (COMMUNICATOR, SET_DC, DC, FANS, 1,2,3,4)
-#       (COMMUNICATOR, SET_DC_MANY, DC, SELECTIONS)
-#                           |
-#                   (INDEX, FANS)
-
-SET_DC = 54
-SET_DC_GROUP = 55
-SET_DC_MULTI = 56
-SET_RPM = 57
-
-# Bootloader commands:
-
-BOOTLOADER_START = 66
-BOOTLOADER_STOP = 67
-
-# End commands -----------------------------------
-
-# Special values:
-NONE = -1
-ALL = -2
-
-FCPRCONSTS = (ADD, DISCONNECT, REBOOT)
-
-# Outputs:
-NEW = 11
-UPDATE = 12
-
-
-# Change codes:
-NO_CHANGE = 0
-CHANGE = 1
-
-# MISO Matrix special columns:
-# FIXME: function undocumented; need to define new MISO standard
-MISO_COLUMN_STATUS = 0
-MISO_COLUMN_TYPE = 1
-MISO_SPECIALCOLUMNS = 2
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX """
+class FCPerformanceMonitor:
+    """FC通信性能监控器"""
+    
+    def __init__(self):
+        self._metrics = {
+            'message_send_time': [],
+            'message_receive_time': [],
+            'network_latency': [],
+            'thread_cpu_usage': [],
+            'memory_usage': [],
+            'error_count': 0,
+            'total_messages': 0
+        }
+        self._start_times = {}
+        self._enabled = True
+    
+    def start_timing(self, operation):
+        """Start timing operation"""
+        if self._enabled:
+            self._start_times[operation] = time.time()
+    
+    def end_timing(self, operation):
+        """End timing and record"""
+        if self._enabled and operation in self._start_times:
+            duration = time.time() - self._start_times[operation]
+            if operation in self._metrics:
+                self._metrics[operation].append(duration)
+                # Keep only the latest 1000 records
+                if len(self._metrics[operation]) > 1000:
+                    self._metrics[operation] = self._metrics[operation][-1000:]
+            del self._start_times[operation]
+    
+    def record_message(self):
+        """Record message count"""
+        if self._enabled:
+            self._metrics['total_messages'] += 1
+    
+    def record_error(self):
+        """Record error count"""
+        if self._enabled:
+            self._metrics['error_count'] += 1
+    
+    def record_system_metrics(self):
+        """Record system performance metrics"""
+        if self._enabled:
+            try:
+                # CPU usage
+                cpu_percent = psutil.cpu_percent(interval=None)
+                self._metrics['thread_cpu_usage'].append(cpu_percent)
+                
+                # Memory usage
+                memory_info = psutil.virtual_memory()
+                self._metrics['memory_usage'].append(memory_info.percent)
+                
+                # Limit record count
+                for key in ['thread_cpu_usage', 'memory_usage']:
+                    if len(self._metrics[key]) > 100:
+                        self._metrics[key] = self._metrics[key][-100:]
+            except Exception:
+                pass  # Ignore system monitoring errors
+    
+    def get_performance_stats(self):
+        """Get performance statistics"""
+        stats = {}
+        for key, values in self._metrics.items():
+            if isinstance(values, list) and values:
+                stats[key] = {
+                    'average': sum(values) / len(values),
+                    'min': min(values),
+                    'max': max(values),
+                    'count': len(values)
+                }
+            elif isinstance(values, (int, float)):
+                stats[key] = values
+        return stats
+    
+    def reset_metrics(self):
+        """Reset all metrics"""
+        for key in self._metrics:
+            if isinstance(self._metrics[key], list):
+                self._metrics[key].clear()
+            else:
+                self._metrics[key] = 0
+    
+    def enable(self):
+        """Enable performance monitoring"""
+        self._enabled = True
+    
+    def disable(self):
+        """Disable performance monitoring"""
+        self._enabled = False
 
 # MOSI commands:
-# TODO: Replace these
-MOSI_NO_COMMAND = 20
-MOSI_DC = 21
-MOSI_DC_ALL = 22
-MOSI_RPM = 23
-MOSI_RPM_ALL = 24
-MOSI_DISCONNECT = 25
-MOSI_REBOOT = 26
-MOSI_DC_MULTI = 27
+# MOSI commands - using standardized constants from fc.standards
+MOSI_NO_COMMAND = getattr(s, 'MOSI_NO_COMMAND', 20)
+MOSI_DC = getattr(s, 'MOSI_DC', 21)
+MOSI_DC_ALL = getattr(s, 'MOSI_DC_ALL', 22)
+MOSI_RPM = getattr(s, 'MOSI_RPM', 23)
+MOSI_RPM_ALL = getattr(s, 'MOSI_RPM_ALL', 24)
+MOSI_DISCONNECT = getattr(s, 'MOSI_DISCONNECT', 25)
+MOSI_REBOOT = getattr(s, 'MOSI_REBOOT', 26)
+MOSI_DC_MULTI = getattr(s, 'MOSI_DC_MULTI', 27)
 
 ## CLASS DEFINITION ############################################################
 
 # DONE:
 # - change profile usage (DONE)
+# - change FCSlave constants for s.standards constants (DONE)
 
 # TODO:
-# - change FCSlave constants for s.standards constants
 # - change command queue for pipe
 # - change pipes
 # - change output formatting
@@ -157,10 +202,8 @@ class FCCommunicator(pt.PrintClient):
     SYMBOL = "[CM]"
     SYMBOL_IR = "[IR]"
 
-    # TODO: parameterize these
-    DEFAULT_IP_ADDRESS = "0.0.0.0"
-        #"0.0.0.0"
-    DEFAULT_BROADCAST_IP = "<broadcast>"
+    # Network configuration (now configurable via profile)
+    # DEFAULT_IP_ADDRESS and DEFAULT_BROADCAST_IP are loaded from profile
 
     def __init__(self,
             profile,
@@ -189,6 +232,10 @@ class FCCommunicator(pt.PrintClient):
         pt.PrintClient.__init__(self, pqueue)
         try:
             # INITIALIZE DATA MEMBERS ==========================================
+            
+            # Initialize performance monitor
+            self.performance_monitor = FCPerformanceMonitor()
+            self.performance_monitor.start_timing('communicator_init')
 
             # Store parameters -------------------------------------------------
             self.profile = profile
@@ -199,6 +246,10 @@ class FCCommunicator(pt.PrintClient):
             self.periodS = self.periodMS/1000
             self.broadcastPort = profile[ac.broadcastPort]
             self.passcode = profile[ac.passcode]
+            
+            # Load configurable IP addresses from profile
+            self.defaultIPAddress = profile[ac.defaultIPAddress]
+            self.defaultBroadcastIP = profile[ac.defaultBroadcastIP]
             self.misoQueueSize = profile[ac.misoQueueSize]
             self.maxTimeouts = profile[ac.maxTimeouts]
             self.maxLength = profile[ac.maxLength]
@@ -245,6 +296,11 @@ class FCCommunicator(pt.PrintClient):
 
             # Initialize Slave-list-related data:
             self.slavesLock = mt.Lock()
+            # Performance optimization: MAC to index mapping for O(1) lookup
+            self.macToIndexMap = {}
+            
+            # Initialize error handler for better exception management
+            self.error_handler = fcex.create_error_handler('FCCommunicator')
 
             # Command handling:
             self.commandHandlers = {
@@ -259,6 +315,10 @@ class FCCommunicator(pt.PrintClient):
                 s.CMD_BIP : self.__handle_input_CMD_BIP,
                 s.CMD_N : self.__handle_input_CMD_N,
                 s.CMD_S : self.__handle_input_CMD_S,
+                s.CMD_PERF_STATS : self.__handle_input_CMD_PERF_STATS,
+                s.CMD_PERF_RESET : self.__handle_input_CMD_PERF_RESET,
+                s.CMD_PERF_ENABLE : self.__handle_input_CMD_PERF_ENABLE,
+                s.CMD_PERF_DISABLE : self.__handle_input_CMD_PERF_DISABLE,
             }
 
             self.controlHandlers = {
@@ -311,7 +371,7 @@ class FCCommunicator(pt.PrintClient):
 
             # Bind socket to "nothing" (Broadcast on all interfaces and let OS
             # assign port number):
-            self.broadcastSocket.bind((self.DEFAULT_IP_ADDRESS, 0))
+            self.broadcastSocket.bind((self.defaultIPAddress, 0))
             self.broadcastIP = self.profile[ac.broadcastIP]
 
             self.broadcastSocketPort = self.broadcastSocket.getsockname()[1]
@@ -335,7 +395,7 @@ class FCCommunicator(pt.PrintClient):
 
             # Bind socket to "nothing" (Broadcast on all interfaces and let OS
             # assign port number):
-            self.rebootSocket.bind((self.DEFAULT_IP_ADDRESS, 0))
+            self.rebootSocket.bind((self.defaultIPAddress, 0))
 
             self.rebootSocketPort = self.rebootSocket.getsockname()[1]
 
@@ -358,7 +418,7 @@ class FCCommunicator(pt.PrintClient):
 
             # Bind socket to "nothing" (Broadcast on all interfaces and let OS
             # assign port number):
-            self.disconnectSocket.bind((self.DEFAULT_IP_ADDRESS, 0))
+            self.disconnectSocket.bind((self.defaultIPAddress, 0))
 
             self.disconnectSocketPort = self.disconnectSocket.getsockname()[1]
 
@@ -442,22 +502,24 @@ class FCCommunicator(pt.PrintClient):
             # instantiate any saved Slaves:
             saved = self.profile[ac.savedSlaves]
             self.slaves = [None]*len(saved)
-            # TODO: get rid of FCSlaves
 
             update = False
             for index, slave in enumerate(saved):
                 self.slaves[index] = \
-                    sv.FCSlave(
+                    s.FCSlave(
                     name = slave[ac.SV_name],
                     mac = slave[ac.SV_mac],
                     fans = slave[ac.SV_maxFans],
                     maxFans = self.maxFans,
-                    status = sv.DISCONNECTED,
+                    status = s.SS_DISCONNECTED,
                     routine = self._slaveRoutine,
                     routineArgs = (index,),
                     misoQueueSize = self.misoQueueSize,
                     index = index,
                     )
+                
+                # Update MAC to index mapping for performance optimization
+                self.macToIndexMap[slave[ac.SV_mac]] = index
 
                 update = True
 
@@ -482,10 +544,22 @@ class FCCommunicator(pt.PrintClient):
             self._sendNetwork()
 
             # DONE
+            self.performance_monitor.end_timing('communicator_init')
             self.prints("Communicator ready")
 
+        except (socket.error, OSError) as e:
+            error = self.error_handler.handle_network_error(e, "Communicator initialization")
+            self.printx(error, "Network error in Communicator __init__: ")
+            raise error
+        except (ValueError, TypeError) as e:
+            error = fcex.ConfigurationError("Configuration error in Communicator __init__: {}".format(e))
+            self.error_handler.log_exception(error, "Communicator initialization")
+            self.printx(error, "Configuration error in Communicator __init__: ")
+            raise error
         except Exception as e:
-            self.printx(e, "Exception in Communicator __init__: ")
+            self.error_handler.log_exception(e, "Communicator initialization", "error")
+            self.printx(e, "Unexpected error in Communicator __init__: ")
+            raise fcex.FCCommunicatorError("Unexpected error during initialization: {}".format(e))
 
         # End __init__ =========================================================
 
@@ -499,8 +573,15 @@ class FCCommunicator(pt.PrintClient):
         SYM = self.SYMBOL_IR
         try:
             self.prints(SYM + " Prototype input routine started")
+            last_metrics_time = time.time()
             while True:
                 try:
+                    # Record system metrics every 5 seconds
+                    current_time = time.time()
+                    if current_time - last_metrics_time >= 5.0:
+                        self.performance_monitor.record_system_metrics()
+                        last_metrics_time = current_time
+                    
                     if self.commandPipeRecv.poll():
                         D = self.commandPipeRecv.recv()
                         self.commandHandlers[D[s.CMD_I_CODE]](D)
@@ -508,12 +589,22 @@ class FCCommunicator(pt.PrintClient):
                         C = self.controlPipeRecv.recv()
                         self.controlHandlers[C[s.CTL_I_CODE]](C)
 
-                except Exception as e: # Print uncaught exceptions
-                    self.printx(e, SYM + " Exception in back-end input thread:")
+                except KeyError as e:
+                    error_msg = "Unknown command/control code: {}".format(e)
+                    self.error_handler.log_exception(e, "input thread command handling", "warning")
+                    self.printw(SYM + " {}".format(error_msg))
+                except (EOFError, OSError) as e:
+                    error = self.error_handler.handle_network_error(e, "input thread pipe communication")
+                    self.printx(error, SYM + " Pipe communication error: ")
+                    break  # Exit loop on pipe errors
+                except Exception as e:
+                    self.error_handler.log_exception(e, "input thread", "error")
+                    self.printx(e, SYM + " Unexpected error in back-end input thread: ")
 
-        except Exception as e: # Print uncaught exceptions
-            self.printx(e, SYM + " Exception in back-end input thread "\
-                + "(LOOP BROKEN):")
+        except Exception as e:
+            error = self.error_handler.handle_thread_error(e, "input_routine", "input thread main loop")
+            self.printx(error, SYM + " Critical error in back-end input thread (LOOP BROKEN): ")
+            raise error
         # End _inputRoutine ====================================================
 
     def __handle_input_CMD_ADD(self, D):
@@ -571,7 +662,7 @@ class FCCommunicator(pt.PrintClient):
         self.printr("Received shutdown command. Stopping all operations.")
         # Stop all slave communications
         for slave in self.slaves:
-            if slave.getStatus() == sv.CONNECTED:
+            if slave.getStatus() == s.SS_CONNECTED:
                 slave.disconnect()
         # Stop the communicator
         self.stop()
@@ -591,10 +682,10 @@ class FCCommunicator(pt.PrintClient):
 
             self.flashFlag = True
 
-            # FIXME: Why is the passcode "CT" hard-coded? Is it because it is
-            # also hard-coded in the bootloader?
-            self.flashMessage = "U|CT|{}|{}|{}|{}".format(
-                self.listenerPort, self.httpPort, filename, filesize)
+            # Use configurable passcode instead of hard-coded "CT"
+            # The passcode is now read from the profile configuration
+            self.flashMessage = "U|{}|{}|{}|{}|{}".format(
+                self.passcode, self.listenerPort, self.httpPort, filename, filesize)
 
             self.prints("Firmware update setup complete.")
 
@@ -628,10 +719,10 @@ class FCCommunicator(pt.PrintClient):
         if new_mode in [s.BMODE_BROADCAST, s.BMODE_TARGETTED]:
             self.broadcastMode = new_mode
             mode_name = "broadcast" if new_mode == s.BMODE_BROADCAST else "targeted"
-            self.prints(f"Broadcast mode set to {mode_name}")
+            self.prints("Broadcast mode set to {}".format(mode_name))
             self._sendNetwork()  # Update network status
         else:
-            self.printe(f"Invalid broadcast mode: {new_mode}")
+            self.printe("Invalid broadcast mode: {}".format(new_mode))
 
     def __handle_input_CMD_BIP(self, D):
         """
@@ -657,6 +748,42 @@ class FCCommunicator(pt.PrintClient):
         Process a request for an updated slave state vector.
         """
         self._sendSlaves()
+    
+    def __handle_input_CMD_PERF_STATS(self, *_):
+        """
+        Process a request for performance statistics.
+        """
+        stats = self.get_performance_stats()
+        # Send stats through feedback pipe as a special message
+        self.feedbackPipeSend.send(('PERF_STATS', stats))
+    
+    def __handle_input_CMD_PERF_RESET(self, *_):
+        """
+        Process a request to reset performance statistics.
+        """
+        self.reset_performance_stats()
+        self.prints("Performance statistics reset")
+    
+    def __handle_input_CMD_PERF_ENABLE(self, *_):
+        """
+        Process a request to enable performance monitoring.
+        """
+        self.enable_performance_monitoring()
+        self.prints("Performance monitoring enabled")
+    
+    def __handle_input_CMD_PERF_DISABLE(self, *_):
+        """
+        Process a request to disable performance monitoring.
+        """
+        self.disable_performance_monitoring()
+        self.prints("Performance monitoring disabled")
+
+    def _getSlaveIndexByMAC(self, mac):
+        """
+        Performance-optimized method to get slave index by MAC address.
+        Returns index if found, None otherwise.
+        """
+        return self.macToIndexMap.get(mac, None)
 
     def _validBIP(self, ip):
         """
@@ -705,7 +832,7 @@ class FCCommunicator(pt.PrintClient):
         if target is s.TGT_ALL:
             fans = C[s.CTL_I_SINGLE_ALL_SELECTION]
             for slave in self.slaves: # FIXME performance w/ getIndex?
-                if slave.getStatus() == sv.CONNECTED:
+                if slave.getStatus() == s.SS_CONNECTED:
                     slave.setMOSI((MOSI_DC, dc,  fans), False)
         elif target is s.TGT_SELECTED:
             # FIXME performance
@@ -714,7 +841,7 @@ class FCCommunicator(pt.PrintClient):
             while i < L:
                 slave = self.slaves[C[i]]
                 fans = C[i + 1]
-                if slave.getStatus() == sv.CONNECTED:
+                if slave.getStatus() == s.SS_CONNECTED:
                     slave.setMOSI((MOSI_DC, dc,  fans), False)
                 i += 2
         else:
@@ -725,20 +852,30 @@ class FCCommunicator(pt.PrintClient):
         """
         Process the control vector C with the corresponding command.
         See fc.standards for the expected form of C.
+        
+        Revised to support dynamic maxFans padding based on actual slave fan count.
         """
-        # TODO: Revise DC standard with maxFans padding
-
         index = 0
         i = s.CTL_I_VECTOR_DC_OFFSET
         L = len(C)
 
-        while i < L:
-            if self.slaves[index].getStatus() == sv.CONNECTED:
-                self.slaves[index].setMOSI((
+        while i < L and index < len(self.slaves):
+            slave = self.slaves[index]
+            if slave.getStatus() == s.SS_CONNECTED:
+                # Get actual fan count for this slave
+                slaveFans = slave.getFans()
+                # Extract DC values for this slave's fans
+                slaveDCs = C[i:i+slaveFans]
+                # Pad with zeros if needed to match maxFans
+                paddedDCs = slaveDCs + [0] * (self.maxFans - len(slaveDCs))
+                # Create template for this slave's fan count
+                slaveTemplate = "{}" + ",{}" * (self.maxFans - 1)
+                slave.setMOSI((
                     MOSI_DC_MULTI,
-                    self.dcTemplate.format(*(C[i:i+self.maxFans]))))
+                    slaveTemplate.format(*paddedDCs)))
+            # Move to next slave's data (use actual fan count, not maxFans)
             index += 1
-            i += self.maxFans
+            i += self.slaves[index-1].getFans() if index > 0 else self.maxFans
 
 
     def _outputRoutine(self): # ================================================
@@ -886,12 +1023,8 @@ class FCCommunicator(pt.PrintClient):
                                 raise ValueError("MAC ({}) not 17 chars".\
                                     format(mac))
 
-                            # Search for Slave in self.slaves
-                            index = None
-                            for slave in self.slaves:
-                                if slave.getMAC() == mac:
-                                    index = slave.getIndex()
-                                    break
+                            # Performance-optimized slave lookup by MAC
+                            index = self._getSlaveIndexByMAC(mac)
 
                             # Check if the Slave is known:
                             if index is not None :
@@ -913,7 +1046,7 @@ class FCCommunicator(pt.PrintClient):
                                 # check its status and proceed accordingly:
 
                                 elif self.slaves[index].getStatus() in \
-                                    (sv.DISCONNECTED, sv.BOOTLOADER):
+                                    (s.SS_DISCONNECTED, s.SS_UPDATING):
                                     # If the Slave is DISCONNECTED but just res-
                                     # ponded to a broadcast, update its status
                                     # for automatic reconnection. (handled by
@@ -922,7 +1055,7 @@ class FCCommunicator(pt.PrintClient):
                                     # Update status and networking information:
                                     self.setSlaveStatus(
                                         self.slaves[index],
-                                        sv.KNOWN,
+                                        s.SS_KNOWN,
                                         lock = False,
                                         netargs = (
                                             senderAddress[0],
@@ -946,12 +1079,12 @@ class FCCommunicator(pt.PrintClient):
                                 fans = self.defaultSlave[ac.SV_maxFans]
 
                                 self.slaves.append(
-                                    sv.FCSlave(
+                                    s.FCSlave(
                                         name = name,
                                         mac = mac,
                                         fans = fans,
                                         maxFans = self.maxFans,
-                                        status = sv.AVAILABLE,
+                                        status = s.SS_AVAILABLE,
                                         routine = self._slaveRoutine,
                                         routineArgs = (index, ),
                                         version = version,
@@ -961,6 +1094,9 @@ class FCCommunicator(pt.PrintClient):
                                         mosiP = mosiPort,
                                         index = index)
                                 )
+                                
+                                # Update MAC to index mapping for new slave
+                                self.macToIndexMap[mac] = index
 
                                 # Add new Slave's information to newSlaveQueue:
                                 self._sendSlaves()
@@ -1006,14 +1142,9 @@ class FCCommunicator(pt.PrintClient):
 
                             # Update Slave status:
 
-                            # Search for Slave in self.slaves
-                            index = None
+                            # Performance-optimized slave lookup by MAC
                             mac = messageSplitted[2]
-
-                            for slave in self.slaves:
-                                if slave.getMAC() == mac:
-                                    index = slave.getIndex()
-                                    break
+                            index = self._getSlaveIndexByMAC(mac)
 
                             if index is not None:
                                 # Known Slave. Update status:
@@ -1027,7 +1158,7 @@ class FCCommunicator(pt.PrintClient):
                                 self.slaves[index].setVersion(version)
                                 self.setSlaveStatus(
                                     self.slaves[index],
-                                    sv.BOOTLOADER
+                                    s.SS_UPDATING
                                 )
 
                             else:
@@ -1056,8 +1187,20 @@ class FCCommunicator(pt.PrintClient):
                         "character '{}' discarded".format(
                             senderAddress[0], messageSplitted[0]))
 
-            except Exception as e: # Print uncaught exceptions
-                self.printx(e, "Exception in listener thread")
+            except socket.timeout:
+                # Socket timeout is expected, continue listening
+                continue
+            except socket.error as e:
+                error = self.error_handler.handle_network_error(e, "listener thread socket operation")
+                self.printx(error, "Socket error in listener thread: ")
+                continue
+            except (ValueError, IndexError) as e:
+                error = self.error_handler.handle_parsing_error(e, "", "listener thread message parsing")
+                self.printw("Message parsing error in listener thread: {}".format(error))
+                continue
+            except Exception as e:
+                self.error_handler.log_exception(e, "listener thread", "error")
+                self.printx(e, "Unexpected error in listener thread: ")
         # End _listenerRoutine =================================================
 
     def _slaveRoutine(self, targetIndex, target): # # # # # # # # # # # # # # # #
@@ -1146,7 +1289,7 @@ class FCCommunicator(pt.PrintClient):
                     status = slave.getStatus()
 
                     # Act according to Slave's state:
-                    if status == sv.KNOWN: # = = = = = = = = = = = = = = = =
+                    if status == s.SS_KNOWN: # = = = = = = = = = = = = = = = =
 
                         # If the Slave is known, try to secure a connection:
                         # print "Attempting handshake"
@@ -1170,7 +1313,7 @@ class FCCommunicator(pt.PrintClient):
 
                                 # Mark as CONNECTED and get to work:
                                 #slave.setStatus(sv.CONNECTED, lock = False)
-                                self.setSlaveStatus(slave,sv.CONNECTED,False)
+                                self.setSlaveStatus(slave,s.SS_CONNECTED,False)
                                 tryBuffer = True
                                 break
 
@@ -1193,7 +1336,7 @@ class FCCommunicator(pt.PrintClient):
                                 #slave.setStatus(sv.DISCONNECTED, lock = False)
 
                                 self.setSlaveStatus(
-                                    slave,sv.DISCONNECTED,False)
+                                slave,s.SS_DISCONNECTED,False)
                                     # NOTE: This call also resets exchange
                                     # index.
                                 break
@@ -1244,7 +1387,7 @@ class FCCommunicator(pt.PrintClient):
 
                             continue
 
-                    elif status == sv.CONNECTED: # = = = = = = = = = = = = = = =
+                    elif status == s.SS_CONNECTED: # = = = = = = = = = = = = = = =
                         # If the Slave's state is positive, it is online and
                         # there is a connection to maintain.
 
@@ -1262,7 +1405,7 @@ class FCCommunicator(pt.PrintClient):
                             # the wrong version, reboot it
 
                             self._send("R", slave, 1)
-                            self.setSlaveStatus(slave, sv.DISCONNECTED, False)
+                            self.setSlaveStatus(slave, s.SS_DISCONNECTED, False)
 
                             continue
 
@@ -1306,8 +1449,15 @@ class FCCommunicator(pt.PrintClient):
                         # DEBUG:
                         # print "Sent: {}".format(message)
 
+                        # Start network latency measurement
+                        self.performance_monitor.start_timing('network_latency')
+                        
                         # Get reply:
                         reply = self._receive(slave)
+                        
+                        # End network latency measurement if reply received
+                        if reply is not None:
+                            self.performance_monitor.end_timing('network_latency')
 
                         # Check reply: -----------------------------------------
                         if reply is not None:
@@ -1334,21 +1484,27 @@ class FCCommunicator(pt.PrintClient):
 
                                     # Update RPMs and DCs:
                                     try:
-                                        # Set up data placeholder as a tuple:
-                                        # FIXME performance
-
-                                        rpms =  list(map(
-                                            int,reply[-2].split(',')))
-                                        dcs = list(map(
-                                            float,reply[-1].split(',')))
-
-                                        rpms += [0]*(self.maxFans - len(rpms))
-                                        dcs += [0]*(self.maxFans - len(dcs))
-
-                                        # FIXME performance pls
-                                        # FIXME rem. fix on slave.getMISO()
-                                        # when this format is changed
-                                        slave.setMISO((rpms, dcs), False)
+                                        # Optimized MISO data parsing for better performance
+                                        # Use numpy for faster array operations and pre-allocate arrays
+                                        
+                                        # Pre-allocate arrays with maxFans size
+                                        rpms = np.zeros(self.maxFans, dtype=int)
+                                        dcs = np.zeros(self.maxFans, dtype=float)
+                                        
+                                        # Parse RPM data efficiently
+                                        rpm_parts = reply[-2].split(',')
+                                        rpm_count = min(len(rpm_parts), self.maxFans)
+                                        for i in range(rpm_count):
+                                            rpms[i] = int(rpm_parts[i])
+                                        
+                                        # Parse DC data efficiently  
+                                        dc_parts = reply[-1].split(',')
+                                        dc_count = min(len(dc_parts), self.maxFans)
+                                        for i in range(dc_count):
+                                            dcs[i] = float(dc_parts[i])
+                                        
+                                        # Convert to lists for compatibility
+                                        slave.setMISO((rpms.tolist(), dcs.tolist()), False)
                                             # FORM: (RPMs, DCs)
                                     except queue.Full:
                                         # If there is no room for this message,
@@ -1452,7 +1608,7 @@ class FCCommunicator(pt.PrintClient):
                                     sv.DISCONNECTED, lock = False)
                                 """
                                 self.setSlaveStatus(
-                                    slave, sv.DISCONNECTED, False)
+                                slave, s.SS_DISCONNECTED, False)
                                 # Restart loop:
                                 pass
 
@@ -1460,7 +1616,7 @@ class FCCommunicator(pt.PrintClient):
 
                             # End check reply ---------------------------------
 
-                    elif status == sv.BOOTLOADER:
+                    elif status == s.SS_UPDATING:
                         time.sleep(self.periodS)
 
                     else: # = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -1487,13 +1643,21 @@ class FCCommunicator(pt.PrintClient):
                                     # Slave reconnected!
                                     #slave.setStatus(sv.CONNECTED)
                                     self.setSlaveStatus(
-                                        slave,sv.CONNECTED, False)
+                                        slave,s.SS_CONNECTED, False)
 
                             else:
                                 self._sendToListener("X", slave)
                         """
-                except Exception as e: # Print uncaught exceptions
-                    self.printx(e, "[{}] Exception: ".format(targetIndex + 1))
+                except socket.timeout:
+                    # Socket timeout is expected in slave communication
+                    continue
+                except socket.error as e:
+                    slave_info = {'mac': target.getMAC(), 'ip': target.getIP()}
+                    error = self.error_handler.handle_network_error(e, "slave {} communication".format(targetIndex + 1), slave_info)
+                    self.printx(error, "[{}] Network error: ".format(targetIndex + 1))
+                except Exception as e:
+                    self.error_handler.log_exception(e, "slave {} routine".format(targetIndex + 1), "error")
+                    self.printx(e, "[{}] Unexpected error: ".format(targetIndex + 1))
 
                 finally:
                     # DEBUG DEACTV
@@ -1508,9 +1672,10 @@ class FCCommunicator(pt.PrintClient):
                 # End Slave loop (while(True)) =================================
 
 
-        except Exception as e: # Print uncaught exceptions
-            self.printx(e, "[{}] Exception: (BROKEN LOOP)".format(
-                targetIndex + 1))
+        except Exception as e:
+            error = self.error_handler.handle_thread_error(e, "slave_{}_routine".format(targetIndex + 1), "slave {} main loop".format(targetIndex + 1))
+            self.printx(error, "[{}] Critical error (BROKEN LOOP): ".format(targetIndex + 1))
+            raise error
         # End _slaveRoutine  # # # # # # # # # # # # # # # # # # # # # # # # #
 
     # # AUXILIARY METHODS # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1530,6 +1695,9 @@ class FCCommunicator(pt.PrintClient):
         # - broadcast: Bool, whether to send this message as a broad
         # WARNING: THIS METHOD ASSUMES THE SLAVE'S LOCK IS HELD BY ITS CALLER.
 
+        # Start performance monitoring
+        self.performance_monitor.start_timing('message_send_time')
+        
         if not hsk:
             # Increment exchange index:
             slave.incrementMOSIIndex()
@@ -1544,6 +1712,10 @@ class FCCommunicator(pt.PrintClient):
         for i in range(repeat):
             slave._mosiSocket().sendto(bytearray(outgoing,'ascii'),
                 (slave.ip, slave.getMOSIPort()))
+        
+        # End performance monitoring and record message
+        self.performance_monitor.end_timing('message_send_time')
+        self.performance_monitor.record_message()
 
         # Notify user:
         # print "Sent \"{}\" to {} {} time(s)".
@@ -1569,7 +1741,7 @@ class FCCommunicator(pt.PrintClient):
                 self.passcode, slave.getMAC(), message)
             for i in range(repeat):
                 slave._mosiSocket().sendto(bytearray(outgoing,'ascii'),
-                (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                (self.defaultBroadcastIP, self.broadcastPort))
 
         # End _sendToListener # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -1586,6 +1758,9 @@ class FCCommunicator(pt.PrintClient):
         # - What exceptions may arise from passing an invalid argument.
         # WARNING: THIS METHOD ASSUMES THE SLAVE'S LOCK IS HELD BY ITS CALLER.
 
+        # Start performance monitoring
+        self.performance_monitor.start_timing('message_receive_time')
+        
         try:
             # Keep searching for messages until a message with a matching index
             # is found or the socket times out (no more messages to retrieve)
@@ -1657,39 +1832,61 @@ class FCCommunicator(pt.PrintClient):
                     # Return splitted message: ---------------------------------
                     # DEBUG DEACTV
                     ## print "Returning {}".format(output), "D"
+                    self.performance_monitor.end_timing('message_receive_time')
                     return output
 
-                except (ValueError, IndexError, TypeError) as e:
-                    # Handle potential Exceptions from format mismatches:
-
-                    # print "Bad message: \"{}\"".
-                    #   format(e), "W")
-
+                except UnicodeDecodeError as e:
+                    # Handle message decoding errors
+                    slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+                    error = self.error_handler.handle_communication_error(e, "message decode", slave_info)
+                    self.printw("Message decode error from slave: {}".format(error))
                     if not indexMatch:
-                        # If the correct index has not yet been found, keep lo-
-                        # oking:
-
-                        # DEBUG DEACTV
-                        ## print "Retrying receive", "D"
-
-                        continue;
+                        continue
                     else:
-                        # If the matching message is broken, exit w/ error code
-                        # (None)
-                        # print
-                        #   "WARNING: Broken message with matching index: " +\
-                        #   "\n\t Raw: \"{}\"" +\
-                        #   "\n\t Splitted: {}" +\
-                        #   "\n\t Error: \"{}\"".\
-                        #   format(message, splitted, e), "E")
-
                         return None
+                        
+                except (ValueError, IndexError) as e:
+                    # Handle message format errors
+                    slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+                    error = self.error_handler.handle_communication_error(e, "message format", slave_info)
+                    self.printw("Message format error from slave: {}".format(error))
+                    
+                    if not indexMatch:
+                        # If the correct index has not yet been found, keep looking
+                        continue
+                    else:
+                        # If the matching message is broken, exit with error code (None)
+                        self.performance_monitor.end_timing('message_receive_time')
+                        self.performance_monitor.record_error()
+                        return None
+                        
+                except TypeError as e:
+                    # Handle type conversion errors
+                    slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+                    error = self.error_handler.handle_communication_error(e, "type conversion", slave_info)
+                    self.printx("Type error in message processing: {}".format(error))
+                    self.performance_monitor.end_timing('message_receive_time')
+                    self.performance_monitor.record_error()
+                    return None
 
                 # End receive loop = = = = = = = = = = = = = = = = = = = = = = =
 
         # Handle exceptions: ---------------------------------------------------
         except socket.timeout:
-            # print "Timed out.", "D"
+            # Socket timeout is expected behavior in receive operations
+            # Log timeout for debugging if needed
+            slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+            self.error_handler.log_timeout("receive operation", slave_info)
+            self.performance_monitor.end_timing('message_receive_time')
+            return None
+            
+        except socket.error as e:
+            # Handle other socket errors
+            slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+            error = self.error_handler.handle_network_error(e, "receive operation", slave_info)
+            self.printw("Network error in receive: {}".format(error))
+            self.performance_monitor.end_timing('message_receive_time')
+            self.performance_monitor.record_error()
             return None
 
         # End _receive # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1723,8 +1920,8 @@ class FCCommunicator(pt.PrintClient):
         # Check status:
         status = self.slaves[targetIndex].getStatus()
 
-        if status == sv.AVAILABLE:
-            self.setSlaveStatus(self.slaves[targetIndex], sv.KNOWN)
+        if status == s.SS_AVAILABLE:
+            self.setSlaveStatus(self.slaves[targetIndex], s.SS_KNOWN)
         else:
             pass
 
@@ -1763,6 +1960,34 @@ class FCCommunicator(pt.PrintClient):
 
         # End sendReboot =======================================================
 
+    def sendChase(self, targetRPM, targets = None): # ==========================
+        """
+        Send a CHASE command to start RPM control mode.
+            targetRPM := target RPM value for CHASE mode
+            targets := list of slave indices to target. If None, broadcast to all.
+        """
+        try:
+            if targets is None:
+                # Broadcast to all slaves
+                self.disconnectSocket.sendto(
+                    bytearray("C|{}|{}".format(self.passcode, targetRPM), 'ascii'),
+                    (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                self.printw("[sC] Sent CHASE command (broadcast): target RPM = {}".format(targetRPM))
+            else:
+                # Send to specific targets
+                for slaveIndex in targets:
+                    slave = self.getSlaveByIndex(slaveIndex)
+                    if slave is not None:
+                        self.disconnectSocket.sendto(
+                            bytearray("c|{}|{}|{}".format(self.passcode, targetRPM, slave.getMAC()), 'ascii'),
+                            (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                        self.printw("[sC] Sent CHASE command to slave {}: target RPM = {}".format(slaveIndex, targetRPM))
+
+        except Exception as e:
+            self.printx(e, "[sC] Exception in CHASE routine:")
+
+        # End sendChase ========================================================
+
     def sendDisconnect(self): # ================================================
         # ABOUT: Use disconenct socket to send a general "disconnect" message
         # that terminates any existing connection.
@@ -1779,18 +2004,18 @@ class FCCommunicator(pt.PrintClient):
         # End sendDisconnect ===================================================
 
     def setSlaveStatus(self, slave, newStatus, lock = True, netargs = None): # =
-        # FIXME: No locking?
-        # FIXME: Upon simplification of SV data structure...
+        # Thread-safe slave status update with proper locking
+        
+        with self.slavesLock:
+            # Update status:
+            if netargs is None:
+                slave.setStatus(newStatus, lock = lock)
+            else:
+                slave.setStatus(newStatus, netargs[0], netargs[1], netargs[2],
+                    netargs[3], lock = lock)
 
-        # Update status:
-        if netargs is None:
-            slave.setStatus(newStatus, lock = lock)
-        else:
-            slave.setStatus(newStatus, netargs[0], netargs[1], netargs[2],
-                netargs[3], lock = lock)
-
-        # Send update to handlers:
-        self.slaveUpdateQueue.put_nowait(self.getSlaveStateVector(slave))
+            # Send update to handlers:
+            self.slaveUpdateQueue.put_nowait(self.getSlaveStateVector(slave))
         # End setSlaveStatus ===================================================
 
     def getSlaveStateVector(self, slave):
@@ -1838,6 +2063,30 @@ class FCCommunicator(pt.PrintClient):
         for slave in self.slaves:
             S += self.getSlaveStateVector(slave)
         self.slavePipeSend.send(S)
+    
+    def get_performance_stats(self):
+        """
+        Get current performance statistics from the performance monitor.
+        """
+        return self.performance_monitor.get_performance_stats()
+    
+    def reset_performance_stats(self):
+        """
+        Reset all performance statistics.
+        """
+        self.performance_monitor.reset_metrics()
+    
+    def enable_performance_monitoring(self):
+        """
+        Enable performance monitoring.
+        """
+        self.performance_monitor.enable()
+    
+    def disable_performance_monitoring(self):
+        """
+        Disable performance monitoring.
+        """
+        self.performance_monitor.disable()
 
 ## MODULE'S TEST SUITE #########################################################
 

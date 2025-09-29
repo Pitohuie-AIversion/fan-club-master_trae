@@ -1,7 +1,7 @@
 ################################################################################
 ## Project: Fanclub Mark IV "Master" base grid  ## File: grids.py             ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
 ## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
@@ -17,9 +17,9 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com> ##                 ##
+## dashuai                    ## <dschen2018@gmail.com>    ##                 ##
+##                            ##                           ##                 ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -100,9 +100,29 @@ class BaseGrid(ttk.Frame):
         - The cell's stored color, border width, and border color
 
         """
-        # TODO: Implement everything above
-
+        # Initialize data structures for grid representation
+        import numpy as np
+        
         ttk.Frame.__init__(self, master)
+        
+        # Store grid dimensions
+        self.R, self.C = R, C
+        self.total_cells = R * C
+        
+        # Initialize NumPy arrays for cell data
+        self.cell_iids = np.full(self.total_cells, None, dtype=object)  # Canvas item IDs
+        self.cell_values = np.zeros(self.total_cells, dtype=float)       # Duty cycle values
+        self.cell_selected = np.zeros(self.total_cells, dtype=bool)      # Selection state
+        self.cell_active = np.zeros(self.total_cells, dtype=bool)        # Active state
+        self.cell_colors = np.full(self.total_cells, empty, dtype=object) # Fill colors
+        self.cell_outlines = np.full(self.total_cells, outline, dtype=object) # Border colors
+        self.cell_widths = np.full(self.total_cells, border, dtype=int)  # Border widths
+        
+        # Store default styling
+        self.default_empty = empty
+        self.default_outline = outline
+        self.default_border = border
+        self.min_cell_size = minCell
         self.config(cursor = cursor)
 
         self.grid_rowconfigure(self.GRID_ROW, weight = self.GRID_WEIGHT)

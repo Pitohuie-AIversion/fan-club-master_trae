@@ -1,8 +1,7 @@
 ################################################################################
-## Project: Fanclub Mark IV "Master" profile GUI  ## File: profile.py         ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+## WESTLAKE UNIVERSITY                                                        ##
+## ADVANCED SYSTEMS LABORATORY                                                ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
 ##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
@@ -17,9 +16,9 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## AUTHORS: zhaoyang (mzymuzhaoyang@gmail.com)                               ##
+##          dashuai (dschen2018@gmail.com)                                   ##
+##----------------------------------------------------------------------------##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -45,7 +44,7 @@ MODULE = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -130,7 +129,7 @@ SEVENSQ = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -270,7 +269,7 @@ DEV1 = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -378,7 +377,7 @@ BOX = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -489,7 +488,7 @@ DEV2 = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -597,7 +596,7 @@ DEV3 = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -705,7 +704,7 @@ BASE = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -915,7 +914,7 @@ CAST = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -4717,7 +4716,7 @@ CAST_SIDE = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.defaultSlave :
@@ -8641,7 +8640,7 @@ CANN = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
 
@@ -8830,7 +8829,7 @@ TENX10 = {
     ac.listenerQueueSize : 3,
     ac.misoQueueSize : 2,
     ac.printerQueueSize : 3,
-    ac.passcode : "CT",
+    ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
     ac.pinouts : ac.PINOUTS.copy(),

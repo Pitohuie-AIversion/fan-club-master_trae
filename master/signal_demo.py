@@ -1,9 +1,28 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-信号生成演示脚本
-展示系统启动后产生的信号数据
-"""
+#!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
+################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + Signal generation demonstration script.
+ + Shows signal data produced after system startup.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
 
 import sys
 import os
@@ -11,15 +30,11 @@ import time
 import numpy as np
 from datetime import datetime
 
-# 添加fc模块路径
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'fc', 'backend'))
+# 添加项目路径
+sys.path.append(os.path.dirname(__file__))
 
-try:
-    from fc.backend.signal_acquisition import SimulatedHardware, AcquisitionConfig, ChannelConfig
-except ImportError as e:
-    print(f"导入错误: {e}")
-    sys.exit(1)
+# 导入信号采集模块
+import fc.backend.signal_acquisition as sa
 
 def demo_signal_generation():
     """演示信号生成"""
