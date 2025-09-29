@@ -87,6 +87,9 @@ class FCGUI(fe.FCFrontend):
         self.archiveClient(base)
         self.network.connect()
         base.focusControl()
+        
+        # Trigger initial profile loading after GUI is fully initialized
+        self.root.after_idle(lambda: base.profileChange())
 
     def _mainloop(self):
         """

@@ -839,6 +839,7 @@ class FCArchive(pt.PrintClient):
         name : "Unnamed FC Profile",
         description : "",
         platform : UNKNOWN,
+        version : VERSION,  # 添加缺失的version键
 
         broadcastIP : "<broadcast>",
         broadcastPort  : 65000,
@@ -922,13 +923,24 @@ class FCArchive(pt.PrintClient):
         self._path = None  # 当前配置文件路径
         self._encoding = encoding  # 文件编码格式
         self._runtime = {
-            'version': fc_version,
-            'platform': us.platform(),
+            version: fc_version,
+            platform: us.platform(),
             'last_modified': time.time(),
             'access_count': 0,
             'validation_errors': [],
             'backup_count': 0
         }
+        
+        # 初始化profile - 如果没有提供profile，使用默认配置
+        if profile is not None:
+            self.profile(profile)
+        else:
+            # 使用默认配置，不添加运行时信息到P中
+            self.P = cp.deepcopy(self.DEFAULT)
+            # 只更新已存在的配置键
+            self.P[version] = fc_version
+            self.P[platform] = us.platform()
+            self.isModified = False
     
     def _validate_config_structure(self, data):
         """
@@ -1431,7 +1443,9 @@ class FCArchive(pt.PrintClient):
         """
         if new is not None:
             self.P = cp.deepcopy(new)
-            self.P.update(self._runtime)
+            # 只更新已存在的配置键
+            self.P[version] = self._runtime[version]
+            self.P[platform] = self._runtime[platform]
             self.isModified = False
         if self.P is not None:
             return cp.deepcopy(self.P)

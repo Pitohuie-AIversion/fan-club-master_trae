@@ -10,7 +10,7 @@
 ##                    ██║ █╗ ██║█████╗  ███████╗   ██║                      ##
 ##                    ██║███╗██║██╔══╝  ╚════██║   ██║                      ##
 ##                    ╚███╔███╔╝███████╗███████║   ██║                      ##
-##                     ╚══╝╚══╝ ╚══════╝╚══════╝   ╚═╝                      ##
+##                     ╚══╝╚══╝ ╚════════╝╚══════╝   ╚═╝                      ##
 ##                                                                            ##
 ##                         LAKE SYSTEMS LABORATORY                          ##
 ##                                                                            ##
@@ -105,7 +105,7 @@ class NetworkWidget(ttk.Frame, pt.PrintClient):
         self.networkFrame = ttk.LabelFrame(self.main, text = "Network Control")
         self.networkFrame.grid(row = 0, sticky = "EW")
         self.networkControl = NetworkControlWidget(self.networkFrame, network,
-            self.slaveList, pqueue)
+            self.slaveList, archive, pqueue)
         self.networkControl.pack(fill = tk.BOTH, expand = True)
         self.networkControl.addClient(self.firmwareUpdate)
 
@@ -114,6 +114,9 @@ class NetworkWidget(ttk.Frame, pt.PrintClient):
 
     def profileChange(self):
         self.slaveList.clear()
+        # 调用NetworkControlWidget的profileChange方法
+        if hasattr(self.networkControl, 'profileChange'):
+            self.networkControl.profileChange()
 
 ## WIDGETS #####################################################################
 
@@ -126,7 +129,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
     NO_IP = "[NO IP]"
     NO_PORT = "[NO PORT]"
 
-    def __init__(self, master, network, slaveList, pqueue):
+    def __init__(self, master, network, slaveList, archive, pqueue):
         """
         Create a new NetworkControlWidget.
 
@@ -134,6 +137,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         NETWORK := NetworkAbstraction for this system
         SLAVELIST := SlaveList instance from which to fetch selections for
             control messages
+        ARCHIVE := FCArchive instance for profile configuration
         PQUEUE := Queue instance to use for I-P printing
         """
 
@@ -142,6 +146,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
 
         self.network = network
         self.slaveList = slaveList
+        self.archive = archive
 
         frameconfig = {"side" : tk.TOP, "fill" : tk.BOTH, "expand" : True,
             "padx" : 10, "pady" : 5}
@@ -179,7 +184,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
 
         # Broadcast IP:
         self.bcipVar = tk.StringVar()
-        self.bcipVar.set(self.NO_IP)
+        self.bcipVar.set(self.NO_IP)  # 先设置默认值
         self.ips.append(self.bcipVar)
         name = "Broadcast IP"
         self.bcipFrame = ttk.Frame(self.connectionFrame)
@@ -197,18 +202,28 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             textvariable = self.bcipVar, width = 15,
             relief = tk.SUNKEN, font = gus.typography["code"]["font"], padx = 10, pady = 5)
         self.bcipDisplay.pack(side = tk.TOP, fill = tk.X, pady = 5, padx = 10)
+        
+        # 在GUI组件创建完成后再加载profile配置
+        # 使用更长的延迟确保GUI完全初始化
+        self.after(100, self._loadProfileBroadcastIP)
 
         # Broadcast port:
         self.bcVar = tk.StringVar()
-        self.bcVar.set(self.NO_PORT)
+        self.bcVar.set(self.NO_PORT)  # 先设置默认值
         self.ports.append(self.bcVar)
         self.__addDisplay("Broadcast Port", self.bcVar)
+        
+        # 在GUI组件创建完成后再加载profile配置
+        self.after_idle(self._loadProfileBroadcastPort)
 
         # Listener port:
         self.ltVar = tk.StringVar()
         self.ltVar.set(self.NO_PORT)
         self.ports.append(self.ltVar)
         self.__addDisplay("Listener Port", self.ltVar)
+        
+        # 在GUI组件创建完成后再加载profile配置
+        self.after_idle(self._loadProfileListenerPort)
 
         # Connection display:
         self.connectionVar = tk.StringVar()
@@ -271,7 +286,14 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             if not self.isConnected:
                 self.connected()
             self.ipVar.set(N[1])
-            self.bcipVar.set(N[2])
+            
+            # 处理广播IP显示 - 将 "<broadcast>" 转换为用户友好的显示
+            broadcast_ip = N[2]
+            if broadcast_ip == "<broadcast>":
+                self.bcipVar.set("Broadcast (Auto)")
+            else:
+                self.bcipVar.set(broadcast_ip)
+                
             self.bcVar.set(N[3])
             self.ltVar.set(N[4])
         else:
@@ -301,6 +323,112 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self._setWidgetState(tk.NORMAL)
         for client in self.clients:
             client.connected()
+
+
+    def _setBroadcastIP(self, ip):
+        """
+        Set the broadcast IP to IP.
+        """
+        # 处理用户输入的转换
+        if ip == "Broadcast (Auto)" or ip == "":
+            ip = "<broadcast>"
+        
+        self.network.setBroadcastIP(ip)
+
+    def _loadProfileBroadcastPort(self):
+        """
+        从profile加载broadcastPort配置并设置到GUI显示
+        """
+        try:
+            if self.archive:
+                profile = self.archive.profile()
+                # 使用正确的常量键而不是字符串键
+                import fc.archive as ac
+                if profile and ac.broadcastPort in profile:
+                    broadcast_port = profile[ac.broadcastPort]
+                    self.bcVar.set(str(broadcast_port))
+                else:
+                    # 如果profile中没有配置，显示默认端口
+                    self.bcVar.set(self.NO_PORT)
+            else:
+                self.bcVar.set(self.NO_PORT)
+        except Exception as e:
+            # 出错时显示默认值
+            self.bcVar.set(self.NO_PORT)
+            self.printr(f"Error loading profile broadcast port: {e}")
+
+    def _loadProfileListenerPort(self):
+        """
+        从profile加载externalDefaultListenerPort配置并设置到GUI显示
+        """
+        try:
+            if self.archive:
+                profile = self.archive.profile()
+                # 使用正确的常量键而不是字符串键
+                import fc.archive as ac
+                if profile and ac.externalDefaultListenerPort in profile:
+                    listener_port = profile[ac.externalDefaultListenerPort]
+                    self.ltVar.set(str(listener_port))
+                else:
+                    # 如果profile中没有配置，显示默认端口
+                    self.ltVar.set(self.NO_PORT)
+            else:
+                self.ltVar.set(self.NO_PORT)
+        except Exception as e:
+            # 出错时显示默认值
+            self.ltVar.set(self.NO_PORT)
+            self.printr(f"Error loading profile listener port: {e}")
+
+    def _loadProfileBroadcastIP(self):
+        """
+        从profile加载broadcastIP配置并设置到GUI显示
+        """
+        try:
+            if self.archive:
+                profile = self.archive.profile()
+                # 使用正确的常量键而不是字符串键
+                import fc.archive as ac
+                if profile and ac.broadcastIP in profile:
+                    broadcast_ip = profile[ac.broadcastIP]
+                    # 将 "<broadcast>" 转换为用户友好的显示
+                    if broadcast_ip == "<broadcast>":
+                        self.bcipVar.set("Broadcast (Auto)")
+                    else:
+                        self.bcipVar.set(broadcast_ip)
+                    # 强制更新GUI显示
+                    self.bcipDisplay.update()
+                else:
+                    # 如果profile中没有配置，显示默认的广播地址
+                    self.bcipVar.set("Broadcast (Auto)")
+            else:
+                self.bcipVar.set(self.NO_IP)
+        except Exception as e:
+            # 出错时显示默认值
+            self.printr(f"Error loading profile broadcast IP: {e}")
+            self.bcipVar.set(self.NO_IP)
+
+    def profileChange(self):
+        """
+        处理profile变更事件，更新网络设置显示
+        """
+        self.printr("Debug: NetworkControlWidget.profileChange called!")
+        # 重新加载profile中的broadcastIP和broadcastPort配置
+        self._loadProfileBroadcastIP()
+        self._loadProfileBroadcastPort()
+        self._loadProfileListenerPort()
+        
+        # 如果当前未连接，显示profile配置
+        if not self.isConnected:
+            try:
+                if self.archive:
+                    profile = self.archive.profile()
+                    if profile:
+                        # 更新其他网络设置显示（如果需要）
+                        # 注意：IP地址和端口通常在连接时才确定，这里主要处理broadcastIP
+                        pass
+            except Exception as e:
+                self.printr(f"Error updating profile network settings: {e}")
+
         self.bcipDisplay.enable()
         self.isConnected = True
 
@@ -319,10 +447,10 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self.connectButton.config(state = tk.NORMAL, text = "Connect",
             command = self._onConnect)
         self.connectionVar.set("Disconnected")
-        for ip in self.ips:
-            ip.set(self.NO_IP)
-        for port in self.ports:
-            port.set(self.NO_PORT)
+        # 只重置IP地址，不重置broadcastIP（保持profile配置）
+        self.ipVar.set(self.NO_IP)
+        # 只重置监听端口，保留广播端口配置
+        self.ltVar.set(self.NO_PORT)
         for client in self.clients:
             client.disconnected()
         # ttk.Label doesn't support direct fg/bg usage, switch to style instead
@@ -430,18 +558,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             style = "Sunken.TLabel", font = gus.typography["code"]["font"])
         display.pack(side = tk.TOP, fill = tk.X, pady = 5, padx = 10)
 
-    def _setBroadcastIP(self, ip):
-        """
-        Send a command to the Communicator to change the broadcast IP, if
-        connected.
 
-        - ip := String, the new IP address to set.
-        """
-        if ip == "":
-            ip = "<broadcast>"
-        if self.isConnected and ip is not None:
-            self.network.broadcastIP(ip)
-            self.printr("Sent broadcast IP change request (\"{}\")".format(ip))
 
 # Firmware update ==============================================================
 class FirmwareUpdateWidget(ttk.Frame, pt.PrintClient):
