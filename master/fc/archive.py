@@ -705,7 +705,7 @@ class FCArchive(pt.PrintClient):
                 SV_counterCounts : 2,
                 SV_counterTimeoutMS : 30,
                 SV_pulsesPerRotation : 2,
-                SV_maxRPM : 16000,
+                SV_maxRPM : 25000,
                 SV_minRPM : 1200,
                 SV_minDC : 0.5,
                 SV_maxFans : 21,
@@ -719,7 +719,7 @@ class FCArchive(pt.PrintClient):
             },
         savedSlaves : (),
         pinouts : PINOUTS.copy(),
-        maxRPM : 16000,
+        maxRPM : 25000,
         maxFans : 21,
         dcDecimals : 2,
         fanArray : {
