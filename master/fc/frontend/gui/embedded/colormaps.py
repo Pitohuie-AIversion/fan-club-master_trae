@@ -1,7 +1,7 @@
 ################################################################################
 ## Project: Fanclub Mark IV "Master"                 ## File: colormaps.py    ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
 ## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
@@ -17,9 +17,9 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com> ##                 ##
+## dashuai                    ## <dschen2018@gmail.com>    ##                 ##
+##                            ##                           ##                 ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

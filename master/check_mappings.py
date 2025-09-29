@@ -1,9 +1,35 @@
-import copy as cp
+#!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
+################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + Profile mapping validation and consistency checking utilities.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
+
+import copy
 import multiprocessing as mp
 
-from fc.builtin import profiles as btp
-from fc import archive as ac, standards as std
-from fc.backend.mapper import Mapper
+import fc.builtin.profiles as btp
+import fc.archive as ac
+import fc.standards as s
+import fc.backend.mapper as mapper
 
 
 def flatten_mapping(m):

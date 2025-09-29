@@ -1,14 +1,32 @@
 ################################################################################
-## Project: Fanclub Mark IV "Master"              ## File: visual_effects.py ##
+## Project: Fan Club Mark II "Master" ## File: visual_effects.py           ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES       ##                     ##
+##----------------------------------------------------------------------------##
+##      ____      __      __  __      _____      __      __    __    ____     ##
+##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
+##    / /_ |/  / /  /|  /  // /|/ / /|__| _|   / /|    / /|  / /|/ /   --||   ##
+##   / __/|/ _/    /|/ /   / /|/ / /|    __   / /|    / /|  / /|/ / _  \|/    ##
+##  / /|_|/ /  /  /|/ / // //|/ / /|__- / /  / /___  / -|_ - /|/ /     /|     ##
+## /_/|/   /_/ /_/|/ /_/ /_/|/ |\___--|_|  /_____/| |-___-_|/  /____-/|/     ##
+## |_|/    |_|/|_|/  |_|/|_|/   \|___|-    |_____|/   |___|     |____|/       ##
+##                   _ _    _    ___   _  _      __   __                      ##
+##                  | | |  | |  | T_| | || |    |  | |  |                     ##
+##                  | _ |  |T|  |  |  |  _|      ||   ||                      ##
+##                  || || |_ _| |_|_| |_| _|    |__| |__|                     ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>  ##                ##
+## dashuai                    ## <dschen2018@gmail.com>     ##                ##
 ################################################################################
 
-""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- + Advanced visual effects system for enhanced UI appearance.
- + Provides gradient backgrounds, improved shadows, and micro-interactions.
- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
+## ABOUT #######################################################################
+"""
+Advanced visual effects system for enhanced UI appearance.
+Provides gradient backgrounds, improved shadows, and micro-interactions.
+"""
+################################################################################
 
 import tkinter as tk
 import tkinter.ttk as ttk

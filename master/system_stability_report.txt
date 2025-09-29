@@ -4,9 +4,9 @@
 ============================================================
 
 总测试数: 6
-通过测试: 4
-失败测试: 2
-通过率: 66.7%
+通过测试: 6
+失败测试: 0
+通过率: 100.0%
 
 详细结果:
 ------------------------------------------------------------
@@ -14,64 +14,70 @@
 信号采集基础功能: ✓ 通过
   持续时间: 5.00s
   错误数: 0
-  CPU使用: 4.6%
+  CPU使用: 8.9%
   内存使用: 0.1%
-  详情: 采集了 90570 个样本，错误 0 次
+  详情: 采集了 11550 个样本，错误 0 次
   性能指标:
-    samples_acquired: 90570
-    acquisition_rate: 18098.70
+    samples_acquired: 11550
+    acquisition_rate: 2308.38
     error_rate: 0.00
 
-数据处理和传输可靠性: ✗ 失败
-  持续时间: 0.00s
-  错误数: 1
-  CPU使用: 0.0%
+数据处理和传输可靠性: ✓ 通过
+  持续时间: 10.01s
+  错误数: 0
+  CPU使用: 8.8%
   内存使用: 0.1%
-  详情: 测试异常: 'Queue' object has no attribute 'buffer_size'
+  详情: 处理了 6900 个样本，错误 0 次
+  性能指标:
+    processed_samples: 6900
+    processing_rate: 689.52
+    error_rate: 0.00
 
 多线程架构稳定性: ✓ 通过
-  持续时间: 8.01s
+  持续时间: 8.09s
   错误数: 0
-  CPU使用: 6.9%
+  CPU使用: 8.7%
   内存使用: 0.1%
-  详情: 运行了 3 个采集引擎，总采集 46007 个样本
+  详情: 运行了 3 个采集引擎，总采集 5114 个样本
   性能指标:
-    total_samples: 46007
+    total_samples: 5114
     engines_count: 3
-    avg_samples_per_engine: 15335.67
+    avg_samples_per_engine: 1704.67
 
-系统资源使用: ✗ 失败
-  持续时间: 20.08s
-  错误数: 1
-  CPU使用: 5.3%
-  内存使用: 0.6%
-  详情: 平均CPU: 5.3%, 最大CPU: 7.8%, 内存增长: 186.2MB
+系统资源使用: ✓ 通过
+  持续时间: 20.02s
+  错误数: 0
+  CPU使用: 9.2%
+  内存使用: 0.1%
+  详情: 平均CPU: 9.2%, 最大CPU: 13.1%, 内存增长: 1.8MB
   性能指标:
-    avg_cpu_usage: 5.33
-    max_cpu_usage: 7.80
-    memory_increase_mb: 186.21
-    final_memory_mb: 228.24
+    avg_cpu_usage: 9.23
+    max_cpu_usage: 13.10
+    memory_increase_mb: 1.78
+    final_memory_mb: 40.39
 
 异常处理和错误恢复: ✓ 通过
-  持续时间: 10.00s
+  持续时间: 10.02s
   错误数: 0
-  CPU使用: 5.9%
+  CPU使用: 9.4%
   内存使用: 0.1%
-  详情: 异常处理后仍采集了 5681 个样本
+  详情: 异常处理后仍采集了 695 个样本
   性能指标:
-    samples_after_exceptions: 5681
+    samples_after_exceptions: 695
     recovery_success: 1
 
 长时间运行稳定性: ✓ 通过
-  持续时间: 60.06s
+  持续时间: 60.04s
   错误数: 0
-  CPU使用: 6.6%
-  内存使用: 0.2%
-  详情: 运行 60s，采集 124310 样本，错误 0 次
+  CPU使用: 9.0%
+  内存使用: 0.1%
+  详情: 运行 60s，采集 36850 样本，错误 0 次，实际采样率 614.2Hz
   性能指标:
-    total_samples: 124310
-    expected_samples: 54000.00
-    sample_rate_accuracy: 2.30
+    total_samples: 36850
+    expected_samples: 27000.00
+    sample_rate_accuracy: 1.36
+    actual_sample_rate: 614.17
+    expected_sample_rate: 450.00
     total_errors: 0
 
 ============================================================

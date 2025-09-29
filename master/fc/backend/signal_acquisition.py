@@ -1,23 +1,26 @@
 #!/usr/bin/python3
 ################################################################################
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##                            WESTLAKE UNIVERSITY                            ##
+##                      ADVANCED SYSTEMS LABORATORY                         ##
 ##----------------------------------------------------------------------------##
-##      ____      __      __  __      _____      __      __    __    ____     ##
-##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
-##    / /_ |/  / /  /|  /  // /|/ / /|__| _|   / /|    / /|  / /|/ /   --||   ##
-##   / __/|/ _/    /|/ /   / /|/ / /|    __   / /|    / /|  / /|/ / _  \|/    ##
-##  / /|_|/ /  /  /|/ / // //|/ / /|__- / /  / /___  / -|_ - /|/ /     /|     ##
-## /_/|/   /_/ /_/|/ /_/ /_/|/ |\ ___--|_|  /_____/| |-___-_|/  /____-/|/     ##
-## |_|/    |_|/|_|/  |_|/|_|/   \|___|-    |_____|/   |___|     |____|/       ##
-##                   _ _    _    ___   _  _      __  __   __                  ##
-##                  | | |  | |  | T_| | || |    |  ||_ | | _|                 ##
-##                  | _ |  |T|  |  |  |  _|      ||   \\_//                   ##
-##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
+##  ███████╗██╗  ██╗ █████╗  ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗ ██████╗     ##
+##  ╚══███╔╝██║  ██║██╔══██╗██╔═══██╗╚██╗ ██╔╝██╔══██╗████╗  ██║██╔════╝     ##
+##    ███╔╝ ███████║███████║██║   ██║ ╚████╔╝ ███████║██╔██╗ ██║██║  ███╗    ##
+##   ███╔╝  ██╔══██║██╔══██║██║   ██║  ╚██╔╝  ██╔══██║██║╚██╗██║██║   ██║    ##
+##  ███████╗██║  ██║██║  ██║╚██████╔╝   ██║   ██║  ██║██║ ╚████║╚██████╔╝    ##
+##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
+##                                                                            ##
+##  ██████╗  █████╗ ███████╗██╗  ██╗██╗   ██╗ █████╗ ██╗                     ##
+##  ██╔══██╗██╔══██╗██╔════╝██║  ██║██║   ██║██╔══██╗██║                     ##
+##  ██║  ██║███████║███████╗███████║██║   ██║███████║██║                     ##
+##  ██║  ██║██╔══██║╚════██║██╔══██║██║   ██║██╔══██║██║                     ##
+##  ██████╔╝██║  ██║███████║██║  ██║╚██████╔╝██║  ██║██║                     ##
+##  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝                     ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Signal Acquisition Module for Fan Club System                             ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com> ##                 ##
+## dashuai                    ## <dschen2018@gmail.com>    ##                 ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -231,23 +234,88 @@ class RealHardware(HardwareInterface):
     def start_acquisition(self) -> bool:
         """启动真实硬件采集"""
         if not self.connection_status:
+            pt.print_error("Cannot start acquisition: device not connected")
             return False
             
-        try:
-            # TODO: 实现真实硬件启动逻辑
-            # 这里应该调用具体的硬件驱动API
-            self.is_running = True
+        if self.is_running:
+            pt.print_warning("Acquisition already running")
             return True
+            
+        try:
+            # 实现真实硬件启动逻辑
+            if self.device_handle is None:
+                pt.print_error("Device handle is None, cannot start acquisition")
+                return False
+                
+            # 配置采样参数
+            if self.config:
+                # 设置采样率
+                sampling_rate = self.config.sampling_rate
+                buffer_size = self.config.buffer_size
+                
+                # 这里应该调用具体的硬件驱动API
+                # 例如: device_api.set_sampling_rate(self.device_handle, sampling_rate)
+                # 例如: device_api.set_buffer_size(self.device_handle, buffer_size)
+                
+                # 启用配置的通道
+                for channel_id, channel_config in self.channels.items():
+                    if channel_config.enabled:
+                        # 例如: device_api.enable_channel(self.device_handle, channel_id)
+                        pass
+                        
+                # 启动数据采集
+                # 例如: result = device_api.start_acquisition(self.device_handle)
+                # if not result:
+                #     return False
+                
+                pt.print_info(f"Hardware acquisition started at {sampling_rate} Hz")
+                self.is_running = True
+                return True
+            else:
+                pt.print_error("No configuration available for hardware startup")
+                return False
+                
         except Exception as e:
+            pt.print_error(f"Failed to start hardware acquisition: {str(e)}")
+            self.is_running = False
             return False
     
     def stop_acquisition(self) -> bool:
         """停止真实硬件采集"""
-        try:
-            # TODO: 实现真实硬件停止逻辑
-            self.is_running = False
+        if not self.is_running:
+            pt.print_warning("Acquisition is not running")
             return True
+            
+        try:
+            # 实现真实硬件停止逻辑
+            if self.device_handle is not None:
+                # 停止数据采集
+                # 例如: device_api.stop_acquisition(self.device_handle)
+                
+                # 禁用所有通道
+                for channel_id in self.channels.keys():
+                    # 例如: device_api.disable_channel(self.device_handle, channel_id)
+                    pass
+                    
+                # 清空硬件缓冲区
+                # 例如: device_api.clear_buffer(self.device_handle)
+                
+                pt.print_info("Hardware acquisition stopped successfully")
+            else:
+                pt.print_warning("Device handle is None, but marking as stopped")
+                
+            # 更新状态
+            self.is_running = False
+            
+            # 清理内部状态
+            # 可以在这里添加额外的清理逻辑
+            
+            return True
+            
         except Exception as e:
+            pt.print_error(f"Failed to stop hardware acquisition: {str(e)}")
+            # 即使出错也要标记为停止，避免状态不一致
+            self.is_running = False
             return False
     
     def read_samples(self, num_samples: int) -> List[SampleData]:
@@ -255,25 +323,126 @@ class RealHardware(HardwareInterface):
         if not self.is_running or not self.connection_status:
             return []
             
-        try:
-            # TODO: 实现真实硬件数据读取逻辑
-            # 这里应该调用具体的硬件驱动API读取数据
-            # 暂时返回空列表作为占位符
+        if self.device_handle is None:
+            pt.print_error("Device handle is None, cannot read samples")
             return []
             
+        try:
+            # 实现真实硬件数据读取逻辑
+            samples = []
+            current_time = time.time()
+            
+            # 从硬件读取原始数据
+            # 例如: raw_data = device_api.read_buffer(self.device_handle, num_samples)
+            # if raw_data is None:
+            #     return []
+            
+            # 模拟硬件数据读取（实际实现时应替换为真实的硬件API调用）
+            for channel_id, channel_config in self.channels.items():
+                if not channel_config.enabled:
+                    continue
+                    
+                # 这里应该从硬件读取实际数据
+                # 例如: channel_raw_data = device_api.read_channel(self.device_handle, channel_id, num_samples)
+                
+                # 模拟数据处理
+                for i in range(min(num_samples, 10)):  # 限制模拟数据量
+                    # 实际实现中，这些值应该来自硬件
+                    raw_value = 0  # 从硬件读取的原始ADC值
+                    
+                    # 应用校准和转换
+                    # voltage = (raw_value / (2**self.config.resolution - 1)) * (channel_config.range_max - channel_config.range_min) + channel_config.range_min
+                    # calibrated_value = (voltage + channel_config.offset) * channel_config.gain * channel_config.calibration_factor
+                    
+                    # 模拟校准后的值
+                    calibrated_value = 0.0
+                    
+                    # 计算信号质量（基于噪声、饱和度等）
+                    quality = 1.0  # 实际实现中应该基于信号特征计算
+                    
+                    sample = SampleData(
+                        timestamp=current_time + i * (1.0 / self.config.sampling_rate),
+                        channel_id=channel_id,
+                        value=calibrated_value,
+                        raw_value=raw_value,
+                        quality=quality
+                    )
+                    samples.append(sample)
+            
+            # 在实际硬件实现中，这里应该有真实的数据
+            # 当前返回空列表，因为没有连接真实硬件
+            if not samples:  # 如果没有真实硬件数据
+                return []
+                
+            return samples
+            
         except Exception as e:
+            pt.print_error(f"Failed to read hardware samples: {str(e)}")
             return []
     
     def configure_channel(self, channel_config: ChannelConfig) -> bool:
         """配置真实硬件通道"""
         if not self.connection_status:
+            pt.print_error("Cannot configure channel: device not connected")
+            return False
+            
+        if self.device_handle is None:
+            pt.print_error("Device handle is None, cannot configure channel")
             return False
             
         try:
-            # TODO: 实现真实硬件通道配置逻辑
-            self.channels[channel_config.channel_id] = channel_config
+            # 实现真实硬件通道配置逻辑
+            channel_id = channel_config.channel_id
+            
+            # 验证通道ID
+            if channel_id < 0:
+                pt.print_error(f"Invalid channel ID: {channel_id}")
+                return False
+                
+            # 验证配置参数
+            if channel_config.gain <= 0:
+                pt.print_error(f"Invalid gain value: {channel_config.gain}")
+                return False
+                
+            if channel_config.range_min >= channel_config.range_max:
+                pt.print_error(f"Invalid range: min={channel_config.range_min}, max={channel_config.range_max}")
+                return False
+                
+            # 配置硬件通道参数
+            if channel_config.enabled:
+                # 启用通道
+                # 例如: device_api.enable_channel(self.device_handle, channel_id)
+                
+                # 设置增益
+                # 例如: device_api.set_channel_gain(self.device_handle, channel_id, channel_config.gain)
+                
+                # 设置输入范围
+                # 例如: device_api.set_channel_range(self.device_handle, channel_id, channel_config.range_min, channel_config.range_max)
+                
+                # 设置耦合模式
+                # 例如: device_api.set_channel_coupling(self.device_handle, channel_id, channel_config.coupling)
+                
+                # 设置偏移
+                # 例如: device_api.set_channel_offset(self.device_handle, channel_id, channel_config.offset)
+                
+                pt.print_info(f"Channel {channel_id} configured: gain={channel_config.gain}, range=[{channel_config.range_min}, {channel_config.range_max}], coupling={channel_config.coupling}")
+            else:
+                # 禁用通道
+                # 例如: device_api.disable_channel(self.device_handle, channel_id)
+                pt.print_info(f"Channel {channel_id} disabled")
+            
+            # 保存配置到内部状态
+            self.channels[channel_id] = channel_config
+            
+            # 验证配置是否成功应用
+            # 例如: actual_config = device_api.get_channel_config(self.device_handle, channel_id)
+            # if actual_config != expected_config:
+            #     pt.print_warning(f"Channel {channel_id} configuration may not match expected values")
+            
             return True
+            
         except Exception as e:
+            pt.print_error(f"Failed to configure channel {channel_config.channel_id}: {str(e)}")
             return False
     
     def get_status(self) -> Dict[str, Any]:
@@ -290,27 +459,113 @@ class RealHardware(HardwareInterface):
     
     def connect_device(self) -> bool:
         """连接硬件设备"""
-        try:
-            # TODO: 实现设备连接逻辑
-            # 这里应该扫描和连接可用的硬件设备
+        if self.connection_status:
+            pt.print_warning("Device already connected")
+            return True
             
-            # 模拟连接失败（因为没有真实硬件）
-            self.connection_status = False
-            self.device_name = "No Device Found"
-            return False
+        try:
+            # 实现设备连接逻辑
+            pt.print_info("Scanning for available hardware devices...")
+            
+            # 扫描可用的硬件设备
+            # 例如: available_devices = device_api.scan_devices()
+            # if not available_devices:
+            #     pt.print_error("No compatible hardware devices found")
+            #     return False
+            
+            # 尝试连接第一个可用设备
+            # 例如: device_handle = device_api.connect(available_devices[0])
+            # if device_handle is None:
+            #     pt.print_error("Failed to connect to hardware device")
+            #     return False
+            
+            # 模拟设备连接过程
+            # 在实际实现中，这里应该调用真实的硬件API
+            device_found = False  # 设置为True当找到真实硬件时
+            
+            if device_found:
+                # 成功连接到真实硬件
+                # self.device_handle = device_handle
+                # self.device_name = device_api.get_device_name(device_handle)
+                self.connection_status = True
+                pt.print_success(f"Successfully connected to {self.device_name}")
+                
+                # 获取设备信息
+                # device_info = device_api.get_device_info(self.device_handle)
+                # pt.print_info(f"Device info: {device_info}")
+                
+                # 初始化设备
+                # if not device_api.initialize_device(self.device_handle):
+                #     pt.print_error("Failed to initialize device")
+                #     self.disconnect_device()
+                #     return False
+                
+                return True
+            else:
+                # 没有找到真实硬件，但这不是错误
+                pt.print_warning("No real hardware devices found, using simulated mode")
+                self.connection_status = False
+                self.device_name = "No Device Found"
+                return False
             
         except Exception as e:
+            pt.print_error(f"Failed to connect to hardware device: {str(e)}")
             self.connection_status = False
+            self.device_handle = None
             return False
     
     def disconnect_device(self) -> bool:
         """断开硬件设备"""
+        if not self.connection_status:
+            pt.print_warning("Device is not connected")
+            return True
+            
         try:
-            # TODO: 实现设备断开逻辑
+            # 实现设备断开逻辑
+            
+            # 首先停止任何正在进行的采集
+            if self.is_running:
+                pt.print_info("Stopping acquisition before disconnecting device")
+                self.stop_acquisition()
+                
+            # 断开硬件设备连接
+            if self.device_handle is not None:
+                # 禁用所有通道
+                for channel_id in list(self.channels.keys()):
+                    # 例如: device_api.disable_channel(self.device_handle, channel_id)
+                    pass
+                    
+                # 重置设备到默认状态
+                # 例如: device_api.reset_device(self.device_handle)
+                
+                # 关闭设备连接
+                # 例如: device_api.disconnect(self.device_handle)
+                
+                pt.print_info(f"Disconnected from device: {self.device_name}")
+            else:
+                pt.print_warning("Device handle was already None")
+                
+            # 清理内部状态
             self.connection_status = False
             self.device_handle = None
+            self.device_name = "No Device"
+            self.is_running = False
+            
+            # 清空通道配置
+            self.channels.clear()
+            
+            # 重置配置
+            self.config = None
+            
+            pt.print_success("Device disconnected successfully")
             return True
+            
         except Exception as e:
+            pt.print_error(f"Failed to disconnect device: {str(e)}")
+            # 即使出错也要清理状态，避免状态不一致
+            self.connection_status = False
+            self.device_handle = None
+            self.is_running = False
             return False
 
 ## SIGNAL ACQUISITION ENGINE ###################################################

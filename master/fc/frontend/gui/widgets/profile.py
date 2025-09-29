@@ -1,7 +1,7 @@
 ################################################################################
 ## Project: Fanclub Mark IV "Master" profile GUI  ## File: profile.py         ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
 ## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
@@ -17,9 +17,8 @@
 ##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <astefanz@berkeley.edu>   ##                 ##
-## Chris J. Dougherty         ## <cdougher@caltech.edu>    ##                 ##
-## Marcel Veismann            ## <mveisman@caltech.edu>    ##                 ##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>  ##                ##
+## dashuai                    ## <dschen2018@gmail.com>     ##                ##
 ################################################################################
 
 """ ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -56,15 +55,19 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         ttk.Frame.__init__(self, master = master)
         pt.PrintClient.__init__(self, pqueue, self.SYMBOL)
 
-        # TODO:
-        # - means by which to automatically update values here if the archive
-        #   is modified elsewhere (should this be allowed?)
-
+        # Auto-update mechanism for external archive modifications
+        self._auto_update_enabled = True
+        self._last_archive_hash = None
+        self._update_check_interval = 1000  # milliseconds
+        
         # Core setup ..........................................................
         self.archive = archive
         self.callback = callback
         self.map = {}
         self.root = ''
+        
+        # Initialize auto-update monitoring
+        self._schedule_update_check()
 
         # Grid:
         self.grid_rowconfigure(0, weight = 0)
@@ -324,7 +327,15 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         name = self.display.item(iid)['values'][0]
         key = ac.INVERSE[name]
 
-        #self.archive.meta[key][ac.VALIDATOR](value) FIXME
+        try:
+            # Validate the value using the appropriate validator
+            self.archive.meta[key][ac.VALIDATOR](value)
+        except ValueError as e:
+            self.printx(f"Validation error: {e}")
+            return
+        except Exception as e:
+            self.printx(f"Unexpected error during validation: {e}")
+            return
 
         value = self.archive[self.archive.defaults[key][ac.KEY]]
         self.archive.add(key, value)
@@ -350,9 +361,131 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         Callback for when the Remove button is pressed. Removes the currently
         selected attribute.
         """
-        # FIXME
-        pass
+        iid = self.display.focus()
+        if iid == self.root:
+            self.printx("Cannot remove root item")
+            return
+            
+        parent_iid = self.display.parent(iid)
+        if parent_iid == self.root:
+            self.printx("Cannot remove top-level configuration items")
+            return
+            
+        parent_name = self.display.item(parent_iid)['values'][0]
+        parent_key = ac.INVERSE[parent_name]
+        parent_meta = self.archive.meta[parent_key]
+        
+        # Only allow removal from lists and maps
+        if parent_meta[ac.TYPE] not in (ac.TYPE_LIST, ac.TYPE_MAP):
+            self.printx("Can only remove items from lists or maps")
+            return
+            
+        try:
+            item_name, item_value = self.display.item(iid)['values']
+            
+            if parent_meta[ac.TYPE] == ac.TYPE_LIST:
+                # For lists, remove by value
+                current_list = list(self.archive[parent_key])
+                if item_value in current_list:
+                    current_list.remove(item_value)
+                    self.archive.set(parent_key, tuple(current_list))
+                else:
+                    self.printx(f"Item {item_value} not found in list")
+                    return
+            elif parent_meta[ac.TYPE] == ac.TYPE_MAP:
+                # For maps, remove by key
+                current_map = dict(self.archive[parent_key])
+                if item_name in current_map:
+                    del current_map[item_name]
+                    self.archive.set(parent_key, current_map)
+                else:
+                    self.printx(f"Key {item_name} not found in map")
+                    return
+                    
+            # Rebuild the display to reflect changes
+            self.build()
+            self.printx(f"Successfully removed item from {parent_name}")
+            
+        except Exception as e:
+            self.printx(f"Error removing item: {e}")
 
+
+    # Auto-update mechanism ---------------------------------------------------
+    def _schedule_update_check(self):
+        """
+        Schedule the next archive update check using Tkinter's after method.
+        """
+        if self._auto_update_enabled:
+            self.after(self._update_check_interval, self._check_archive_updates)
+    
+    def _check_archive_updates(self):
+        """
+        Check if the archive has been modified externally and update display if needed.
+        """
+        try:
+            # Calculate current archive hash
+            current_hash = self._calculate_archive_hash()
+            
+            # Check if archive has changed
+            if self._last_archive_hash is not None and current_hash != self._last_archive_hash:
+                self.printx("[AUTO-UPDATE] Archive modified externally, refreshing display...")
+                self.build()  # Rebuild the display
+                
+            # Update stored hash
+            self._last_archive_hash = current_hash
+            
+        except Exception as e:
+            self.printx(f"[AUTO-UPDATE] Error checking archive updates: {e}")
+        
+        # Schedule next check
+        self._schedule_update_check()
+    
+    def _calculate_archive_hash(self):
+        """
+        Calculate a hash of the current archive state for change detection.
+        """
+        import hashlib
+        import json
+        
+        try:
+            # Get current profile as dictionary
+            profile_data = self.archive.profile()
+            
+            # Convert to JSON string for consistent hashing
+            profile_json = json.dumps(profile_data, sort_keys=True, default=str)
+            
+            # Calculate hash
+            return hashlib.md5(profile_json.encode()).hexdigest()
+            
+        except Exception as e:
+            # Fallback: use string representation
+            return hashlib.md5(str(self.archive.profile()).encode()).hexdigest()
+    
+    def enable_auto_update(self, enabled=True):
+        """
+        Enable or disable automatic update checking.
+        
+        - enabled: bool, whether to enable auto-update monitoring
+        """
+        self._auto_update_enabled = enabled
+        if enabled:
+            self.printx("[AUTO-UPDATE] Automatic update monitoring enabled")
+            self._schedule_update_check()
+        else:
+            self.printx("[AUTO-UPDATE] Automatic update monitoring disabled")
+    
+    def set_update_interval(self, interval_ms):
+        """
+        Set the interval for checking archive updates.
+        
+        - interval_ms: int, interval in milliseconds (minimum 100ms)
+        """
+        if interval_ms < 100:
+            interval_ms = 100
+            self.printx("[AUTO-UPDATE] Minimum update interval is 100ms")
+            
+        self._update_check_interval = interval_ms
+        self.printx(f"[AUTO-UPDATE] Update check interval set to {interval_ms}ms")
 
     # Auxiliary ----------------------------------------------------------------
     def _nothing(*args):
@@ -367,11 +500,49 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         - name := String, name of the built-in profile, as defined in
             fc.builtin.profiles.
         """
-        # FIXME TODO GGG
-        self.archive.profile(self.builtin[name])
-        self.build()
-        self.callback()
-        return
+        try:
+            # Validate profile name
+            if name not in self.builtin:
+                self.printx(f"Error: Built-in profile '{name}' not found")
+                available_profiles = ", ".join(self.builtin.keys())
+                self.printx(f"Available profiles: {available_profiles}")
+                return False
+                
+            # Get the profile data
+            profile_data = self.builtin[name]
+            
+            # Validate profile data structure
+            if not isinstance(profile_data, dict):
+                self.printx(f"Error: Invalid profile data for '{name}' - expected dictionary")
+                return False
+                
+            # Check for required profile fields
+            required_fields = [ac.name, ac.description]
+            missing_fields = [field for field in required_fields if field not in profile_data]
+            if missing_fields:
+                self.printx(f"Warning: Profile '{name}' missing fields: {missing_fields}")
+                
+            # Load the profile into archive
+            self.archive.profile(profile_data)
+            
+            # Rebuild the display
+            self.build()
+            
+            # Apply the changes
+            self.callback()
+            
+            # Provide user feedback
+            profile_name = profile_data.get(ac.name, name)
+            self.printx(f"Successfully loaded built-in profile: {profile_name}")
+            
+            return True
+            
+        except KeyError as e:
+            self.printx(f"Error accessing profile data for '{name}': {e}")
+            return False
+        except Exception as e:
+            self.printx(f"Unexpected error loading built-in profile '{name}': {e}")
+            return False
 
     def _onBuiltinMenuChange(self, *event):
         """
@@ -388,10 +559,58 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         ATTRIBUTE, enforcing the corresponding validator. CURRENT is the current
         value of said attribute, if any.
         """
-        print("[WARNING] _edit_generic not yet implemented")
-        # TODO
-        print(attribute, current)
-        self.editor.preset(current)
+        try:
+            # Get attribute metadata
+            meta = self.archive.meta[attribute]
+            attribute_name = meta[ac.NAME]
+            validator = meta[ac.VALIDATOR]
+            editable = meta[ac.EDITABLE]
+            
+            # Check if attribute is editable
+            if not editable:
+                self.printx(f"Attribute '{attribute_name}' is not editable")
+                return None
+                
+            # Preset the editor with current value
+            if current is not None:
+                self.editor.preset(current)
+            else:
+                # Try to get current value from archive
+                try:
+                    current_value = self.archive[attribute]
+                    self.editor.preset(current_value)
+                except KeyError:
+                    self.printx(f"No current value found for '{attribute_name}'")
+                    
+            # Get the new value from editor
+            try:
+                new_value = self.editor._eval()
+                
+                # Validate the new value
+                validator(new_value)
+                
+                # Set the new value in archive
+                self.archive.set(attribute, new_value)
+                
+                # Rebuild display to show changes
+                self.build()
+                
+                self.printx(f"Successfully updated '{attribute_name}' to: {new_value}")
+                return new_value
+                
+            except ValueError as e:
+                self.printx(f"Validation error for '{attribute_name}': {e}")
+                return None
+            except Exception as e:
+                self.printx(f"Error evaluating expression for '{attribute_name}': {e}")
+                return None
+                
+        except KeyError:
+            self.printx(f"Unknown attribute: {attribute}")
+            return None
+        except Exception as e:
+            self.printx(f"Unexpected error in _edit_generic: {e}")
+            return None
 
 
 class PythonEditor(ttk.Frame):
@@ -482,10 +701,59 @@ class PythonEditor(ttk.Frame):
     def _eval_error(self, e):
         """
         Handle the case of an exception happening during evaluation.
+        Provides detailed error information and user-friendly messages.
         """
-        # TODO finish (prov)
-        self._print("Evaluation error: " + str(e))
+        import traceback
+        
+        # Categorize error types and provide specific messages
+        error_type = type(e).__name__
+        error_message = str(e)
+        
+        if isinstance(e, SyntaxError):
+            user_message = f"Syntax Error: Invalid Python expression\n{error_message}"
+            suggestion = "Check for missing quotes, parentheses, or invalid syntax"
+        elif isinstance(e, NameError):
+            user_message = f"Name Error: Undefined variable or function\n{error_message}"
+            suggestion = "Make sure all variables and functions are properly defined"
+        elif isinstance(e, ValueError):
+            user_message = f"Value Error: Invalid value or type\n{error_message}"
+            suggestion = "Check that the value matches the expected format"
+        elif isinstance(e, TypeError):
+            user_message = f"Type Error: Incorrect data type\n{error_message}"
+            suggestion = "Verify the data type matches what's expected"
+        elif isinstance(e, KeyError):
+            user_message = f"Key Error: Missing dictionary key\n{error_message}"
+            suggestion = "Check that all required keys are present"
+        elif isinstance(e, IndexError):
+            user_message = f"Index Error: List index out of range\n{error_message}"
+            suggestion = "Verify the list index is within valid range"
+        elif isinstance(e, AttributeError):
+            user_message = f"Attribute Error: Missing attribute or method\n{error_message}"
+            suggestion = "Check that the object has the specified attribute"
+        else:
+            user_message = f"{error_type}: {error_message}"
+            suggestion = "Please check your input and try again"
+        
+        # Format the complete error message
+        full_message = f"Evaluation Error:\n{user_message}\n\nSuggestion: {suggestion}"
+        
+        # Print to output with error formatting
+        self._print(full_message)
         self.output.config(**self.OUTPUT_ERROR_CONFIG)
+        
+        # Log detailed error information for debugging
+        try:
+            if hasattr(self, 'printx'):
+                self.printx(f"[DEBUG] {error_type} in evaluation: {error_message}")
+                # Include traceback for debugging (first few lines only)
+                tb_lines = traceback.format_exc().split('\n')[:5]
+                self.printx(f"[DEBUG] Traceback: {' | '.join(tb_lines)}")
+        except:
+            # Fallback if printx is not available
+            pass
+        
+        # Return False to indicate error occurred
+        return False
 
     def clear(self):
         """

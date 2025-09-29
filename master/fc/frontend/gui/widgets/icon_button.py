@@ -1,10 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              WESTLAKE UNIVERSITY                            ║
+║                        ADVANCED SYSTEMS LABORATORY                          ║
+║                                                                              ║
+║                    ██╗    ██╗███████╗███████╗████████╗                     ║
+║                    ██║    ██║██╔════╝██╔════╝╚══██╔══╝                     ║
+║                    ██║ █╗ ██║█████╗  ███████╗   ██║                        ║
+║                    ██║███╗██║██╔══╝  ╚════██║   ██║                        ║
+║                    ╚███╔███╔╝███████╗███████║   ██║                        ║
+║                     ╚══╝╚══╝ ╚══════╝╚══════╝   ╚═╝                        ║
+║                                                                              ║
+║                           LAKE SYSTEMS LABORATORY                           ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
 Icon Button Widget
 
 A modern button widget that combines SVG icons with text labels.
 Supports consistent spacing, hover effects, and theme integration.
+
+Authors: zhaoyang, dashuai
+Email: mzymuzhaoyang@gmail.com, dschen2018@gmail.com
+Date: 2024
+Version: 1.0
 """
 
 import tkinter as tk

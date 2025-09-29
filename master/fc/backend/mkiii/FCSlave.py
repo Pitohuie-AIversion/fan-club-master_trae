@@ -1,8 +1,7 @@
 ################################################################################
-## Project: Fan Club Mark II "Master" ## File: FCSlave.py                     ##
 ##----------------------------------------------------------------------------##
-## CALIFORNIA INSTITUTE OF TECHNOLOGY ## GRADUATE AEROSPACE LABORATORY ##     ##
-## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                             ##
+## WESTLAKE UNIVERSITY                                                        ##
+## ADVANCED SYSTEMS LABORATORY                                                ##
 ##----------------------------------------------------------------------------##
 ##      ____      __      __  __      _____      __      __    __    ____     ##
 ##     / __/|   _/ /|    / / / /|  _- __ __\    / /|    / /|  / /|  / _  \    ##
@@ -11,13 +10,15 @@
 ##  / /|_|/ /  /  /|/ / // //|/ / /|__- / /  / /___  / -|_ - /|/ /     /|     ##
 ## /_/|/   /_/ /_/|/ /_/ /_/|/ |\ ___--|_|  /_____/| |-___-_|/  /____-/|/     ##
 ## |_|/    |_|/|_|/  |_|/|_|/   \|___|-    |_____|/   |___|     |____|/       ##
-##                   _ _    _    ___   _  _      __   __                      ##
-##                  | | |  | |  | T_| | || |    |  | |  |                     ##
-##                  | _ |  |T|  |  |  |  _|      ||   ||                      ##
-##                  || || |_ _| |_|_| |_| _|    |__| |__|                     ##
+##                   _ _    _    ___   _  _      __  __   __                  ##
+##                  | | |  | |  | T_| | || |    |  ||_ | | _|                 ##
+##                  | _ |  |T|  |  |  |  _|      ||   \\_//                   ##
+##                  || || |_ _| |_|_| |_| _|    |__|  |___|                   ##
 ##                                                                            ##
 ##----------------------------------------------------------------------------##
-## Alejandro A. Stefan Zavala ## <alestefanz@hotmail.com> ##                  ##
+## AUTHORS: zhaoyang (mzymuzhaoyang@gmail.com)                               ##
+##          dashuai (dschen2018@gmail.com)                                   ##
+##----------------------------------------------------------------------------##
 ################################################################################
 
 ## ABOUT #######################################################################
@@ -237,21 +238,14 @@ class FCSlave:
         self.mosiS = mosiS
         self.socketLock = threading.Lock()
 
-        # MOSI index:
-        self.mosiIndex = 0
-        self.mosiIndexLock = threading.Lock()
-
-        # MISO index:
-        self.misoIndex = 0
-        self.misoIndexLock = threading.Lock()
-
-        # Data index:
-        self.dataIndex = 0
-        self.dataIndexLock = threading.Lock()
-
-        # Drop index:
-        self.dropIndex = 0
-        self.dropIndexLock = threading.Lock()
+        # Consolidated indices with single lock for better performance
+        self.indices = {
+            'mosi': 0,
+            'miso': 0, 
+            'data': 0,
+            'drop': 0
+        }
+        self.indicesLock = threading.Lock()
 
         # Initialize multithreading attributes .................................
 
@@ -553,16 +547,10 @@ class FCSlave:
         # NOTE: Thread-safe (blocks)
 
         try:
-            self.misoIndexLock.acquire()
-
-            # Use placeholder to return value after releasing lock:
-            placeholder = self.misoIndex
-
-            # Notice finally clause will release lock
-            return placeholder
-
+            self.indicesLock.acquire()
+            return self.indices['miso']
         finally:
-            self.misoIndexLock.release()
+            self.indicesLock.release()
 
         # End getMISOIndex =====================================================
 
@@ -571,12 +559,10 @@ class FCSlave:
         # NOTE: Blocks for thread-safety.
 
         try:
-            self.misoIndexLock.acquire()
-
-            self.misoIndex += 1
-
+            self.indicesLock.acquire()
+            self.indices['miso'] += 1
         finally:
-            self.misoIndexLock.release()
+            self.indicesLock.release()
 
         # End incrementMISOIndex ===============================================
 
@@ -592,12 +578,10 @@ class FCSlave:
                 format(type(newIndex)))
 
         try:
-            self.misoIndexLock.acquire()
-
-            self.misoIndex = newIndex
-
+            self.indicesLock.acquire()
+            self.indices['miso'] = newIndex
         finally:
-            self.misoIndexLock.release()
+            self.indicesLock.release()
 
         # End setMISOIndex =====================================================
 
@@ -607,16 +591,10 @@ class FCSlave:
         # NOTE: Thread-safe (blocks)
 
         try:
-            self.dropIndexLock.acquire()
-
-            # Use placeholder to return value after releasing lock:
-            placeholder = self.dropIndex
-
-            # Notice finally clause will release lock
-            return placeholder
-
+            self.indicesLock.acquire()
+            return self.indices['drop']
         finally:
-            self.dropIndexLock.release()
+            self.indicesLock.release()
 
         # End getDropIndex =====================================================
 
@@ -625,12 +603,10 @@ class FCSlave:
         # NOTE: Blocks for thread-safety.
 
         try:
-            self.dropIndexLock.acquire()
-
-            self.dropIndex += 1
-
+            self.indicesLock.acquire()
+            self.indices['drop'] += 1
         finally:
-            self.dropIndexLock.release()
+            self.indicesLock.release()
 
         # End incrementDropIndex ===============================================
 
@@ -646,12 +622,10 @@ class FCSlave:
                 format(type(newIndex)))
 
         try:
-            self.dropIndexLock.acquire()
-
-            self.dropIndex = newIndex
-
+            self.indicesLock.acquire()
+            self.indices['drop'] = newIndex
         finally:
-            self.dropIndexLock.release()
+            self.indicesLock.release()
 
         # End setDropIndex =====================================================
 
@@ -662,16 +636,10 @@ class FCSlave:
         # NOTE: Thread-safe (blocks)
 
         try:
-            self.dataIndexLock.acquire()
-
-            # Use placeholder to return value after releasing lock:
-            placeholder = self.dataIndex
-
-            # Notice finally clause will release lock
-            return placeholder
-
+            self.indicesLock.acquire()
+            return self.indices['data']
         finally:
-            self.dataIndexLock.release()
+            self.indicesLock.release()
 
         # End getDataIndex =====================================================
 
@@ -680,12 +648,10 @@ class FCSlave:
         # NOTE: Blocks for thread-safety.
 
         try:
-            self.misoDataLock.acquire()
-
-            self.dataIndex += 1
-
+            self.indicesLock.acquire()
+            self.indices['data'] += 1
         finally:
-            self.dataIndexLock.release()
+            self.indicesLock.release()
 
         # End incrementDataIndex ===============================================
 
@@ -701,12 +667,10 @@ class FCSlave:
                 " ({})".format(type(newIndex), newIndex))
 
         try:
-            self.dataIndexLock.acquire()
-
-            self.dataIndex = newIndex
-
+            self.indicesLock.acquire()
+            self.indices['data'] = newIndex
         finally:
-            self.dataIndexLock.release()
+            self.indicesLock.release()
 
         # End setDataIndex =====================================================
     def getMOSIIndex(self): # ==================================================
@@ -715,16 +679,10 @@ class FCSlave:
         # NOTE: Thread-safe (blocks)
 
         try:
-            self.mosiIndexLock.acquire()
-
-            # Use placeholder to return value after releasing lock:
-            placeholder = self.mosiIndex
-
-            # Notice finally clause will release lock
-            return placeholder
-
+            self.indicesLock.acquire()
+            return self.indices['mosi']
         finally:
-            self.mosiIndexLock.release()
+            self.indicesLock.release()
 
         # End getMOSIIndex =====================================================
 
@@ -740,12 +698,10 @@ class FCSlave:
                 format(type(newIndex)))
 
         try:
-            self.mosiIndexLock.acquire()
-
-            self.mosiIndex = newIndex
-
+            self.indicesLock.acquire()
+            self.indices['mosi'] = newIndex
         finally:
-            self.mosiIndexLock.release()
+            self.indicesLock.release()
 
         # End setMOSIIndex =====================================================
 
@@ -754,35 +710,25 @@ class FCSlave:
         # NOTE: Blocks for thread-safety.
 
         try:
-            self.mosiIndexLock.acquire()
-
-            self.mosiIndex += 1
-
+            self.indicesLock.acquire()
+            self.indices['mosi'] += 1
         finally:
-            self.mosiIndexLock.release()
+            self.indicesLock.release()
 
         # End incrementMOSIIndex ===============================================
 
     def resetIndices(self): # ==================================================
-        # ABOUT: Reset both MOSIIndex and MISOIndex to 0.
+        # ABOUT: Reset all indices to 0.
         # NOTE: Blocks for thread-safety.
 
         try:
-            self.misoIndexLock.acquire()
-            self.mosiIndexLock.acquire()
-            self.dataIndexLock.acquire()
-            self.dropIndexLock.acquire()
-
-            self.misoIndex = 0
-            self.mosiIndex = 0
-            self.dataIndex = 0
-            self.dropIndex = 0
-
+            self.indicesLock.acquire()
+            self.indices['miso'] = 0
+            self.indices['mosi'] = 0
+            self.indices['data'] = 0
+            self.indices['drop'] = 0
         finally:
-            self.misoIndexLock.release()
-            self.mosiIndexLock.release()
-            self.dataIndexLock.release()
-            self.dropIndexLock.release()
+            self.indicesLock.release()
 
         # End resetIndices =====================================================
 
@@ -903,16 +849,18 @@ class FCSlave:
 
     def getMISO(self, block = False): # ========================================
         # ABOUT: Try to get an update from this Slave's misoQueue.
+        # Optimized for better performance and fixed buffer clearing bug
         if self.misoBuffer is not None:
             value = self.misoBuffer
-            misoBuffer = None
+            self.misoBuffer = None  # Fixed: was incorrectly 'misoBuffer = None'
             return value
         else:
+            # Return pre-allocated padding arrays for better performance
             return (self.padding_rpm_connected, self.padding_dc_connected) if \
                 self.status is CONNECTED else \
                     (self.padding_rpm_disconnected,
                 self.padding_dc_disconnected)
-        # End getUpdate ========================================================
+        # End getMISO ==========================================================
 
     # PRIVATE AUXILIARY METHODS ################################################
 

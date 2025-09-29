@@ -1,8 +1,27 @@
 #!/usr/bin/python3
+##----------------------------------------------------------------------------##
+## WESTLAKE UNIVERSITY ## ADVANCED SYSTEMS LABORATORY ##                     ##
+## CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                      ##     ##
+##----------------------------------------------------------------------------##
+##   ______   _    _    _____   __ _    _   _  ____                       ##
+##  |__  / | | |  / \  / _ \ \ / // \  | \ | |/ ___|                      ##
+##    / /| |_| | / _ \| | | \ V // _ \ |  \| | |  _                       ##
+##   / /_|  _  |/ ___ \ |_| || |/ ___ \| |\  | |_| |                      ##
+##  /____|_| |_/_/___\_\___/_|_/_/_  \_\_| \_\____|                      ##
+##  |  _ \  / \  / ___|| | | | | | | / \  |_ _|                           ##
+##  | | | |/ _ \ \___ \| |_| | | | |/ _ \  | |                            ##
+##  | |_| / ___ \ ___) |  _  | |_| / ___ \ | |                            ##
+##  |____/_/   \_\____/|_| |_|\___/_/   \_\___|                           ##
+##                                                                            ##
+##----------------------------------------------------------------------------##
+## zhaoyang                   ## <mzymuzhaoyang@gmail.com>   ##              ##
+## dashuai                    ## <dschen2018@gmail.com>      ##              ##
+##                            ##                             ##              ##
 ################################################################################
-## 系统稳定性验证测试脚本
-## 用于验证底层架构的稳定性和可靠性
-################################################################################
+
+""" ABOUT ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + System stability validation test script.
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ """
 
 import time
 import threading
@@ -11,21 +30,25 @@ import gc
 import sys
 import os
 import queue
-from typing import Dict, List, Any
+from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
 # 添加项目路径
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(__file__))
 
-from fc.backend.signal_acquisition import (
-    SignalAcquisitionEngine, 
-    SimulatedHardware, 
-    AcquisitionConfig,
-    ChannelConfig,
-    SampleData
-)
-from fc.signal_processing_system import SignalProcessingSystem
-from fc import printer as pt
+# 导入FC模块
+import fc.backend.signal_acquisition as sa
+import fc.signal_processing_system as sps
+
+class QueueWithBufferSize(queue.Queue):
+    """带有buffer_size属性的Queue包装类"""
+    
+    def __init__(self, maxsize=0, buffer_size=None):
+        super().__init__(maxsize)
+        # 如果没有指定buffer_size，使用maxsize作为buffer_size
+        self.buffer_size = buffer_size if buffer_size is not None else maxsize
+        if self.buffer_size == 0:
+            self.buffer_size = 1000  # 默认缓冲区大小
 
 @dataclass
 class StabilityTestResult:
@@ -44,7 +67,7 @@ class SystemStabilityTester:
     
     def __init__(self):
         self.results: List[StabilityTestResult] = []
-        self.pqueue = queue.Queue()  # 使用Queue而不是list
+        self.pqueue = QueueWithBufferSize()  # 使用带buffer_size属性的Queue
         self.test_duration = 30  # 每个测试持续30秒
         
     def run_all_tests(self) -> List[StabilityTestResult]:
@@ -471,7 +494,12 @@ class SystemStabilityTester:
             duration = time.time() - start_time
             
             # 计算稳定性指标
-            expected_samples = config.sampling_rate * len(config.channels) * test_duration * 0.9  # 允许10%误差
+            # 修复：多通道采样时，总采样率仍为sampling_rate，不应乘以通道数
+            # 每个通道独立采样，但总的样本获取速率不变
+            expected_samples = config.sampling_rate * test_duration * 0.9  # 允许10%误差
+            actual_sample_rate = final_stats['samples_acquired'] / test_duration
+            expected_sample_rate = config.sampling_rate * 0.9
+            
             success = final_stats['samples_acquired'] >= expected_samples and final_stats['errors'] < 100
             
             result = StabilityTestResult(
@@ -483,11 +511,13 @@ class SystemStabilityTester:
                     "total_samples": final_stats['samples_acquired'],
                     "expected_samples": expected_samples,
                     "sample_rate_accuracy": final_stats['samples_acquired'] / expected_samples,
+                    "actual_sample_rate": actual_sample_rate,
+                    "expected_sample_rate": expected_sample_rate,
                     "total_errors": final_stats['errors']
                 },
                 memory_usage=self._get_memory_usage(),
                 cpu_usage=psutil.cpu_percent(),
-                details=f"运行 {test_duration}s，采集 {final_stats['samples_acquired']} 样本，错误 {final_stats['errors']} 次"
+                details=f"运行 {test_duration}s，采集 {final_stats['samples_acquired']} 样本，错误 {final_stats['errors']} 次，实际采样率 {actual_sample_rate:.1f}Hz"
             )
             
             self.results.append(result)
