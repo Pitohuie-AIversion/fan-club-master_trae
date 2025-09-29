@@ -204,8 +204,18 @@ class ControlWidget(ttk.Frame, pt.PrintClient):
         """
         if self.displays:
             for display in self.displays:
-                display.destroy()
-            self.display.destroy()
+                try:
+                    if display.winfo_exists():
+                        display.destroy()
+                except tk.TclError:
+                    # Widget already destroyed
+                    pass
+            try:
+                if self.display.winfo_exists():
+                    self.display.destroy()
+            except tk.TclError:
+                # Widget already destroyed
+                pass
         self.displays = []
 
         self.display = DisplayMaster(self.displayFrame, self.pqueue)
@@ -1231,7 +1241,13 @@ class ControlPanelWidget(ttk.Frame, pt.PrintClient):
 
         self.F = fnt.Font(font = gus.typography["label_small"]["font"])
         self.S = ttk.Style()
-        self.S.configure('.', font = self.F)
+        try:
+            if self.winfo_exists() and hasattr(self, 'S') and self.S:
+                self.S.configure('.', font = self.F)
+        except (tk.TclError, AttributeError) as e:
+            print(f"Error configuring ttk style (application may be closing): {e}")
+        except Exception as e:
+            print(f"Error configuring ttk style: {e}")
         self.activeWidgets = []
         self.filename = None
         self.fullname = None
@@ -2180,8 +2196,15 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         pass
 
     def _scheduleAdjust(self, *E):
-        self.after(self.RESIZE_MS, self._adjust)
-        self.unbind("<Configure>")
+        try:
+            # Check if widget still exists before scheduling
+            if not self.winfo_exists():
+                return
+            self.after(self.RESIZE_MS, self._adjust)
+            self.unbind("<Configure>")
+        except tk.TclError:
+            # Widget has been destroyed, ignore
+            pass
 
     def _updateStyle(self, event = None):
         """
@@ -3021,23 +3044,30 @@ class LiveTable(pt.PrintClient, ttk.Frame):
         """
         Each call checks if printing should be deactivated.
         """
-        if not self.donePrinting:
-            self.after(100, self._printChecker)
-
-        else:
-            # Unlock table:
-            self.playPauseButton.config(state = tk.NORMAL)
-            self.printMatrixButton.config(state = tk.NORMAL)
-            if not self.sentinelFlag:
-                for widget in self.sentinelWidgets:
-                    widget.config(state = tk.NORMAL)
-                self.sentinelApplyButton.config(state = tk.NORMAL)
-                if not self.wasPaused:
-                    self._playPause()
+        try:
+            # Check if widget still exists before scheduling
+            if not self.winfo_exists():
+                return
+                
+            if not self.donePrinting:
+                self.after(100, self._printChecker)
             else:
-                self.sentinelClearButton.config(state = tk.NORMAL)
-                if not self.sentinelPauseVar.get():
-                    self._playPause()
+                # Unlock table:
+                self.playPauseButton.config(state = tk.NORMAL)
+                self.printMatrixButton.config(state = tk.NORMAL)
+                if not self.sentinelFlag:
+                    for widget in self.sentinelWidgets:
+                        widget.config(state = tk.NORMAL)
+                    self.sentinelApplyButton.config(state = tk.NORMAL)
+                    if not self.wasPaused:
+                        self._playPause()
+                else:
+                    self.sentinelClearButton.config(state = tk.NORMAL)
+                    if not self.sentinelPauseVar.get():
+                        self._playPause()
+        except tk.TclError:
+            # Widget has been destroyed, ignore
+            pass
 
     def _printRoutine(self, sentinel = None):
         # FIXME incompatible

@@ -246,18 +246,34 @@ class TimerWidget(ttk.Frame):
 
     def _step(self):
         """
-        Complete one timestep
+        Timer step function
         """
-        if self.running:
-            self.kVar.set(self.k)
-            self.stepF(self.t, self.k)
-            self.t = self.t_in + tm.time() - self.t0
-            self.tVar.set(f"{self.t:.3f}")
-            self.k += 1
-            if self.end is not None and \
-                (self.endType == self.END_TIME and self.t > self.end or\
-                self.endType == self.END_STEP and self.k > self.end):
-                self._stop()
-            else:
-                self.after(self.period, self._step)
+        try:
+            # Check if widget still exists
+            if not (hasattr(self, 'winfo_exists') and self.winfo_exists()):
+                return
+                
+            if self.running:
+                self.kVar.set(self.k)
+                self.stepF(self.t, self.k)
+                self.t = self.t_in + tm.time() - self.t0
+                self.tVar.set(f"{self.t:.3f}")
+                self.k += 1
+                if self.end is not None and \
+                    (self.endType == self.END_TIME and self.t > self.end or\
+                    self.endType == self.END_STEP and self.k > self.end):
+                    self._stop()
+                else:
+                    try:
+                        if self.winfo_exists() and self.running:
+                            self.after(self.period, self._step)
+                    except (tk.TclError, AttributeError):
+                        # Widget destroyed or error, stop timer
+                        self.running = False
+        except (tk.TclError, AttributeError):
+            # Widget destroyed, stop timer
+            self.running = False
+        except Exception as e:
+            print(f"Timer step error: {e}")
+            self.running = False
 

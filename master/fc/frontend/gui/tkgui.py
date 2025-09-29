@@ -89,7 +89,21 @@ class FCGUI(fe.FCFrontend):
         base.focusControl()
         
         # Trigger initial profile loading after GUI is fully initialized
-        self.root.after_idle(lambda: base.profileChange())
+        try:
+            if self.root and self.root.winfo_exists():
+                self.root.after_idle(lambda: self._safe_profile_change(base))
+        except (tk.TclError, AttributeError):
+            # Root window destroyed or not available
+            pass
+    
+    def _safe_profile_change(self, base):
+        """Safely trigger profile change with error handling"""
+        try:
+            if base and base.winfo_exists():
+                base.profileChange()
+        except (tk.TclError, AttributeError):
+            # Widget destroyed during profile change or not available
+            pass
 
     def _mainloop(self):
         """
@@ -138,7 +152,7 @@ class FCGUI(fe.FCFrontend):
             # Use a platform-neutral base theme
             try:
                 style.theme_use("clam")
-            except Exception:
+            except (tk.TclError, AttributeError, RuntimeError, Exception):
                 pass
 
             # Base palette - use theme manager for dynamic colors

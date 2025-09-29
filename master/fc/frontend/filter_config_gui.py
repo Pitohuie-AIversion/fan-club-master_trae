@@ -799,6 +799,50 @@ class FilterConfigGUI:
             "beta": self.config.beta
         }
     
+    def destroy(self):
+        """Override destroy method to properly clean up matplotlib canvases"""
+        try:
+            # Clean up matplotlib canvases
+            if hasattr(self, 'freq_canvas') and self.freq_canvas:
+                try:
+                    self.freq_canvas.get_tk_widget().destroy()
+                    self.freq_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'time_canvas') and self.time_canvas:
+                try:
+                    self.time_canvas.get_tk_widget().destroy()
+                    self.time_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            # Clean up matplotlib figures
+            if hasattr(self, 'freq_fig'):
+                try:
+                    plt.close(self.freq_fig)
+                    self.freq_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'time_fig'):
+                try:
+                    plt.close(self.time_fig)
+                    self.time_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+        except Exception as e:
+            # Ignore cleanup errors during shutdown
+            pass
+            
+        # Destroy root if standalone
+        if hasattr(self, 'standalone') and self.standalone and hasattr(self, 'root'):
+            try:
+                self.root.destroy()
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
+
     def run(self):
         """运行GUI"""
         if self.standalone:

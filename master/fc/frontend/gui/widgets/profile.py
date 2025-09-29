@@ -415,30 +415,73 @@ class ProfileDisplay(ttk.Frame, pt.PrintClient):
         """
         Schedule the next archive update check using Tkinter's after method.
         """
-        if self._auto_update_enabled:
-            self.after(self._update_check_interval, self._check_archive_updates)
+        try:
+            # Check if widget still exists before scheduling
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+                
+            # Check if master widget exists
+            if hasattr(self, 'master') and hasattr(self.master, 'winfo_exists') and not self.master.winfo_exists():
+                return
+                
+            # Check if necessary attributes exist
+            if not hasattr(self, '_auto_update_enabled') or not hasattr(self, '_update_check_interval'):
+                return
+                
+            # Check if after method exists
+            if not hasattr(self, 'after'):
+                return
+                
+            if self._auto_update_enabled:
+                self.after(self._update_check_interval, self._check_archive_updates)
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget has been destroyed, stop scheduling
+            pass
     
     def _check_archive_updates(self):
         """
         Check if the archive has been modified externally and update display if needed.
         """
         try:
+            # Check if widget still exists before proceeding
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+                
+            # Check if master widget exists
+            if hasattr(self, 'master') and hasattr(self.master, 'winfo_exists') and not self.master.winfo_exists():
+                return
+                
+            # Check if necessary attributes exist
+            if not hasattr(self, '_last_archive_hash') or not hasattr(self, 'archive'):
+                return
+                
             # Calculate current archive hash
             current_hash = self._calculate_archive_hash()
             
             # Check if archive has changed
             if self._last_archive_hash is not None and current_hash != self._last_archive_hash:
-                self.printx("[AUTO-UPDATE] Archive modified externally, refreshing display...")
-                self.build()  # Rebuild the display
+                if hasattr(self, 'printx'):
+                    self.printx("[AUTO-UPDATE] Archive modified externally, refreshing display...")
+                if hasattr(self, 'build'):
+                    self.build()  # Rebuild the display
                 
             # Update stored hash
             self._last_archive_hash = current_hash
             
+        except (tk.TclError, AttributeError, RuntimeError) as e:
+            # Widget has been destroyed, stop scheduling
+            return
         except Exception as e:
-            self.printx(f"[AUTO-UPDATE] Error checking archive updates: {e}")
+            if hasattr(self, 'printx'):
+                self.printx(f"[AUTO-UPDATE] Error checking archive updates: {e}")
         
         # Schedule next check
-        self._schedule_update_check()
+        try:
+            if hasattr(self, '_schedule_update_check'):
+                self._schedule_update_check()
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget has been destroyed, stop scheduling
+            pass
     
     def _calculate_archive_hash(self):
         """

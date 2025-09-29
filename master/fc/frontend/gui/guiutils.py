@@ -359,17 +359,29 @@ class PromptLabel(ttk.Label):
         """
         Enable the widget's interactive behavior. This is the default state.
         """
-        self.enabled = True
-        # ttk.Label doesn't support bg option, use style instead
-        self.config(style="Active.TLabel")
+        try:
+            if not self.winfo_exists():
+                return
+            self.enabled = True
+            # ttk.Label doesn't support bg option, use style instead
+            self.config(style="Active.TLabel")
+        except tk.TclError:
+            # Widget has been destroyed
+            return
 
     def disable(self):
         """
         Disable the widget's interactive behavior.
         """
-        self.enabled = False
-        # ttk.Label doesn't support bg option, use style instead
-        self.config(style="Inactive.TLabel")
+        try:
+            if not self.winfo_exists():
+                return
+            self.enabled = False
+            # ttk.Label doesn't support bg option, use style instead
+            self.config(style="Inactive.TLabel")
+        except tk.TclError:
+            # Widget has been destroyed
+            return
 
 
 def _validateN(newCharacter, textBeforeCall, action):
