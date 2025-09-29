@@ -94,6 +94,8 @@ class TachSignalConfig:
     update_rate: float = 10.0  # Hz
     rpm_threshold: float = 100.0  # Minimum valid RPM
     show_raw_signal: bool = False  # Show raw tach signal data
+    enable_simulation: bool = False  # Enable/disable simulated data generation
+    simulation_diagnostics: bool = False  # Enable/disable diagnostics for simulated data
 
 ################################################################################
 class MonitoringWidget(ttk.Frame, pt.PrintClient):
@@ -132,7 +134,9 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             filter_enabled=True,
             filter_type="moving_average",
             filter_window=TACH_FILTER_WINDOW,
-            show_raw_signal=True
+            show_raw_signal=True,
+            enable_simulation=False,  # Disable simulation by default
+            simulation_diagnostics=False  # Disable simulation diagnostics by default
         )
         self.tach_filters = {}  # Filter states
         self.fc_communicator = None
@@ -637,10 +641,18 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             try:
                 current_time = time.time() - start_time
                 
-                # Get data from signal acquisition engine
-                signal_data = self.acquisition_engine.get_data(timeout=0.1)
-                if signal_data:
-                    self._process_signal_data(signal_data, current_time)
+                # Get data from signal acquisition engine - batch processing
+                all_signal_data = []
+                # 批量获取数据，最多获取20批次以提高消费效率
+                for _ in range(20):
+                    signal_data = self.acquisition_engine.get_data(timeout=0.005)
+                    if signal_data:
+                        all_signal_data.extend(signal_data)
+                    else:
+                        break
+                
+                if all_signal_data:
+                    self._process_signal_data(all_signal_data, current_time)
                 
                 # Simulate system performance data (kept for demonstration)
                 self._generate_mock_system_data(current_time)
@@ -649,7 +661,7 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                 if self.tach_monitoring_active:
                     self._generate_mock_tach_data(current_time)
                 
-                time.sleep(0.1)  # 100ms update interval
+                time.sleep(0.05)  # 50ms update interval - 更频繁的更新以消费更多数据
                 
             except Exception as e:
                 self.printd(f"Data update error: {e}")
@@ -836,30 +848,59 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
     def _diagnose_tach_signal(self, fan_id: int, reading: TachReading, filtered_rpm: float):
         """Diagnose Tach signal anomalies"""
         try:
+            # Skip diagnostics for simulated data to reduce log spam
+            if not hasattr(self, 'fc_communicator') or self.fc_communicator is None:
+                # Only log critical issues for simulated data with reduced frequency
+                if reading.timeout and self.tach_config.simulation_diagnostics:
+                    # Reduce timeout logging frequency
+                    if not hasattr(self, '_last_timeout_log'):
+                        self._last_timeout_log = {}
+                    current_time = time.time()
+                    if fan_id not in self._last_timeout_log or current_time - self._last_timeout_log[fan_id] > 30:
+                        self.printd(f"Fan {fan_id+1} Tach signal timeout (simulated)")
+                        self._last_timeout_log[fan_id] = current_time
+                return  # Skip other diagnostics for simulated data
+            
+            # Real hardware diagnostics (only when fc_communicator is available)
+            # Add frequency limiting for real hardware diagnostics too
+            if not hasattr(self, '_last_diagnostic_log'):
+                self._last_diagnostic_log = {}
+            current_time = time.time()
+            
             # Timeout detection
             if reading.timeout:
-                self.printw(f"Fan {fan_id+1} Tach signal timeout")
+                if fan_id not in self._last_diagnostic_log or current_time - self._last_diagnostic_log[fan_id] > 10:
+                    self.printw(f"Fan {fan_id+1} Tach signal timeout")
+                    self._last_diagnostic_log[fan_id] = current_time
             
             # RPM anomaly detection
             if not reading.timeout:
                 # Check if RPM is too low
                 if filtered_rpm < self.tach_config.rpm_threshold:
-                    self.printw(f"Fan {fan_id+1} RPM too low: {filtered_rpm:.0f} < {self.tach_config.rpm_threshold}")
+                    if fan_id not in self._last_diagnostic_log or current_time - self._last_diagnostic_log[fan_id] > 15:
+                        self.printw(f"Fan {fan_id+1} RPM too low: {filtered_rpm:.0f} < {self.tach_config.rpm_threshold}")
+                        self._last_diagnostic_log[fan_id] = current_time
                 
                 # Check if RPM is abnormally high
                 if filtered_rpm > 5000:  # Assume 5000 RPM as abnormally high value
-                    self.printw(f"Fan {fan_id+1} RPM abnormally high: {filtered_rpm:.0f}")
+                    if fan_id not in self._last_diagnostic_log or current_time - self._last_diagnostic_log[fan_id] > 15:
+                        self.printw(f"Fan {fan_id+1} RPM abnormally high: {filtered_rpm:.0f}")
+                        self._last_diagnostic_log[fan_id] = current_time
                 
                 # Check if RPM fluctuation is too large
                 if fan_id in self.tach_data and len(self.tach_data[fan_id]['filtered_rpm']) > 5:
                     recent_rpms = list(self.tach_data[fan_id]['filtered_rpm'])[-5:]
                     rpm_std = np.std(recent_rpms) if len(recent_rpms) > 1 else 0
                     if rpm_std > 200:  # RPM standard deviation too large
-                        self.printw(f"Fan {fan_id+1} RPM fluctuation too large: std={rpm_std:.1f}")
+                        if fan_id not in self._last_diagnostic_log or current_time - self._last_diagnostic_log[fan_id] > 20:
+                            self.printw(f"Fan {fan_id+1} RPM fluctuation too large: std={rpm_std:.1f}")
+                            self._last_diagnostic_log[fan_id] = current_time
             
             # Duty cycle anomaly detection
             if reading.duty_cycle < 0 or reading.duty_cycle > 1:
-                self.printw(f"Fan {fan_id+1} duty cycle abnormal: {reading.duty_cycle:.2f}")
+                if fan_id not in self._last_diagnostic_log or current_time - self._last_diagnostic_log[fan_id] > 10:
+                    self.printw(f"Fan {fan_id+1} duty cycle abnormal: {reading.duty_cycle:.2f}")
+                    self._last_diagnostic_log[fan_id] = current_time
                 
         except Exception as e:
             self.printd(f"Tach signal diagnosis error: {e}")
@@ -900,9 +941,10 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             if self.fc_communicator:
                 # Try to get real Tach data
                 self._get_real_tach_data(timestamp)
-            else:
-                # Generate simulated data
+            elif self.tach_config.enable_simulation:
+                # Generate simulated data only if enabled
                 self._generate_simulated_tach_data(timestamp)
+            # If simulation is disabled and no real hardware, do nothing
                     
         except Exception as e:
             self.printd(f"Tach data acquisition error: {e}")
@@ -926,12 +968,16 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                             )
                             self._process_tach_reading(reading)
             else:
-                # If no get_rpm_data method, fallback to simulated data
-                self._generate_simulated_tach_data(timestamp)
+                # If no get_rpm_data method, fallback to simulated data only if enabled
+                if self.tach_config.enable_simulation:
+                    self._generate_simulated_tach_data(timestamp)
                 
         except Exception as e:
-            self.printw(f"Failed to get real Tach data: {e}, using simulated data")
-            self._generate_simulated_tach_data(timestamp)
+            if self.tach_config.enable_simulation:
+                self.printw(f"Failed to get real Tach data: {e}, using simulated data")
+                self._generate_simulated_tach_data(timestamp)
+            else:
+                self.printd(f"Failed to get real Tach data: {e}, simulation disabled")
     
     def _generate_simulated_tach_data(self, timestamp):
         """Generate simulated Tach data (for testing)"""
@@ -1385,6 +1431,14 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             # Stop monitoring first
             if hasattr(self, 'monitoring_active') and self.monitoring_active:
                 self._stop_monitoring()
+            
+            # Cancel any pending after() calls by clearing the widget's after queue
+            try:
+                # This will cancel all pending after() calls for this widget
+                if hasattr(self, 'tk') and self.tk:
+                    self.tk.call('after', 'cancel', 'all')
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Clean up matplotlib canvases
             if hasattr(self, 'signal_canvas') and self.signal_canvas:

@@ -389,6 +389,14 @@ class UXEnhancementManager:
     
     def _on_closing(self):
         """窗口关闭时的处理"""
+        try:
+            # 清理主题回调以防止关闭时的主题更新错误
+            from fc.frontend.gui.theme_manager import theme_manager
+            theme_manager.clear_callbacks()
+            print("[DEBUG] Theme callbacks cleared during shutdown")
+        except Exception as e:
+            print(f"[DEBUG] Error clearing theme callbacks during shutdown: {e}")
+        
         # 保存窗口状态
         if isinstance(self.root, tk.Tk):
             self.state_manager.save_window_state(self.root)

@@ -1071,9 +1071,24 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
     def destroy(self):
         """Override destroy method to properly clean up matplotlib canvases"""
         try:
-            # Stop any ongoing updates
+            # Stop any ongoing updates and monitoring
             if hasattr(self, 'update_active'):
                 self.update_active = False
+                
+            # Stop tach monitoring to prevent further scheduling
+            if hasattr(self, 'is_tach_monitoring_active'):
+                try:
+                    self.stop_tach_monitoring()
+                except:
+                    pass
+            
+            # Cancel any pending after() calls by clearing the widget's after queue
+            try:
+                # This will cancel all pending after() calls for this widget
+                if hasattr(self, 'tk') and self.tk:
+                    self.tk.call('after', 'cancel', 'all')
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Clean up matplotlib canvases
             if hasattr(self, 'freq_canvas') and self.freq_canvas:

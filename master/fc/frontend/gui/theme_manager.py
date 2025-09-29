@@ -120,6 +120,22 @@ class ThemeManager:
         """Register a callback to be called when theme changes."""
         self.callbacks.append(callback)
     
+    def clear_callbacks(self):
+        """Clear all theme change callbacks. Call during application shutdown."""
+        try:
+            print(f"[DEBUG] Clearing {len(self.callbacks)} theme callbacks")
+            self.callbacks.clear()
+        except Exception as e:
+            print(f"[DEBUG] Error clearing theme callbacks: {e}")
+    
+    def unregister_callback(self, callback):
+        """Unregister a specific theme change callback."""
+        try:
+            if callback in self.callbacks:
+                self.callbacks.remove(callback)
+        except Exception as e:
+            print(f"[DEBUG] Error unregistering theme callback: {e}")
+    
     def _notify_callbacks(self):
         """Notify all registered callbacks of theme change."""
         # Create a copy of callbacks to avoid modification during iteration

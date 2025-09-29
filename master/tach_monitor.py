@@ -114,10 +114,10 @@ class TachSignalMonitor:
         }
         
         # 模拟数据生成器（用于测试）
-        self.simulation_mode = True
+        self.simulation_mode = False  # 默认禁用模拟模式
         self.sim_rpm_targets = {}
         
-    def start_monitoring(self, simulation=True):
+    def start_monitoring(self, simulation=False):
         """开始监控"""
         if self.is_monitoring:
             print("监控已在运行中")
@@ -183,8 +183,8 @@ class TachSignalMonitor:
                 
                 # 检查是否超过最大连续错误数
                 if consecutive_errors >= self.max_consecutive_errors:
-                    print(f"连续错误次数超过限制({self.max_consecutive_errors})，切换到模拟模式")
-                    self.simulation_mode = True
+                    print(f"连续错误次数超过限制({self.max_consecutive_errors})，保持非模拟模式")
+                    # self.simulation_mode = True  # 不自动切换到模拟模式
                     consecutive_errors = 0
                     self.stats['connection_status'] = 'error_fallback'
                 
@@ -886,7 +886,7 @@ def main():
     
     try:
         # 启动监控
-        monitor.start_monitoring(simulation=True)
+        monitor.start_monitoring(simulation=False)
         
         print("\n选择监控模式:")
         print("1. 状态监控 (每5秒显示统计)")

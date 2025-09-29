@@ -822,10 +822,22 @@ class Base(ttk.Frame, ResponsiveMixin):
             
         except (tk.TclError, AttributeError) as e:
             print(f"[DEBUG] Theme change skipped (application may be closing): {e}")
+    def destroy(self):
+        """Override destroy method to clean up theme callbacks"""
+        try:
+            # Unregister theme callback to prevent errors during shutdown
+            from fc.frontend.gui.theme_manager import theme_manager
+            if hasattr(self, '_on_theme_change'):
+                theme_manager.unregister_callback(self._on_theme_change)
+                print("[DEBUG] Theme callback unregistered for base widget")
         except Exception as e:
-            print(f"[ERROR] Error updating theme: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"[DEBUG] Error unregistering theme callback: {e}")
+        
+        # Call parent destroy
+        try:
+            super().destroy()
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
     
     def _setup_ux_callbacks(self):
         """

@@ -9,7 +9,7 @@
 ##    ███╔╝ ███████║███████║██║   ██║ ╚████╔╝ ███████║██╔██╗ ██║██║  ███╗    ##
 ##   ███╔╝  ██╔══██║██╔══██║██║   ██║  ╚██╔╝  ██╔══██║██║╚██╗██║██║   ██║    ##
 ##  ███████╗██║  ██║██║  ██║╚██████╔╝   ██║   ██║  ██║██║ ╚████║╚██████╔╝    ##
-##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
+##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
 ##                                                                            ##
 ##  ██████╗  █████╗ ███████╗██╗  ██╗██╗   ██╗ █████╗ ██╗                     ##
 ##  ██╔══██╗██╔══██╗██╔════╝██║  ██║██║   ██║██╔══██╗██║                     ##
@@ -587,8 +587,8 @@ class SignalAcquisitionEngine(pt.PrintClient):
             # 根据配置选择硬件类型
             self.hardware = self._create_hardware_interface()
         
-        # 数据队列和回调 - 限制队列大小防止内存溢出
-        self.data_queue = queue.Queue(maxsize=100)  # 减少队列大小
+        # 数据队列和回调 - 增加队列大小以处理高频数据
+        self.data_queue = queue.Queue(maxsize=2000)  # 增加队列大小以缓解溢出
         self.acquisition_thread = None
         self.is_running = False
         self.callbacks = []  # 数据回调函数列表
@@ -601,6 +601,15 @@ class SignalAcquisitionEngine(pt.PrintClient):
             'callback_errors': 0   # 回调错误计数
         }
         
+        # 日志频率限制
+        self.last_queue_full_log_time = 0
+        self.queue_full_log_interval = 30.0  # 每30秒最多记录一次队列满日志，减少日志噪音
+        
+        # 队列监控
+        self.last_queue_warning_time = 0
+        self.queue_warning_interval = 30.0  # 每30秒最多警告一次，减少日志噪音
+        self.queue_warning_threshold = 0.9  # 队列使用率超过90%时警告
+    
     def configure(self, config: AcquisitionConfig) -> bool:
         """配置采集参数"""
         try:
@@ -766,9 +775,24 @@ class SignalAcquisitionEngine(pt.PrintClient):
                     # 将数据放入队列
                     try:
                         self.data_queue.put(samples, timeout=0.001)
+                        
+                        # 队列使用率监控
+                        queue_size = self.data_queue.qsize()
+                        queue_usage = queue_size / self.data_queue.maxsize
+                        current_time = time.time()
+                        
+                        if (queue_usage >= self.queue_warning_threshold and 
+                            current_time - self.last_queue_warning_time >= self.queue_warning_interval):
+                            self.printr(f"队列使用率过高: {queue_usage:.1%} ({queue_size}/{self.data_queue.maxsize})")
+                            self.last_queue_warning_time = current_time
+                            
                     except queue.Full:
                         self.statistics['queue_overflows'] += 1
-                        self.printr("数据队列已满，丢弃数据")
+                        # 频率限制日志输出
+                        current_time = time.time()
+                        if current_time - self.last_queue_full_log_time >= self.queue_full_log_interval:
+                            self.printr("数据队列已满，丢弃数据")
+                            self.last_queue_full_log_time = current_time
                     
                     # 调用回调函数
                     for callback in self.callbacks:
