@@ -1937,7 +1937,7 @@ class FCCommunicator(pt.PrintClient):
                 # General broadcast
                 self.rebootSocket.sendto(
                     bytearray("R|{}".format(self.passcode),'ascii'),
-                    (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                    (self.defaultBroadcastIP, self.broadcastPort))
 
             elif target.getIP() is not None:
                 # Targetted broadcast w/ valid IP:
@@ -1950,7 +1950,7 @@ class FCCommunicator(pt.PrintClient):
                 self.rebootSocket.sendto(
                     bytearray("r|{}|{}".format(self.passcode, target.getMAC()),
                         'ascii'),
-                        (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                        (self.defaultBroadcastIP, self.broadcastPort))
 
         except Exception as e:
             self.printx(e, "[sR] Exception in reboot routine:")
@@ -1971,7 +1971,7 @@ class FCCommunicator(pt.PrintClient):
                 # Broadcast to all slaves
                 self.disconnectSocket.sendto(
                     bytearray("C|{}|{}".format(self.passcode, targetRPM), 'ascii'),
-                    (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                    (self.defaultBroadcastIP, self.broadcastPort))
                 self.printw("[sC] Sent CHASE command (broadcast): target RPM = {}".format(targetRPM))
             else:
                 # Send to specific targets
@@ -1980,7 +1980,7 @@ class FCCommunicator(pt.PrintClient):
                     if slave is not None:
                         self.disconnectSocket.sendto(
                             bytearray("c|{}|{}|{}".format(self.passcode, targetRPM, slave.getMAC()), 'ascii'),
-                            (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                            (self.defaultBroadcastIP, self.broadcastPort))
                         self.printw("[sC] Sent CHASE command to slave {}: target RPM = {}".format(slaveIndex, targetRPM))
 
         except Exception as e:
@@ -1996,7 +1996,7 @@ class FCCommunicator(pt.PrintClient):
             #self.broadcastLock.acquire()
             self.disconnectSocket.sendto(
                 bytearray("X|{}".format(self.passcode),'ascii'),
-                (self.DEFAULT_BROADCAST_IP, self.broadcastPort))
+                (self.defaultBroadcastIP, self.broadcastPort))
 
         except Exception as e:
             self.printx(e, "[sD] Exception in disconnect routine")

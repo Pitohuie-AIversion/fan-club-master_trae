@@ -161,6 +161,23 @@ class IconButton(ttk.Frame):
             print(f"Icon error: {e}")
             self.button.config(image="", text=self.text or "")
     
+    def destroy(self):
+        """Override destroy method to clean up theme callbacks"""
+        try:
+            # Unregister theme callback to prevent errors during shutdown
+            from fc.frontend.gui.theme_manager import theme_manager
+            if hasattr(self, '_on_theme_change'):
+                theme_manager.unregister_callback(self._on_theme_change)
+                print("[DEBUG] Theme callback unregistered for icon button")
+        except Exception as e:
+            print(f"[DEBUG] Error unregistering theme callback: {e}")
+        
+        # Call parent destroy
+        try:
+            super().destroy()
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
+
     def _on_theme_change(self):
         """
         Update button appearance when theme changes.
