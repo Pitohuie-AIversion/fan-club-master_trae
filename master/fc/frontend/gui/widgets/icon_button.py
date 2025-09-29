@@ -165,9 +165,19 @@ class IconButton(ttk.Frame):
         """
         Update button appearance when theme changes.
         """
-        # Update icon with new theme colors
-        if self.icon_name:
-            self._update_icon()
+        try:
+            # Check if widget still exists
+            if not (hasattr(self, 'winfo_exists') and self.winfo_exists()):
+                return
+                
+            # Update icon with new theme colors
+            if self.icon_name:
+                self._update_icon()
+        except (tk.TclError, AttributeError) as e:
+            # Widget may be destroyed during theme change
+            pass
+        except Exception as e:
+            print(f"Error updating icon button theme: {e}")
     
     def config_text(self, text):
         """

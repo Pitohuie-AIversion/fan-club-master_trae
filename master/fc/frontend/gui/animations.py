@@ -128,8 +128,19 @@ class AnimationManager:
             
             if progress < 1.0:
                 # Continue animation
-                after_id = self.widget.after(16, animate_step)  # ~60 FPS
-                self.active_animations[animation_id] = after_id
+                try:
+                    # Check if widget still exists
+                    if hasattr(self.widget, 'winfo_exists') and self.widget.winfo_exists():
+                        after_id = self.widget.after(16, animate_step)  # ~60 FPS
+                        self.active_animations[animation_id] = after_id
+                    else:
+                        # Widget destroyed, cancel animation
+                        if animation_id in self.active_animations:
+                            del self.active_animations[animation_id]
+                except (tk.TclError, AttributeError, RuntimeError):
+                    # Widget destroyed, cancel animation
+                    if animation_id in self.active_animations:
+                        del self.active_animations[animation_id]
             else:
                 # Animation complete
                 if animation_id in self.active_animations:
@@ -141,8 +152,17 @@ class AnimationManager:
                         print(f"Animation completion callback error: {e}")
         
         # Start the animation
-        after_id = self.widget.after(16, animate_step)
-        self.active_animations[animation_id] = after_id
+        try:
+            # Check if widget still exists
+            if hasattr(self.widget, 'winfo_exists') and self.widget.winfo_exists():
+                after_id = self.widget.after(16, animate_step)
+                self.active_animations[animation_id] = after_id
+            else:
+                # Widget destroyed, don't start animation
+                return None
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget destroyed, don't start animation
+            return None
         
         return animation_id
     

@@ -144,7 +144,13 @@ class SerialSplash:
         splash = SplashFrame(master = root, widget = self.widget, **self.kwargs)
         start = tm.time()
 
-        root.after(1000*timeout, root.destroy)
+        # Safe after call with error handling
+        try:
+            if root.winfo_exists():
+                root.after(1000*timeout, root.destroy)
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or error occurred, ignore
+            pass
         root.mainloop()
 
 class ParallelSplash:

@@ -287,23 +287,34 @@ class GradientButton(tk.Button, InteractiveWidget):
         self.gradient_canvas.pack(fill=tk.BOTH, expand=True)
         
         # Draw initial gradient
-        self.after(1, self._draw_button_gradient)
+        try:
+            if hasattr(self, 'winfo_exists') and self.winfo_exists():
+                self.after(1, self._draw_button_gradient)
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
         
         # Bind resize
         self.gradient_canvas.bind('<Configure>', self._draw_button_gradient)
     
     def _draw_button_gradient(self, event=None):
         """Draw gradient on button canvas."""
-        if not hasattr(self, 'gradient_canvas'):
-            return
+        try:
+            # Check if widget still exists
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+                
+            if not hasattr(self, 'gradient_canvas'):
+                return
+                
+            width = self.gradient_canvas.winfo_width()
+            height = self.gradient_canvas.winfo_height()
             
-        width = self.gradient_canvas.winfo_width()
-        height = self.gradient_canvas.winfo_height()
-        
-        if width <= 1 or height <= 1:
+            if width <= 1 or height <= 1:
+                return
+                
+            self.gradient_canvas.delete('all')
+        except (tk.TclError, AttributeError, RuntimeError):
             return
-            
-        self.gradient_canvas.delete('all')
         
         # Draw gradient
         color1, color2 = self.gradient_colors
@@ -421,13 +432,27 @@ class VisualEffectsManager:
             
             # Animate ripple expansion
             def expand_ripple(size=2):
-                if size > 50:  # Max ripple size
-                    overlay.destroy()
-                    return
-                    
-                overlay.configure(width=size, height=size)
-                overlay.place(x=event.x-size//2, y=event.y-size//2)
-                widget.after(20, lambda: expand_ripple(size + 5))
+                try:
+                    # Check if widget still exists
+                    if not hasattr(widget, 'winfo_exists') or not widget.winfo_exists():
+                        if hasattr(overlay, 'destroy'):
+                            overlay.destroy()
+                        return
+                        
+                    if size > 50:  # Max ripple size
+                        overlay.destroy()
+                        return
+                        
+                    overlay.configure(width=size, height=size)
+                    overlay.place(x=event.x-size//2, y=event.y-size//2)
+                    widget.after(20, lambda: expand_ripple(size + 5))
+                except (tk.TclError, AttributeError, RuntimeError):
+                    # Widget destroyed, clean up
+                    try:
+                        if hasattr(overlay, 'destroy'):
+                            overlay.destroy()
+                    except:
+                        pass
             
             expand_ripple()
         

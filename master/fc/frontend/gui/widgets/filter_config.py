@@ -414,7 +414,12 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
             var.trace('w', self.update_plots)
              
         # 延迟初始化频率响应图，避免启动时卡顿
-        self.after(1000, self.safe_update_plots)
+        try:
+            if hasattr(self, 'winfo_exists') and self.winfo_exists() and hasattr(self, 'after'):
+                self.after(1000, self.safe_update_plots)
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget destroyed or error, skip scheduling
+            pass
     
     def on_filter_method_change(self, *args):
         """滤波方法变化时的回调"""
@@ -478,11 +483,40 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
         
     def schedule_filter_update(self):
         """调度滤波器数据更新"""
-        if self.is_tach_monitoring_active():
-            self.update_filtered_data()
-            # 使用tkinter的after方法调度下次更新
-            update_interval = int(1000 / self.update_rate)  # 转换为毫秒
-            self.after(update_interval, self.schedule_filter_update)
+        try:
+            # Check if widget still exists before scheduling
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+                
+            # Additional check for root window
+            if not hasattr(self, 'master') or not hasattr(self.master, 'winfo_exists') or not self.master.winfo_exists():
+                return
+                
+            # Check if we have the necessary methods
+            if not hasattr(self, 'is_tach_monitoring_active') or not hasattr(self, 'update_filtered_data'):
+                return
+                
+            if self.is_tach_monitoring_active():
+                try:
+                    self.update_filtered_data()
+                except (tk.TclError, AttributeError):
+                    # Update failed, stop scheduling
+                    return
+                    
+                # 使用tkinter的after方法调度下次更新
+                update_interval = int(1000 / self.update_rate)  # 转换为毫秒
+                try:
+                    # Double check before scheduling
+                    if (hasattr(self, 'winfo_exists') and self.winfo_exists() and 
+                        hasattr(self, 'is_tach_monitoring_active') and self.is_tach_monitoring_active() and
+                        hasattr(self, 'after')):
+                        self.after(update_interval, self.schedule_filter_update)
+                except (tk.TclError, AttributeError, RuntimeError):
+                    # Failed to schedule, stop updating
+                    pass
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget has been destroyed or attribute error, stop scheduling
+            pass
             
     def update_filtered_data(self):
         """更新滤波后的数据"""
@@ -842,7 +876,22 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
     def safe_update_plots(self):
         """安全的图形更新，用于延迟初始化"""
         try:
+            # Check if widget still exists before proceeding
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+                
+            # Check if master widget exists
+            if hasattr(self, 'master') and hasattr(self.master, 'winfo_exists') and not self.master.winfo_exists():
+                return
+                
+            # Check if update_plots method exists
+            if not hasattr(self, 'update_plots'):
+                return
+                
             self.update_plots()
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget destroyed or error, skip update
+            pass
         except Exception as e:
             if hasattr(self, 'printd'):
                 self.printd(f"延迟初始化频率响应失败: {e}")
@@ -1019,6 +1068,53 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
                 'beta_factor': 0.2
             }
     
+    def destroy(self):
+        """Override destroy method to properly clean up matplotlib canvases"""
+        try:
+            # Stop any ongoing updates
+            if hasattr(self, 'update_active'):
+                self.update_active = False
+            
+            # Clean up matplotlib canvases
+            if hasattr(self, 'freq_canvas') and self.freq_canvas:
+                try:
+                    self.freq_canvas.get_tk_widget().destroy()
+                    self.freq_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'time_canvas') and self.time_canvas:
+                try:
+                    self.time_canvas.get_tk_widget().destroy()
+                    self.time_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            # Clean up matplotlib figures
+            if hasattr(self, 'freq_fig'):
+                try:
+                    plt.close(self.freq_fig)
+                    self.freq_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'time_fig'):
+                try:
+                    plt.close(self.time_fig)
+                    self.time_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+        except Exception as e:
+            # Ignore cleanup errors during shutdown
+            pass
+            
+        # Call parent destroy
+        try:
+            super().destroy()
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
+
     def set_config(self, config):
         """设置配置"""
         self.filter_type_var.set(config.get('filter_type', 'LOWPASS'))

@@ -202,6 +202,9 @@ class ConsoleWidget(ttk.Frame):
         Generic print method. To be used internally.
         """
         try:
+            # Check if the widget still exists before proceeding
+            if not self.winfo_exists() or not hasattr(self, 'screen') or not self.screen.winfo_exists():
+                return
 
             # Switch focus to this tab in case of errors of warnings:
             if tag == TAG_ERROR and not self.winfo_ismapped():
@@ -219,9 +222,16 @@ class ConsoleWidget(ttk.Frame):
             # Check for auto scroll: scroll if Autoscroll enabled or we were at bottom
             if self.autoscrollVar.get() == 1 or was_at_bottom:
                 self.screen.see("end")
+        except tk.TclError:
+            # Widget has been destroyed, silently ignore
+            pass
         except Exception as e:
-            gus.popup_exception("FCMkIV Error", "Exception in console printer",
-                e)
+            # Only show popup for non-Tkinter errors
+            try:
+                gus.popup_exception("FCMkIV Error", "Exception in console printer", e)
+            except:
+                # If even the popup fails, just ignore
+                pass
         return
 
     def _save(self, *E):
@@ -281,14 +291,25 @@ class ConsoleWidget(ttk.Frame):
     # Utilities ----------------------------------------------------------------
     def _is_at_bottom(self):
         try:
+            # Check if the widget still exists
+            if not self.winfo_exists() or not hasattr(self, 'screen') or not self.screen.winfo_exists():
+                return True
+            
             lo, hi = self.screen.yview()
             # hi == 1.0 indicates bottom; use tolerance for floating errors
             return abs(hi - 1.0) < 1e-3
+        except tk.TclError:
+            # Widget has been destroyed
+            return True
         except Exception:
             return True
 
     def _trim_to_max_lines(self):
         try:
+            # Check if the widget still exists
+            if not self.winfo_exists() or not hasattr(self, 'screen') or not self.screen.winfo_exists():
+                return
+                
             max_lines = int(self.maxLinesVar.get()) if self.maxLinesVar else 0
             if max_lines and max_lines > 0:
                 # Total number of lines (end index is one past last char)
@@ -299,6 +320,9 @@ class ConsoleWidget(ttk.Frame):
                     excess = total_lines - max_lines
                     # Delete from line 1.0 up to (excess+1).0 to remove full lines
                     self.screen.delete('1.0', f'{excess + 1}.0')
+        except tk.TclError:
+            # Widget has been destroyed, silently ignore
+            pass
         except Exception:
             # Do not crash on trimming errors
             pass

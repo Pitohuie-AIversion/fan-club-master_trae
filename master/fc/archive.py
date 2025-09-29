@@ -8,7 +8,7 @@
 ##    ███╔╝ ███████║███████║██║   ██║ ╚████╔╝ ███████║██╔██╗ ██║██║  ███╗    ##
 ##   ███╔╝  ██╔══██║██╔══██║██║   ██║  ╚██╔╝  ██╔══██║██║╚██╗██║██║   ██║    ##
 ##  ███████╗██║  ██║██║  ██║╚██████╔╝   ██║   ██║  ██║██║ ╚████║╚██████╔╝    ##
-##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
+##  ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝     ##
 ##                                                                            ##
 ##  ██████╗  █████╗ ███████╗██╗  ██╗██╗   ██╗ █████╗ ██╗                     ##
 ##  ██╔══██╗██╔══██╗██╔════╝██║  ██║██║   ██║██╔══██╗██║                     ##
@@ -176,6 +176,7 @@ externalDefaultRepeat = 120
 externalListenerAutoStart = 121
 externalBroadcastAutoStart = 122
 externalIndexDelta = 123
+autoConnect = 126  # 新增：自动连接配置项
 
 # Slave variables --------------------------------------------------------------
 SV_name = 216
@@ -626,7 +627,12 @@ META = {
 		4,
 		TYPE_PRIMITIVE,
 		True,
-        v_nonnegative_int),
+        v_positive_int),
+    autoConnect: ("autoConnect",
+		4,
+		TYPE_PRIMITIVE,
+		True,
+        v_bool),
     defaultSlave : ("defaultSlave",
 		5,
 		TYPE_SUB,
@@ -869,6 +875,7 @@ class FCArchive(pt.PrintClient):
         externalBroadcastAutoStart: False,
         externalListenerAutoStart: True,
         externalIndexDelta: 10,
+        autoConnect: True,  # 新增：自动连接配置项，默认启用
 
         defaultSlave :
             {

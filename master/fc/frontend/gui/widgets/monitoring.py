@@ -937,7 +937,7 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
         """Generate simulated Tach data (for testing)"""
         import random
         
-        self.printd(f"Generating simulated Tach data for {len(self.tach_config.enabled_fans)} enabled fans")
+        # self.printd(f"Generating simulated Tach data for {len(self.tach_config.enabled_fans)} enabled fans")
         
         for fan_id in range(21):  # Simulate all 21 fans (maximum supported)
             if fan_id in self.tach_config.enabled_fans:
@@ -1014,9 +1014,44 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
     
     def _schedule_gui_update(self):
         """Schedule GUI update"""
-        if self.monitoring_active:
-            self._update_gui()
-            self.after(UPDATE_INTERVAL, self._schedule_gui_update)
+        try:
+            # Check if widget still exists before scheduling
+            if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
+            
+            # Additional check for root window
+            if not hasattr(self, 'master') or not hasattr(self.master, 'winfo_exists') or not self.master.winfo_exists():
+                return
+                
+            # Check if monitoring is still active and we have necessary methods
+            if not hasattr(self, 'monitoring_active') or not self.monitoring_active:
+                return
+                
+            if not hasattr(self, '_update_gui'):
+                return
+                
+            try:
+                self._update_gui()
+            except (tk.TclError, AttributeError):
+                # GUI update failed, stop monitoring
+                if hasattr(self, 'monitoring_active'):
+                    self.monitoring_active = False
+                return
+                
+            # Schedule next update with additional safety check
+            try:
+                if (hasattr(self, 'winfo_exists') and self.winfo_exists() and 
+                    hasattr(self, 'monitoring_active') and self.monitoring_active and
+                    hasattr(self, 'after')):
+                    self.after(UPDATE_INTERVAL, self._schedule_gui_update)
+            except (tk.TclError, AttributeError, RuntimeError):
+                # Failed to schedule, stop monitoring
+                if hasattr(self, 'monitoring_active'):
+                    self.monitoring_active = False
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Widget has been destroyed or attribute error, stop scheduling
+            if hasattr(self, 'monitoring_active'):
+                self.monitoring_active = False
     
     def _update_gui(self):
         """Update GUI display"""
@@ -1076,7 +1111,12 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                 self.signal_ax.set_xlim(min(all_timestamps), max(all_timestamps))
                 self.signal_ax.set_ylim(min(all_values) - 0.5, max(all_values) + 0.5)
         
-        self.signal_canvas.draw_idle()
+        try:
+            if hasattr(self, 'signal_canvas') and self.signal_canvas:
+                self.signal_canvas.draw_idle()
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Canvas destroyed or not available
+            pass
     
     def _update_signal_text(self):
         """Update signal text display"""
@@ -1108,7 +1148,12 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                 max_time = center + 0.05
             self.perf_ax.set_xlim(min_time, max_time)
             
-        self.perf_canvas.draw_idle()
+        try:
+            if hasattr(self, 'perf_canvas') and self.perf_canvas:
+                self.perf_canvas.draw_idle()
+        except (tk.TclError, AttributeError, RuntimeError):
+            # Canvas destroyed or not available
+            pass
     
     def _update_performance_text(self):
         """Update performance text display"""
@@ -1269,7 +1314,12 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                 self.tach_ax2.bar(fan_ids, current_rpms, color=colors, alpha=0.7)
             
             # Layout is handled by subplots_adjust in _build_tach_plot
-            self.tach_canvas.draw_idle()
+            try:
+                if hasattr(self, 'tach_canvas') and self.tach_canvas:
+                    self.tach_canvas.draw_idle()
+            except (tk.TclError, AttributeError, RuntimeError):
+                # Canvas destroyed or not available
+                pass
             
         except Exception as e:
             self.printd(f"Tach plot update error: {e}")
@@ -1329,6 +1379,67 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
         except Exception as e:
             self.printd(f"Tach status update error: {e}")
     
+    def destroy(self):
+        """Override destroy method to properly clean up matplotlib canvases"""
+        try:
+            # Stop monitoring first
+            if hasattr(self, 'monitoring_active') and self.monitoring_active:
+                self._stop_monitoring()
+            
+            # Clean up matplotlib canvases
+            if hasattr(self, 'signal_canvas') and self.signal_canvas:
+                try:
+                    self.signal_canvas.get_tk_widget().destroy()
+                    self.signal_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'perf_canvas') and self.perf_canvas:
+                try:
+                    self.perf_canvas.get_tk_widget().destroy()
+                    self.perf_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'tach_canvas') and self.tach_canvas:
+                try:
+                    self.tach_canvas.get_tk_widget().destroy()
+                    self.tach_canvas = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            # Clean up matplotlib figures
+            if hasattr(self, 'signal_fig'):
+                try:
+                    plt.close(self.signal_fig)
+                    self.signal_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'perf_fig'):
+                try:
+                    plt.close(self.perf_fig)
+                    self.perf_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+            if hasattr(self, 'tach_fig'):
+                try:
+                    plt.close(self.tach_fig)
+                    self.tach_fig = None
+                except (tk.TclError, AttributeError, RuntimeError):
+                    pass
+                    
+        except Exception as e:
+            # Ignore cleanup errors during shutdown
+            pass
+            
+        # Call parent destroy
+        try:
+            super().destroy()
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
+
     def get_monitoring_status(self):
         """Get monitoring status"""
         return {

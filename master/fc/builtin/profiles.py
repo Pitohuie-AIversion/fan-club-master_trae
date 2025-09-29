@@ -8832,6 +8832,10 @@ TENX10 = {
     ac.passcode : ac.DEFAULT_PASSCODE,
     ac.socketLimit : 1024,
 
+    # IP configuration - 添加缺失的网络配置项
+    ac.defaultIPAddress : ac.DEFAULT_IP_ADDRESS,
+    ac.defaultBroadcastIP : ac.DEFAULT_BROADCAST_IP,
+
     ac.pinouts : ac.PINOUTS.copy(),
     ac.maxRPM : 25000,
     ac.maxFans : 21,

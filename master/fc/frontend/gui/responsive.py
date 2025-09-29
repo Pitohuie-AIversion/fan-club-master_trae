@@ -423,6 +423,12 @@ class ResponsiveLayoutManager:
     def _update_widget_styles(self):
         """Update ttk widget styles with responsive values."""
         try:
+            # Check if root window and style still exist
+            if not self.root or not self.root.winfo_exists():
+                return
+            if not hasattr(self, 'style') or not self.style:
+                return
+                
             # Get current theme colors
             base_bg = theme_manager.get_color('SURFACE_2')
             card_bg = theme_manager.get_color('SURFACE_1')
@@ -470,6 +476,8 @@ class ResponsiveLayoutManager:
                                 font=gus.typography["body_medium"]["font"],
                                 rowheight=row_height)
             
+        except (tk.TclError, AttributeError) as e:
+            print(f"Error updating widget styles (application may be closing): {e}")
         except Exception as e:
             print(f"Error updating widget styles: {e}")
     

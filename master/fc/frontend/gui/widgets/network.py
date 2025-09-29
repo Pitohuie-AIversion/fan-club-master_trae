@@ -205,7 +205,11 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         
         # 在GUI组件创建完成后再加载profile配置
         # 使用更长的延迟确保GUI完全初始化
-        self.after(100, self._loadProfileBroadcastIP)
+        try:
+            if self.winfo_exists():
+                self.after(100, self._loadProfileBroadcastIP)
+        except tk.TclError:
+            pass
 
         # Broadcast port:
         self.bcVar = tk.StringVar()
@@ -214,7 +218,12 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self.__addDisplay("Broadcast Port", self.bcVar)
         
         # 在GUI组件创建完成后再加载profile配置
-        self.after_idle(self._loadProfileBroadcastPort)
+        try:
+            if self.winfo_exists() and hasattr(self, 'master') and self.master.winfo_exists():
+                self.after_idle(self._loadProfileBroadcastPort)
+        except (tk.TclError, AttributeError):
+            # Widget destroyed or not available
+            pass
 
         # Listener port:
         self.ltVar = tk.StringVar()
@@ -223,7 +232,20 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self.__addDisplay("Listener Port", self.ltVar)
         
         # 在GUI组件创建完成后再加载profile配置
-        self.after_idle(self._loadProfileListenerPort)
+        try:
+            if self.winfo_exists() and hasattr(self, 'master') and self.master.winfo_exists():
+                self.after_idle(self._loadProfileListenerPort)
+        except (tk.TclError, AttributeError):
+            # Widget destroyed or not available
+            pass
+
+        # 添加自动连接功能
+        self.auto_connect_enabled = True  # 可以通过profile配置控制
+        try:
+            if self.winfo_exists():
+                self.after(200, self._checkAutoConnect)  # 延迟检查自动连接
+        except tk.TclError:
+            pass
 
         # Connection display:
         self.connectionVar = tk.StringVar()
@@ -315,11 +337,15 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             command = self._onDisconnect)
         self.connectionVar.set("Connected")
         # ttk.Label doesn't support direct fg/bg usage, switch to style instead
-        style = ttk.Style(self.connectionLabel)
-        style.configure('NetworkConnected.TLabel',
-                        foreground=s.FOREGROUNDS[s.SS_CONNECTED],
-                        background=s.BACKGROUNDS[s.SS_CONNECTED])
-        self.connectionLabel.configure(style='NetworkConnected.TLabel')
+        try:
+            if hasattr(self, 'connectionLabel') and hasattr(self.connectionLabel, 'winfo_exists') and self.connectionLabel.winfo_exists():
+                style = ttk.Style(self.connectionLabel)
+                style.configure('NetworkConnected.TLabel',
+                                foreground=s.FOREGROUNDS[s.SS_CONNECTED],
+                                background=s.BACKGROUNDS[s.SS_CONNECTED])
+                self.connectionLabel.configure(style='NetworkConnected.TLabel')
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
         self._setWidgetState(tk.NORMAL)
         for client in self.clients:
             client.connected()
@@ -416,6 +442,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self._loadProfileBroadcastIP()
         self._loadProfileBroadcastPort()
         self._loadProfileListenerPort()
+        self._loadProfileAutoConnect()  # 加载自动连接配置
         
         # 如果当前未连接，显示profile配置
         if not self.isConnected:
@@ -429,8 +456,67 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
             except Exception as e:
                 self.printr(f"Error updating profile network settings: {e}")
 
+        # 检查是否需要自动连接
+        if self.auto_connect_enabled and not self.isConnected:
+            try:
+                if self.winfo_exists():
+                    self.after(100, self._checkAutoConnect)  # 延迟一点时间再检查自动连接
+            except tk.TclError:
+                pass
         self.bcipDisplay.enable()
         self.isConnected = True
+
+    def _checkAutoConnect(self):
+        """
+        检查是否需要自动连接到profile配置的设备
+        """
+        try:
+            if not self.auto_connect_enabled or self.isConnected:
+                return
+                
+            if self.archive:
+                profile = self.archive.profile()
+                if profile:
+                    import fc.archive as ac
+                    
+                    # 检查是否配置了自动连接
+                    auto_connect = profile.get('autoConnect', False)  # 新增的配置项
+                    if auto_connect:
+                        self.printr("Auto-connect enabled in profile, attempting to connect...")
+                        # 触发连接
+                        self._onConnect()
+                    else:
+                        self.printr("Auto-connect disabled in profile")
+                else:
+                    self.printr("No profile loaded for auto-connect check")
+            else:
+                self.printr("No archive available for auto-connect check")
+                
+        except Exception as e:
+            self.printr(f"Error during auto-connect check: {e}")
+
+    def _loadProfileAutoConnect(self):
+        """
+        从profile加载自动连接配置
+        """
+        try:
+            if self.archive:
+                profile = self.archive.profile()
+                if profile:
+                    # 使用正确的常量键而不是字符串键
+                    import fc.archive as ac
+                    if ac.autoConnect in profile:
+                        self.auto_connect_enabled = profile[ac.autoConnect]
+                    else:
+                        self.auto_connect_enabled = False
+                    self.printr(f"Auto-connect setting loaded: {self.auto_connect_enabled}")
+                else:
+                    self.auto_connect_enabled = False
+            else:
+                self.auto_connect_enabled = False
+        except Exception as e:
+            self.printr(f"Error loading auto-connect setting: {e}")
+            self.auto_connect_enabled = False
 
     def disconnecting(self):
         """
@@ -454,11 +540,15 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         for client in self.clients:
             client.disconnected()
         # ttk.Label doesn't support direct fg/bg usage, switch to style instead
-        style = ttk.Style(self.connectionLabel)
-        style.configure('NetworkDisconnected.TLabel',
-                        foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
-                        background=s.BACKGROUNDS[s.SS_DISCONNECTED])
-        self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
+        try:
+            if hasattr(self, 'connectionLabel') and hasattr(self.connectionLabel, 'winfo_exists') and self.connectionLabel.winfo_exists():
+                style = ttk.Style(self.connectionLabel)
+                style.configure('NetworkDisconnected.TLabel',
+                                foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
+                                background=s.BACKGROUNDS[s.SS_DISCONNECTED])
+                self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
         self._setWidgetState(tk.DISABLED)
         self.bcipDisplay.disable()
         self.isConnected = False
@@ -630,25 +720,31 @@ class FirmwareUpdateWidget(ttk.Frame, pt.PrintClient):
         self.liveLabelConfig = {'text': 'LIVE'}
 
         self._fu_style = ttk.Style()
-        self._fu_style.configure(
-            "FirmwareInactive.TLabel",
-            foreground = TEXT_SECONDARY,
-            font = gus.typography['label_small']['font']
-        )
-        self._fu_style.configure(
-            "FirmwareReady.TLabel",
-            foreground = TEXT_PRIMARY,
-            font = gus.typography['label_small']['font']
-        )
-        self._fu_style.configure(
-            "FirmwareLive.TLabel",
-            foreground = ERROR_MAIN,
-            font = (
-                gus.typography['label_small']['font'][0],
-                gus.typography['label_small']['font'][1],
-                'bold'
-            )
-        )
+        try:
+            if self.winfo_exists() and hasattr(self, '_fu_style') and self._fu_style:
+                self._fu_style.configure(
+                    "FirmwareInactive.TLabel",
+                    foreground = TEXT_SECONDARY,
+                    font = gus.typography['label_small']['font']
+                )
+                self._fu_style.configure(
+                    "FirmwareReady.TLabel",
+                    foreground = TEXT_PRIMARY,
+                    font = gus.typography['label_small']['font']
+                )
+                self._fu_style.configure(
+                    "FirmwareLive.TLabel",
+                    foreground = ERROR_MAIN,
+                    font = (
+                        gus.typography['label_small']['font'][0],
+                        gus.typography['label_small']['font'][1],
+                        'bold'
+                    )
+                )
+        except (tk.TclError, AttributeError, RuntimeError) as e:
+            print(f"Error configuring ttk style (application may be closing): {e}")
+        except Exception as e:
+            print(f"Error configuring ttk style: {e}")
 
         self.statusLabel = ttk.Label(
             self.bottomFrame,
@@ -867,9 +963,13 @@ class SlaveListWidget(ttk.Frame, pt.PrintClient):
         #       ttk-treeview-cant-change-row-height
         self.listFontSize = gus.typography["label_small"]["font"][1]
         font = fnt.Font(font=gus.typography["label_small"]["font"])  # base font for row height
-        self.style = ttk.Style(self.winfo_toplevel())
-        self.style.configure('Treeview',
-            rowheight = font.metrics()['linespace'] + 2)
+        try:
+            if self.winfo_exists():
+                self.style = ttk.Style(self.winfo_toplevel())
+                self.style.configure('Treeview',
+                    rowheight = font.metrics()['linespace'] + 2)
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
 
         # Create columns:
         self.slaveList.column('#0', width = 20, stretch = False)
@@ -1139,7 +1239,7 @@ class StatusBarWidget(ttk.Frame, pt.PrintClient):
         ttk.Frame.__init__(self, master)
         pt.PrintClient.__init__(self, pqueue)
 
-        # Setup ...............................................................
+        # Setup ..............................................................
 
         # Status counters ......................................................
         self.statusFrame = ttk.Frame(self, relief = tk.SUNKEN, borderwidth = 0)
@@ -1157,12 +1257,20 @@ class StatusBarWidget(ttk.Frame, pt.PrintClient):
             self.statusVars[code].set(0)
 
             # Create per-status styles for label and display
-            _style = ttk.Style(self)
-            _label_style = f"StatusBarLabel-{code}.TLabel"
-            _display_style = f"StatusBarDisplay-{code}.TLabel"
-            _fg_color = s.FOREGROUNDS[code] if code in s.FOREGROUNDS else TEXT_PRIMARY
-            _style.configure(_label_style, foreground=_fg_color)
-            _style.configure(_display_style, foreground=_fg_color, relief='sunken', borderwidth=1)
+            try:
+                if self.winfo_exists():
+                    _style = ttk.Style(self)
+                    _label_style = f"StatusBarLabel-{code}.TLabel"
+                    _display_style = f"StatusBarDisplay-{code}.TLabel"
+                    _fg_color = s.FOREGROUNDS[code] if code in s.FOREGROUNDS else TEXT_PRIMARY
+                    _style.configure(_label_style, foreground=_fg_color)
+                    _style.configure(_display_style, foreground=_fg_color, relief='sunken', borderwidth=1)
+                else:
+                    _label_style = "TLabel"
+                    _display_style = "TLabel"
+            except (tk.TclError, AttributeError, RuntimeError):
+                _label_style = "TLabel"
+                _display_style = "TLabel"
 
             self.statusLabels[code] = ttk.Label(
                 self.statusFrames[code],
@@ -1238,12 +1346,16 @@ class StatusBarWidget(ttk.Frame, pt.PrintClient):
         Handle network switching to connected.
         """
         self.connectionVar.set(self.CONNECTED_STR)
-        style = ttk.Style(self.connectionLabel)
-        style.configure('NetworkConnected.TLabel',
-                        relief='sunken',
-                        foreground=s.FOREGROUNDS[s.SS_CONNECTED],
-                        background=s.BACKGROUNDS[s.SS_CONNECTED])
-        self.connectionLabel.configure(style='NetworkConnected.TLabel')
+        try:
+            if hasattr(self, 'connectionLabel') and hasattr(self.connectionLabel, 'winfo_exists') and self.connectionLabel.winfo_exists():
+                style = ttk.Style(self.connectionLabel)
+                style.configure('NetworkConnected.TLabel',
+                                relief='sunken',
+                                foreground=s.FOREGROUNDS[s.SS_CONNECTED],
+                                background=s.BACKGROUNDS[s.SS_CONNECTED])
+                self.connectionLabel.configure(style='NetworkConnected.TLabel')
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
         self.status = s.SS_CONNECTED
 
     def disconnected(self):
@@ -1252,12 +1364,16 @@ class StatusBarWidget(ttk.Frame, pt.PrintClient):
         """
         self.clear()
         self.connectionVar.set(self.DISCONNECTED_STR)
-        style = ttk.Style(self.connectionLabel)
-        style.configure('NetworkDisconnected.TLabel',
-                        relief='sunken',
-                        foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
-                        background=s.BACKGROUNDS[s.SS_DISCONNECTED])
-        self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
+        try:
+            if hasattr(self, 'connectionLabel') and hasattr(self.connectionLabel, 'winfo_exists') and self.connectionLabel.winfo_exists():
+                style = ttk.Style(self.connectionLabel)
+                style.configure('NetworkDisconnected.TLabel',
+                                relief='sunken',
+                                foreground=s.FOREGROUNDS[s.SS_DISCONNECTED],
+                                background=s.BACKGROUNDS[s.SS_DISCONNECTED])
+                self.connectionLabel.configure(style='NetworkDisconnected.TLabel')
+        except (tk.TclError, AttributeError, RuntimeError):
+            pass
         self.status = s.SS_DISCONNECTED
 
     def setCount(self, status, count):

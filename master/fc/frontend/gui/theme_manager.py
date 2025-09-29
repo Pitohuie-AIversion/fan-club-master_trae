@@ -122,15 +122,41 @@ class ThemeManager:
     
     def _notify_callbacks(self):
         """Notify all registered callbacks of theme change."""
-        for callback in self.callbacks:
+        # Create a copy of callbacks to avoid modification during iteration
+        callbacks_copy = self.callbacks.copy()
+        for callback in callbacks_copy:
             try:
-                callback()
+                # Check if callback is still valid before calling
+                if callable(callback):
+                    callback()
+            except (tk.TclError, AttributeError, RuntimeError) as e:
+                print(f"Theme callback error (application may be closing): {e}")
+                # Remove invalid callback to prevent future errors
+                if callback in self.callbacks:
+                    self.callbacks.remove(callback)
             except Exception as e:
                 print(f"Theme callback error: {e}")
+                # Remove problematic callback
+                if callback in self.callbacks:
+                    self.callbacks.remove(callback)
     
     def apply_ttk_theme(self, style):
         """Apply current theme to ttk.Style object."""
         try:
+            # Check if style object is valid and application is not destroyed
+            if not style:
+                return
+                
+            # Additional safety checks
+            if not hasattr(style, 'configure'):
+                return
+                
+            # Try to access the style to see if it's still valid
+            try:
+                style.theme_names()  # This will fail if the application is destroyed
+            except (tk.TclError, AttributeError, RuntimeError):
+                return
+            
             # Get current theme colors
             base_bg = self.get_color('SURFACE_2')
             card_bg = self.get_color('SURFACE_1')
@@ -140,62 +166,97 @@ class ThemeManager:
             fg_muted = self.get_color('TEXT_SECONDARY')
             surface_3 = self.get_color('SURFACE_3')
             
-            # Apply base styles
-            style.configure("TLabel", background=base_bg, foreground=fg, font=gus.typography["body_medium"]["font"])
-            style.configure("TFrame", background=base_bg)
-            style.configure("TPanedwindow", background=base_bg)
+            # Apply base styles with individual error handling
+            try:
+                style.configure("TLabel", background=base_bg, foreground=fg, font=gus.typography["body_medium"]["font"])
+                style.configure("TFrame", background=base_bg)
+                style.configure("TPanedwindow", background=base_bg)
+            except (tk.TclError, AttributeError, RuntimeError):
+                return
             
             # Topbar & Bottombar styles
-            style.configure("Topbar.TFrame", background=surface_3)
-            style.configure("Topbar.TLabel", background=surface_3, foreground=fg)
-            style.configure("Bottombar.TFrame", background=surface_3)
+            try:
+                style.configure("Topbar.TFrame", background=surface_3)
+                style.configure("Topbar.TLabel", background=surface_3, foreground=fg)
+                style.configure("Bottombar.TFrame", background=surface_3)
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Card styles
-            style.configure("Card.TFrame", background=card_bg, padding=(16, 12))
-            style.configure("TitleLabel.TLabel", background=card_bg, foreground=fg, font=gus.typography["title_large"]["font"])
+            try:
+                style.configure("Card.TFrame", background=card_bg, padding=(16, 12))
+                style.configure("TitleLabel.TLabel", background=card_bg, foreground=fg, font=gus.typography["title_large"]["font"])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Button styles
-            style.configure("TButton", background=accent, foreground=self.get_color('TEXT_ON_PRIMARY'), padding=(10, 6), borderwidth=0, focusthickness=0)
-            style.map("TButton", background=[("active", accent_hover), ("pressed", accent_hover)], relief=[("pressed", "flat"), ("!pressed", "flat")])
+            try:
+                style.configure("TButton", background=accent, foreground=self.get_color('TEXT_ON_PRIMARY'), padding=(10, 6), borderwidth=0, focusthickness=0)
+                style.map("TButton", background=[("active", accent_hover), ("pressed", accent_hover)], relief=[("pressed", "flat"), ("!pressed", "flat")])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Secondary button
-            style.configure("Secondary.TButton", background=card_bg, foreground=fg, padding=(10, 6), borderwidth=1)
-            style.map("Secondary.TButton", background=[("active", surface_3), ("pressed", surface_3)])
+            try:
+                style.configure("Secondary.TButton", background=card_bg, foreground=fg, padding=(10, 6), borderwidth=1)
+                style.map("Secondary.TButton", background=[("active", surface_3), ("pressed", surface_3)])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Entry styles
-            style.configure("TEntry", fieldbackground=card_bg, background=card_bg, foreground=fg, padding=6, borderwidth=1)
-            style.map("TEntry", fieldbackground=[["focus", card_bg]], foreground=[["disabled", fg_muted]])
+            try:
+                style.configure("TEntry", fieldbackground=card_bg, background=card_bg, foreground=fg, padding=6, borderwidth=1)
+                style.map("TEntry", fieldbackground=[["focus", card_bg]], foreground=[["disabled", fg_muted]])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Treeview styles
-            style.configure("Treeview", background=card_bg, fieldbackground=card_bg, foreground=fg, rowheight=22, borderwidth=0)
-            style.configure("Treeview.Heading", background=base_bg, foreground=fg, relief="flat", padding=(8, 6))
-            style.map("Treeview", background=[["selected", accent]], foreground=[["selected", self.get_color('TEXT_ON_PRIMARY')]])
+            try:
+                style.configure("Treeview", background=card_bg, fieldbackground=card_bg, foreground=fg, rowheight=22, borderwidth=0)
+                style.configure("Treeview.Heading", background=base_bg, foreground=fg, relief="flat", padding=(8, 6))
+                style.map("Treeview", background=[["selected", accent]], foreground=[["selected", self.get_color('TEXT_ON_PRIMARY')]])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Notebook styles
-            style.configure("TNotebook", background=base_bg, borderwidth=0)
-            style.configure("TNotebook.Tab", background=base_bg, foreground=fg_muted, padding=(16, 10))
-            style.map("TNotebook.Tab", background=[["selected", card_bg]], foreground=[["selected", fg]])
+            try:
+                style.configure("TNotebook", background=base_bg, borderwidth=0)
+                style.configure("TNotebook.Tab", background=base_bg, foreground=fg_muted, padding=(16, 10))
+                style.map("TNotebook.Tab", background=[["selected", card_bg]], foreground=[["selected", fg]])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Other widget styles
-            style.configure("TCheckbutton", background=base_bg, foreground=fg, padding=(6, 4))
-            style.configure("TRadiobutton", background=base_bg, foreground=fg, padding=(6, 4))
-            style.configure("TCombobox", fieldbackground=card_bg, background=card_bg, foreground=fg)
-            style.configure("TMenubutton", background=card_bg, foreground=fg, padding=(10, 6))
-            style.configure("TScale", background=base_bg)
-            style.configure("TProgressbar", background=accent, troughcolor=surface_3)
-            style.configure("TScrollbar", background=card_bg)
-            style.configure("TSeparator", background=surface_3)
+            try:
+                style.configure("TCheckbutton", background=base_bg, foreground=fg, padding=(6, 4))
+                style.configure("TRadiobutton", background=base_bg, foreground=fg, padding=(6, 4))
+                style.configure("TCombobox", fieldbackground=card_bg, background=card_bg, foreground=fg)
+                style.configure("TMenubutton", background=card_bg, foreground=fg, padding=(10, 6))
+                style.configure("TScale", background=base_bg)
+                style.configure("TProgressbar", background=accent, troughcolor=surface_3)
+                style.configure("TScrollbar", background=card_bg)
+                style.configure("TSeparator", background=surface_3)
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Error banner
-            style.configure("ErrorBanner.TLabel", background=self.get_color('ERROR_MAIN'), foreground=self.get_color('TEXT_ON_DARK'), padding=(10, 6), font=gus.typography["label_large"]["font"])
+            try:
+                style.configure("ErrorBanner.TLabel", background=self.get_color('ERROR_MAIN'), foreground=self.get_color('TEXT_ON_DARK'), padding=(10, 6), font=gus.typography["label_large"]["font"])
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
             # Additional styles
-            style.configure("Secondary.TLabel", background=base_bg, foreground=fg_muted)
-            style.configure("Warning.TLabel", background=base_bg, foreground=self.get_color('WARNING_MAIN'))
-            style.configure("Surface3.TLabel", background=surface_3, foreground=fg)
-            style.configure("Splash.TLabel", background=base_bg, foreground=fg, borderwidth=0)
-            style.configure("Toolbar.TFrame", background=surface_3)
+            try:
+                style.configure("Secondary.TLabel", background=base_bg, foreground=fg_muted)
+                style.configure("Warning.TLabel", background=base_bg, foreground=self.get_color('WARNING_MAIN'))
+                style.configure("Surface3.TLabel", background=surface_3, foreground=fg)
+                style.configure("Splash.TLabel", background=base_bg, foreground=fg, borderwidth=0)
+                style.configure("Toolbar.TFrame", background=surface_3)
+            except (tk.TclError, AttributeError, RuntimeError):
+                pass
             
+        except (tk.TclError, AttributeError, RuntimeError) as e:
+            print(f"Error applying theme (application may be closing): {e}")
         except Exception as e:
             print(f"Error applying theme: {e}")
 

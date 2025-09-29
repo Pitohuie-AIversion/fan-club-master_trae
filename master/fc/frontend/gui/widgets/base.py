@@ -328,7 +328,13 @@ class Base(ttk.Frame, ResponsiveMixin):
         self.controlWidget.blockAdjust()
         self.notebook.select(2)
         self.controlWidget.redraw()
-        self.after(50, self.controlWidget.unblockAdjust)
+        # Safe after call with error handling
+        try:
+            if self.winfo_exists():
+                self.after(50, self.controlWidget.unblockAdjust)
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or error occurred, ignore
+            pass
 
     def focusConsole(self, *_):
         self.notebook.select(3)
@@ -696,72 +702,74 @@ class Base(ttk.Frame, ResponsiveMixin):
         Enhanced with comprehensive control sizing and font adjustments.
         """
         try:
-            style = ttk.Style(self.master)
-            
-            if density == 'compact':
-                # Compact density settings - smaller, tighter layout
-                # Basic controls
-                style.configure("Treeview", rowheight=18, font=("Segoe UI", 8))
-                style.configure("Treeview.Heading", font=("Segoe UI", 8, "bold"))
-                style.configure("TButton", padding=(6, 3), font=("Segoe UI", 8))
-                style.configure("Secondary.TButton", padding=(6, 3), font=("Segoe UI", 8))
-                style.configure("TEntry", padding=3, font=("Segoe UI", 8))
-                style.configure("TLabel", padding=(3, 1), font=("Segoe UI", 8))
-                style.configure("TFrame", padding=3)
-                style.configure("TLabelFrame", padding=4, font=("Segoe UI", 8, "bold"))
+            if hasattr(self, 'master') and self.master and hasattr(self.master, 'winfo_exists') and self.master.winfo_exists():
+                style = ttk.Style(self.master)
                 
-                # Additional controls
-                style.configure("TCheckbutton", padding=(3, 1), font=("Segoe UI", 8))
-                style.configure("TRadiobutton", padding=(3, 1), font=("Segoe UI", 8))
-                style.configure("TCombobox", padding=3, font=("Segoe UI", 8))
-                style.configure("TScale", sliderlength=15)
-                style.configure("TProgressbar", thickness=8)
-                style.configure("TScrollbar", width=12)
+                if density == 'compact':
+                    # Compact density settings - smaller, tighter layout
+                    # Basic controls
+                    style.configure("Treeview", rowheight=18, font=("Segoe UI", 8))
+                    style.configure("Treeview.Heading", font=("Segoe UI", 8, "bold"))
+                    style.configure("TButton", padding=(6, 3), font=("Segoe UI", 8))
+                    style.configure("Secondary.TButton", padding=(6, 3), font=("Segoe UI", 8))
+                    style.configure("TEntry", padding=3, font=("Segoe UI", 8))
+                    style.configure("TLabel", padding=(3, 1), font=("Segoe UI", 8))
+                    style.configure("TFrame", padding=3)
+                    style.configure("TLabelFrame", padding=4, font=("Segoe UI", 8, "bold"))
+                    
+                    # Additional controls
+                    style.configure("TCheckbutton", padding=(3, 1), font=("Segoe UI", 8))
+                    style.configure("TRadiobutton", padding=(3, 1), font=("Segoe UI", 8))
+                    style.configure("TCombobox", padding=3, font=("Segoe UI", 8))
+                    style.configure("TScale", sliderlength=15)
+                    style.configure("TProgressbar", thickness=8)
+                    style.configure("TScrollbar", width=12)
+                    
+                    # Notebook tabs
+                    style.configure("TNotebook.Tab", padding=(8, 4), font=("Segoe UI", 8))
+                    
+                    # Special styles
+                    style.configure("Topbar.TLabel", padding=(3, 1), font=("Segoe UI", 8))
+                    style.configure("TitleLabel.TLabel", padding=(3, 2), font=("Segoe UI", 9, "bold"))
+                    style.configure("Card.TFrame", padding=(8, 6))
+                    
+                else:
+                    # Comfortable density settings (default) - spacious, readable
+                    # Basic controls
+                    style.configure("Treeview", rowheight=24, font=("Segoe UI", 9))
+                    style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
+                    style.configure("TButton", padding=(10, 6), font=("Segoe UI", 9))
+                    style.configure("Secondary.TButton", padding=(10, 6), font=("Segoe UI", 9))
+                    style.configure("TEntry", padding=6, font=("Segoe UI", 9))
+                    style.configure("TLabel", padding=(6, 4), font=("Segoe UI", 9))
+                    style.configure("TFrame", padding=6)
+                    style.configure("TLabelFrame", padding=8, font=("Segoe UI", 9, "bold"))
+                    
+                    # Additional controls
+                    style.configure("TCheckbutton", padding=(6, 4), font=("Segoe UI", 9))
+                    style.configure("TRadiobutton", padding=(6, 4), font=("Segoe UI", 9))
+                    style.configure("TCombobox", padding=6, font=("Segoe UI", 9))
+                    style.configure("TScale", sliderlength=20)
+                    style.configure("TProgressbar", thickness=12)
+                    style.configure("TScrollbar", width=16)
+                    
+                    # Notebook tabs
+                    style.configure("TNotebook.Tab", padding=(12, 8), font=("Segoe UI", 9))
+                    
+                    # Special styles
+                    style.configure("Topbar.TLabel", padding=(6, 4), font=("Segoe UI", 9))
+                    style.configure("TitleLabel.TLabel", padding=(6, 4), font=("Segoe UI", 10, "bold"))
+                    style.configure("Card.TFrame", padding=(16, 12))
                 
-                # Notebook tabs
-                style.configure("TNotebook.Tab", padding=(8, 4), font=("Segoe UI", 8))
+                # Store current density for future reference
+                self._ui_density = density
                 
-                # Special styles
-                style.configure("Topbar.TLabel", padding=(3, 1), font=("Segoe UI", 8))
-                style.configure("TitleLabel.TLabel", padding=(3, 2), font=("Segoe UI", 9, "bold"))
-                style.configure("Card.TFrame", padding=(8, 6))
+                # Force refresh of all widgets
+                self.master.update_idletasks()
                 
-            else:
-                # Comfortable density settings (default) - spacious, readable
-                # Basic controls
-                style.configure("Treeview", rowheight=24, font=("Segoe UI", 9))
-                style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
-                style.configure("TButton", padding=(10, 6), font=("Segoe UI", 9))
-                style.configure("Secondary.TButton", padding=(10, 6), font=("Segoe UI", 9))
-                style.configure("TEntry", padding=6, font=("Segoe UI", 9))
-                style.configure("TLabel", padding=(6, 4), font=("Segoe UI", 9))
-                style.configure("TFrame", padding=6)
-                style.configure("TLabelFrame", padding=8, font=("Segoe UI", 9, "bold"))
-                
-                # Additional controls
-                style.configure("TCheckbutton", padding=(6, 4), font=("Segoe UI", 9))
-                style.configure("TRadiobutton", padding=(6, 4), font=("Segoe UI", 9))
-                style.configure("TCombobox", padding=6, font=("Segoe UI", 9))
-                style.configure("TScale", sliderlength=20)
-                style.configure("TProgressbar", thickness=12)
-                style.configure("TScrollbar", width=16)
-                
-                # Notebook tabs
-                style.configure("TNotebook.Tab", padding=(12, 8), font=("Segoe UI", 9))
-                
-                # Special styles
-                style.configure("Topbar.TLabel", padding=(6, 4), font=("Segoe UI", 9))
-                style.configure("TitleLabel.TLabel", padding=(6, 4), font=("Segoe UI", 10, "bold"))
-                style.configure("Card.TFrame", padding=(16, 12))
-            
-            # Store current density for future reference
-            self._ui_density = density
-            
-            # Force refresh of all widgets
-            self.master.update_idletasks()
-            
-            print(f"Applied {density} density settings successfully")
-            
+                print(f"Applied {density} density settings successfully")
+        except (tk.TclError, AttributeError, RuntimeError) as e:
+            print(f"Error applying density settings (application may be closing): {e}")
         except Exception as e:
             print(f"Error applying density settings: {e}")
     
@@ -771,15 +779,27 @@ class Base(ttk.Frame, ResponsiveMixin):
         Simplified version for reliable theme switching.
         """
         try:
+            # Check if widgets still exist
+            if not (hasattr(self, 'master') and self.master and 
+                    hasattr(self.master, 'winfo_exists') and self.master.winfo_exists()):
+                return
+            
+            if not (hasattr(self, 'winfo_exists') and self.winfo_exists()):
+                return
+                
             print(f"[DEBUG] _on_theme_change called - updating main interface")
             
             # Get new theme colors
             new_bg = theme_manager.get_color('SURFACE_2')
             
             # Apply ttk theme immediately
-            style = ttk.Style(self.master)
-            theme_manager.apply_ttk_theme(style)
-            print(f"[DEBUG] TTK theme applied")
+            try:
+                style = ttk.Style(self.master)
+                theme_manager.apply_ttk_theme(style)
+                print(f"[DEBUG] TTK theme applied")
+            except (tk.TclError, AttributeError, RuntimeError):
+                print(f"[DEBUG] Failed to apply TTK theme (application may be closing)")
+                return
             
             # Update main window background
             if hasattr(self.master, 'configure'):
@@ -790,13 +810,18 @@ class Base(ttk.Frame, ResponsiveMixin):
             try:
                 self.configure(style='TFrame')
                 print(f"[DEBUG] Base frame style updated")
-            except:
+            except (tk.TclError, AttributeError):
                 pass
             
             # Force refresh of all widgets
-            self.master.update_idletasks()
-            print(f"[DEBUG] Interface refresh completed")
+            try:
+                self.master.update_idletasks()
+                print(f"[DEBUG] Interface refresh completed")
+            except (tk.TclError, AttributeError):
+                pass
             
+        except (tk.TclError, AttributeError) as e:
+            print(f"[DEBUG] Theme change skipped (application may be closing): {e}")
         except Exception as e:
             print(f"[ERROR] Error updating theme: {e}")
             import traceback

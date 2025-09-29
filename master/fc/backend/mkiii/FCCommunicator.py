@@ -506,7 +506,7 @@ class FCCommunicator(pt.PrintClient):
             update = False
             for index, slave in enumerate(saved):
                 self.slaves[index] = \
-                    s.FCSlave(
+                    sv.FCSlave(
                     name = slave[ac.SV_name],
                     mac = slave[ac.SV_mac],
                     fans = slave[ac.SV_maxFans],
@@ -1079,7 +1079,7 @@ class FCCommunicator(pt.PrintClient):
                                 fans = self.defaultSlave[ac.SV_maxFans]
 
                                 self.slaves.append(
-                                    s.FCSlave(
+                                    sv.FCSlave(
                                         name = name,
                                         mac = mac,
                                         fans = fans,
