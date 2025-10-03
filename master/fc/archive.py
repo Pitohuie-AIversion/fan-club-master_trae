@@ -1584,6 +1584,6 @@ class FCArchive(pt.PrintClient):
         try:
             return self.P[key]
         except KeyError:
-            self.printw("Missing key {} loaded from default profile.".format(
-                META[key][NAME]))
+            # 使用调试级别的日志，避免在正常使用默认值时产生警告噪音
+            self.printd("Using default value for key: {}".format(META[key][NAME]))
             return self.DEFAULT[key]

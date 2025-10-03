@@ -67,7 +67,7 @@ except ImportError:
 
 ## GLOBALS ### CONSTANTS ####################################################################
 MAX_DATA_POINTS = 100  # Maximum data points
-UPDATE_INTERVAL = 100  # Update interval (ms)
+UPDATE_INTERVAL = 500  # Update interval (ms) - 优化：从100ms增加到500ms减少CPU占用
 CHANNEL_COLORS = ['#2196F3', '#4CAF50', '#FF9800', '#F44336', '#9C27B0', '#00BCD4']
 TACH_COLORS = ['#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#00BCD4']
 MAX_TACH_FANS = 29  # Maximum number of fans
@@ -1310,7 +1310,10 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                             self.tach_ax_raw.plot(timestamps, raw_signals, color=color, 
                                                label=f'Fan{fan_id+1}', linewidth=1, alpha=0.7)
                 
-                self.tach_ax_raw.legend()
+                # 只有当有数据绘制时才显示图例
+                handles, labels = self.tach_ax_raw.get_legend_handles_labels()
+                if handles:
+                    self.tach_ax_raw.legend()
             
             # Update RPM time series plot
             self.tach_ax1.clear()
@@ -1332,7 +1335,10 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
                         self.tach_ax1.plot(timestamps, rpm_values, color=color, 
                                          label=f'Fan{fan_id+1}', linewidth=2)
             
-            self.tach_ax1.legend()
+            # 只有当有数据绘制时才显示图例
+            handles, labels = self.tach_ax1.get_legend_handles_labels()
+            if handles:
+                self.tach_ax1.legend()
             
             # Update RPM distribution bar chart
             self.tach_ax2.clear()

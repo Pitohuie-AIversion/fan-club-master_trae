@@ -2200,10 +2200,19 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
             # Check if widget still exists before scheduling
             if not self.winfo_exists():
                 return
-            self.after(self.RESIZE_MS, self._adjust)
+            
+            # Cancel any existing scheduled adjustment to prevent accumulation
+            if hasattr(self, '_adjust_timer') and self._adjust_timer:
+                self.after_cancel(self._adjust_timer)
+                self._adjust_timer = None
+            
+            # Schedule the adjustment with improved debouncing
+            self._adjust_timer = self.after(self.RESIZE_MS, self._adjust)
             self.unbind("<Configure>")
-        except tk.TclError:
-            # Widget has been destroyed, ignore
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or other error, ignore
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
             pass
 
     def _updateStyle(self, event = None):
@@ -2226,8 +2235,22 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         self.control_buffer = [0]*self.size_k
 
     def _adjust(self, *E):
-        self.redraw()
-        self.bind("<Configure>", self._scheduleAdjust)
+        try:
+            # Clear the timer reference
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
+            
+            # Check if widget still exists before adjusting
+            if not self.winfo_exists():
+                return
+                
+            self.redraw()
+            self.bind("<Configure>", self._scheduleAdjust)
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or other error, ignore
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
+            pass
 
     @staticmethod
     def _onLeftClick(grid, i):

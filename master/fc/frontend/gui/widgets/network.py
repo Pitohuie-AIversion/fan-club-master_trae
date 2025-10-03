@@ -243,7 +243,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         self.auto_connect_enabled = True  # 可以通过profile配置控制
         try:
             if self.winfo_exists():
-                self.after(200, self._checkAutoConnect)  # 延迟检查自动连接
+                self.after(2000, self._checkAutoConnect)  # 优化：延迟检查自动连接从200ms增加到2000ms
         except tk.TclError:
             pass
 
@@ -460,7 +460,7 @@ class NetworkControlWidget(ttk.Frame, pt.PrintClient):
         if self.auto_connect_enabled and not self.isConnected:
             try:
                 if self.winfo_exists():
-                    self.after(100, self._checkAutoConnect)  # 延迟一点时间再检查自动连接
+                    self.after(5000, self._checkAutoConnect)  # 优化：延迟一点时间再检查自动连接从100ms增加到5000ms
             except tk.TclError:
                 pass
         self.bcipDisplay.enable()
