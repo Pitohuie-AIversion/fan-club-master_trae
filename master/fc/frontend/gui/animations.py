@@ -131,7 +131,7 @@ class AnimationManager:
                 try:
                     # Check if widget still exists
                     if hasattr(self.widget, 'winfo_exists') and self.widget.winfo_exists():
-                        after_id = self.widget.after(16, animate_step)  # ~60 FPS
+                        after_id = self.widget.after(50, animate_step)  # 优化：降低到20 FPS减少CPU占用
                         self.active_animations[animation_id] = after_id
                     else:
                         # Widget destroyed, cancel animation
