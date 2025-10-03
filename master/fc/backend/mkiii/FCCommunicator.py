@@ -1960,28 +1960,31 @@ class FCCommunicator(pt.PrintClient):
 
         # End sendReboot =======================================================
 
-    def sendChase(self, targetRPM, targets = None): # ==========================
+    def sendChase(self, targetRPM, fanID=0, targets = None): # ==========================
         """
         Send a CHASE command to start RPM control mode.
             targetRPM := target RPM value for CHASE mode
+            fanID := fan ID to control (default 0)
             targets := list of slave indices to target. If None, broadcast to all.
         """
         try:
             if targets is None:
                 # Broadcast to all slaves
+                # Format: C|passcode|fanID|targetRPM
                 self.disconnectSocket.sendto(
-                    bytearray("C|{}|{}".format(self.passcode, targetRPM), 'ascii'),
+                    bytearray("C|{}|{}|{}".format(self.passcode, fanID, targetRPM), 'ascii'),
                     (self.defaultBroadcastIP, self.broadcastPort))
-                self.printw("[sC] Sent CHASE command (broadcast): target RPM = {}".format(targetRPM))
+                self.printw("[sC] Sent CHASE command (broadcast): fanID = {}, target RPM = {}".format(fanID, targetRPM))
             else:
                 # Send to specific targets
                 for slaveIndex in targets:
                     slave = self.getSlaveByIndex(slaveIndex)
                     if slave is not None:
+                        # Format: c|passcode|fanID|targetRPM|MAC
                         self.disconnectSocket.sendto(
-                            bytearray("c|{}|{}|{}".format(self.passcode, targetRPM, slave.getMAC()), 'ascii'),
+                            bytearray("c|{}|{}|{}|{}".format(self.passcode, fanID, targetRPM, slave.getMAC()), 'ascii'),
                             (self.defaultBroadcastIP, self.broadcastPort))
-                        self.printw("[sC] Sent CHASE command to slave {}: target RPM = {}".format(slaveIndex, targetRPM))
+                        self.printw("[sC] Sent CHASE command to slave {}: fanID = {}, target RPM = {}".format(slaveIndex, fanID, targetRPM))
 
         except Exception as e:
             self.printx(e, "[sC] Exception in CHASE routine:")
