@@ -1020,7 +1020,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.kiScale.set(ki * 1000)
             
             # Update current parameters display
-            self.piStatusLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
+            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
             
             # Update performance status
             self.piStatusLabel.config(text="状态: 自动调节完成", fg="green")
@@ -1053,8 +1053,11 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.kpScale.set(default_kp * 1000)
             self.kiScale.set(default_ki * 1000)
             
-            # Update current parameters display and status
-            self.piStatusLabel.config(text=f"状态: 已重置为默认值 - Kp={default_kp:.4f}, Ki={default_ki:.4f}", fg="blue")
+            # Update current parameters display
+            self.piCurrentLabel.config(text=f"当前参数: Kp={default_kp:.4f}, Ki={default_ki:.4f}")
+            
+            # Update performance status
+            self.piStatusLabel.config(text="状态: 已重置为默认值", fg="blue")
             
             self.printw(f"PI参数已重置为默认值: Kp={default_kp:.4f}, Ki={default_ki:.4f}")
             
@@ -1156,7 +1159,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
                 # Update current parameters display
                 current_kp = getattr(self, 'kp', 0.01)
                 current_ki = getattr(self, 'ki', 0.001)
-                self.piStatusLabel.config(text=f"当前参数: Kp={current_kp:.4f}, Ki={current_ki:.4f}")
+                self.piCurrentLabel.config(text=f"当前参数: Kp={current_kp:.4f}, Ki={current_ki:.4f}")
                 
                 # Update entry fields and sliders
                 self.kpEntry.delete(0, tk.END)
