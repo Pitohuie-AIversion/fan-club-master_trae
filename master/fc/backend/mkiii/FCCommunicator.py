@@ -1422,7 +1422,7 @@ class FCCommunicator(pt.PrintClient):
                             misoS.bind(('', 0))
 
                             # MOSI:
-                            slave._misoSocket().close()
+                            slave._mosiSocket().close()
 
                             mosiS = socket.socket(
                                 socket.AF_INET, socket.SOCK_DGRAM)
