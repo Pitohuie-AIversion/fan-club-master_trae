@@ -1437,8 +1437,7 @@ class FCCommunicator(pt.PrintClient):
                             # Here each dc is already normalized
                             # NOTE: Notice here maxFans is assumed (should be
                             # ignored by slave)
-                            # Fixed: Remove S| prefix to match slave's expected format F:dc1,dc2,dc3...
-                            message = "F:" + fetchedMessage[1]
+                            message = "S|F:" + fetchedMessage[1]
                             self._send(message, slave, 2)
 
                         elif fetchedMessage[0] == MOSI_DISCONNECT:
