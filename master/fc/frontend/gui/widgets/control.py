@@ -1023,14 +1023,14 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.piStatusLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
             
             # Update performance status
-            self.piStatusLabel.config(text="状态: 自动调节完成", fg="green")
+            self.piStatusLabel.config(text="状态: 自动调节完成")
             
             self.printw(f"自动调节完成: Kp={kp:.4f}, Ki={ki:.4f}")
             
         except Exception as e:
             self.printx(e, "自动调节PI参数时发生异常")
             if hasattr(self, 'piStatusLabel'):
-                self.piStatusLabel.config(text="状态: 自动调节失败", fg="red")
+                self.piStatusLabel.config(text="状态: 自动调节失败")
 
     def _onPIReset(self, *_):
         """
@@ -1054,14 +1054,14 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.kiScale.set(default_ki * 1000)
             
             # Update current parameters display and status
-            self.piStatusLabel.config(text=f"状态: 已重置为默认值 - Kp={default_kp:.4f}, Ki={default_ki:.4f}", fg="blue")
+            self.piStatusLabel.config(text=f"状态: 已重置为默认值 - Kp={default_kp:.4f}, Ki={default_ki:.4f}")
             
             self.printw(f"PI参数已重置为默认值: Kp={default_kp:.4f}, Ki={default_ki:.4f}")
             
         except Exception as e:
             self.printx(e, "重置PI参数时发生异常")
             if hasattr(self, 'piStatusLabel'):
-                self.piStatusLabel.config(text="状态: 重置失败", fg="red")
+                self.piStatusLabel.config(text="状态: 重置失败")
 
     def _onPIApply(self, *_):
         """
@@ -1090,21 +1090,18 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             self.kiScale.set(ki * 1000)
             
             # Update current parameters display
-            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
-            
-            # Update performance status
-            self.piStatusLabel.config(text="状态: 参数已应用", fg="green")
+            self.piStatusLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f} - 状态: 参数已应用")
             
             self.printw(f"PI参数已应用: Kp={kp:.4f}, Ki={ki:.4f}")
             
         except ValueError as e:
             self.printx(e, "PI参数输入无效")
             if hasattr(self, 'piStatusLabel'):
-                self.piStatusLabel.config(text="状态: 参数无效", fg="red")
+                self.piStatusLabel.config(text="状态: 参数无效")
         except Exception as e:
             self.printx(e, "应用PI参数时发生异常")
             if hasattr(self, 'piStatusLabel'):
-                self.piStatusLabel.config(text="状态: 应用失败", fg="red")
+                self.piStatusLabel.config(text="状态: 应用失败")
 
     def _onKpScaleChange(self, value):
         """
@@ -1167,7 +1164,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
                 self.kpScale.set(current_kp * 1000)
                 self.kiScale.set(current_ki * 1000)
                 
-                self.piStatusLabel.config(text="状态: PI调节界面已激活", fg="green")
+                self.piStatusLabel.config(text="状态: PI调节界面已激活")
                 
             else:
                 self.printw("请先启动反馈控制模式才能显示PI调节界面")
