@@ -119,7 +119,7 @@ int main(){ ////////////////////////////////////////////////////////////////////
 
 // MAIN LOOP ===================================================================
 
-	Thread mainThread(osPriorityNormal, 8*1024);
+	Thread mainThread(osPriorityNormal, STACK_SIZE*1024);
 	mainThread.start(&mainLoop);
 
 	#if defined(HEAP_PRINTS) || defined(STACK_PRINTS)

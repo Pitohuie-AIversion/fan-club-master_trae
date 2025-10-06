@@ -1991,6 +1991,26 @@ class FCCommunicator(pt.PrintClient):
 
         # End sendChase ========================================================
 
+    def sendChaseWithSelection(self, targetRPM, selection, fanID=0): # ================
+        """
+        Send a CHASE command with fan selection to start RPM control mode.
+            targetRPM := target RPM value for CHASE mode
+            selection := string of 1s and 0s indicating which fans to control
+            fanID := fan ID to control (default 0)
+        """
+        try:
+            # Broadcast CHASE command with selection to all slaves
+            # Format: CS|passcode|fanID|targetRPM|selection
+            self.disconnectSocket.sendto(
+                bytearray("CS|{}|{}|{}|{}".format(self.passcode, fanID, targetRPM, selection), 'ascii'),
+                (self.defaultBroadcastIP, self.broadcastPort))
+            self.printw("[sCS] Sent CHASE command with selection (broadcast): fanID = {}, target RPM = {}, selection = {}".format(fanID, targetRPM, selection))
+
+        except Exception as e:
+            self.printx(e, "[sCS] Exception in CHASE with selection routine:")
+
+        # End sendChaseWithSelection ==============================================
+
     def sendDisconnect(self): # ================================================
         # ABOUT: Use disconenct socket to send a general "disconnect" message
         # that terminates any existing connection.

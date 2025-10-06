@@ -646,12 +646,55 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.chaseRPMEntry.insert(0, "1000")
         self.activeWidgets.append(self.chaseRPMEntry)
 
-        self.chaseStartButton = ttk.Button(self.chaseControlFrame, text = "Start CHASE",
+        # Fan Selection for CHASE Mode
+        self.chaseFanFrame = ttk.Frame(self.chaseFrame)
+        self.chaseFanFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 2)
+
+        self.chaseFanLabel = ttk.Label(self.chaseFanFrame, text = "Fan Selection:", style = "Secondary.TLabel")
+        self.chaseFanLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # Target selection radio buttons
+        self.chaseTargetVar = tk.StringVar(value = "all")
+        self.chaseAllRadio = ttk.Radiobutton(self.chaseFanFrame, text = "All Fans", 
+            variable = self.chaseTargetVar, value = "all", command = self._onChaseTargetChange)
+        self.chaseAllRadio.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.chaseAllRadio)
+
+        self.chaseSelectedRadio = ttk.Radiobutton(self.chaseFanFrame, text = "Selected", 
+            variable = self.chaseTargetVar, value = "selected", command = self._onChaseTargetChange)
+        self.chaseSelectedRadio.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.chaseSelectedRadio)
+
+        # Fan selection entry (for selected mode)
+        self.chaseFanSelectionFrame = ttk.Frame(self.chaseFrame)
+        self.chaseFanSelectionFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 2)
+
+        self.chaseFanSelectionLabel = ttk.Label(self.chaseFanSelectionFrame, text = "Selection String:", style = "Secondary.TLabel")
+        self.chaseFanSelectionLabel.pack(side = tk.LEFT, **gus.padc)
+
+        self.chaseFanSelectionEntry = ttk.Entry(self.chaseFanSelectionFrame, width = 20)
+        self.chaseFanSelectionEntry.pack(side = tk.LEFT, **gus.padc)
+        self.chaseFanSelectionEntry.insert(0, "11110000")  # Default selection pattern
+        self.chaseFanSelectionEntry.config(state = tk.DISABLED)  # Initially disabled
+        self.activeWidgets.append(self.chaseFanSelectionEntry)
+
+        # Help label for selection format
+        self.chaseHelpLabel = ttk.Label(self.chaseFanSelectionFrame, 
+            text = "(1=selected, 0=not selected)", style = "Secondary.TLabel")
+        self.chaseHelpLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # Note: Using Feedback Control mode only (Standard CHASE mode removed)
+
+        # Control buttons frame
+        self.chaseButtonFrame = ttk.Frame(self.chaseFrame)
+        self.chaseButtonFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 2)
+
+        self.chaseStartButton = ttk.Button(self.chaseButtonFrame, text = "Start CHASE",
             command = self._onStartChase)
         self.chaseStartButton.pack(side = tk.LEFT, **gus.padc)
         self.activeWidgets.append(self.chaseStartButton)
 
-        self.chaseStopButton = ttk.Button(self.chaseControlFrame, text = "Stop",
+        self.chaseStopButton = ttk.Button(self.chaseButtonFrame, text = "Stop",
             command = self._onStopChase, style = "Secondary.TButton")
         self.chaseStopButton.pack(side = tk.LEFT, **gus.padc)
         self.chaseStopButton.config(state = tk.DISABLED)
@@ -659,6 +702,86 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
 
         self.chaseStatusLabel = ttk.Label(self.chaseFrame, text = "Status: Ready", style = "Secondary.TLabel")
         self.chaseStatusLabel.pack(side = tk.TOP, **gus.padc)
+
+        # PI Parameter Tuning Frame (only visible when feedback control is selected)
+        self.piTuningFrame = ttk.LabelFrame(self.chaseFrame, text = "PI Parameter Tuning")
+        self.piTuningFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 2)
+        self.piTuningFrame.pack_forget()  # Initially hidden
+
+        # Kp parameter adjustment
+        self.kpFrame = ttk.Frame(self.piTuningFrame)
+        self.kpFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 1)
+
+        self.kpLabel = ttk.Label(self.kpFrame, text = "Kp (比例增益):", style = "Secondary.TLabel")
+        self.kpLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # Kp validation function for numeric input
+        vcmd_kp = (self.register(self._validatePIParameter), '%P', 'kp')
+        self.kpEntry = ttk.Entry(self.kpFrame, width = 8, validate='key', validatecommand=vcmd_kp)
+        self.kpEntry.pack(side = tk.LEFT, **gus.padc)
+        self.kpEntry.insert(0, "0.01")  # Default Kp value
+        self.activeWidgets.append(self.kpEntry)
+
+        self.kpScale = ttk.Scale(self.kpFrame, from_ = 0.001, to = 0.1, 
+            command = self._onKpScaleChange, orient = tk.HORIZONTAL, length = 150)
+        self.kpScale.pack(side = tk.LEFT, fill = tk.X, expand = True, **gus.padc)
+        self.kpScale.set(0.01)  # Default value
+        self.activeWidgets.append(self.kpScale)
+
+        self.kpRangeLabel = ttk.Label(self.kpFrame, text = "(0.001-0.1)", style = "Secondary.TLabel")
+        self.kpRangeLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # Ki parameter adjustment
+        self.kiFrame = ttk.Frame(self.piTuningFrame)
+        self.kiFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 1)
+
+        self.kiLabel = ttk.Label(self.kiFrame, text = "Ki (积分增益):", style = "Secondary.TLabel")
+        self.kiLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # Ki validation function for numeric input
+        vcmd_ki = (self.register(self._validatePIParameter), '%P', 'ki')
+        self.kiEntry = ttk.Entry(self.kiFrame, width = 8, validate='key', validatecommand=vcmd_ki)
+        self.kiEntry.pack(side = tk.LEFT, **gus.padc)
+        self.kiEntry.insert(0, "0.001")  # Default Ki value
+        self.activeWidgets.append(self.kiEntry)
+
+        self.kiScale = ttk.Scale(self.kiFrame, from_ = 0.0001, to = 0.01, 
+            command = self._onKiScaleChange, orient = tk.HORIZONTAL, length = 150)
+        self.kiScale.pack(side = tk.LEFT, fill = tk.X, expand = True, **gus.padc)
+        self.kiScale.set(0.001)  # Default value
+        self.activeWidgets.append(self.kiScale)
+
+        self.kiRangeLabel = ttk.Label(self.kiFrame, text = "(0.0001-0.01)", style = "Secondary.TLabel")
+        self.kiRangeLabel.pack(side = tk.LEFT, **gus.padc)
+
+        # PI tuning buttons
+        self.piButtonFrame = ttk.Frame(self.piTuningFrame)
+        self.piButtonFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 2)
+
+        self.autoTuneButton = ttk.Button(self.piButtonFrame, text = "自动调优",
+            command = self._onPIAutoTune)
+        self.autoTuneButton.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.autoTuneButton)
+
+        self.resetPIButton = ttk.Button(self.piButtonFrame, text = "重置默认值",
+            command = self._onPIReset, style = "Secondary.TButton")
+        self.resetPIButton.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.resetPIButton)
+
+        self.applyPIButton = ttk.Button(self.piButtonFrame, text = "应用参数",
+            command = self._onPIApply)
+        self.applyPIButton.pack(side = tk.LEFT, **gus.padc)
+        self.activeWidgets.append(self.applyPIButton)
+
+        # PI status display
+        self.piStatusFrame = ttk.Frame(self.piTuningFrame)
+        self.piStatusFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 1)
+
+        self.piStatusLabel = ttk.Label(self.piStatusFrame, text = "当前参数: Kp=0.01, Ki=0.001", style = "Secondary.TLabel")
+        self.piStatusLabel.pack(side = tk.LEFT, **gus.padc)
+
+        self.piPerformanceLabel = ttk.Label(self.piStatusFrame, text = "性能: 稳定", style = "Secondary.TLabel")
+        self.piPerformanceLabel.pack(side = tk.RIGHT, **gus.padc)
 
         # Padding row:
         self.grid_rowconfigure(row, weight = 2)
@@ -815,18 +938,35 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             if targetRPM <= 0:
                 raise ValueError("Target RPM must be positive")
             
-            # Send CHASE command through network
-            if hasattr(self.network, 'sendChase'):
-                self.network.sendChase(targetRPM)
-                self.chaseStatusLabel.config(text = "Status: CHASE Active (Target: {} RPM)".format(int(targetRPM)))
-                self.chaseStartButton.config(state = tk.DISABLED)
-                self.chaseStopButton.config(state = tk.NORMAL)
-                self.printw("Started CHASE mode with target RPM: {}".format(targetRPM))
+            # Determine fan selection based on radio button selection
+            target_mode = self.chaseTargetVar.get()
+            
+            # Use feedback control mode only (standard mode removed)
+            if target_mode == "all":
+                self._startFeedbackChase(targetRPM, "all", "")
+                self.chaseStatusLabel.config(text = "Status: Feedback CHASE Active - All Fans (Target: {} RPM)".format(int(targetRPM)))
+                self.printw("Started feedback-controlled CHASE mode for all fans with target RPM: {}".format(targetRPM))
             else:
-                self.printe("Network backend does not support CHASE command")
+                # Selected fans with feedback control
+                selection_string = self.chaseFanSelectionEntry.get().strip()
+                if not selection_string:
+                    raise ValueError("Selection string cannot be empty")
                 
+                # Validate selection string format (should be 1s and 0s)
+                if not all(c in '01' for c in selection_string):
+                    raise ValueError("Selection string must contain only 1s and 0s")
+                
+                self._startFeedbackChase(targetRPM, "selected", selection_string)
+                selected_count = selection_string.count('1')
+                self.chaseStatusLabel.config(text = "Status: Feedback CHASE Active - {} Selected Fans (Target: {} RPM)".format(selected_count, int(targetRPM)))
+                self.printw("Started feedback-controlled CHASE mode for selected fans ({}) with target RPM: {}".format(selection_string, targetRPM))
+            
+            # Update button states
+            self.chaseStartButton.config(state = tk.DISABLED)
+            self.chaseStopButton.config(state = tk.NORMAL)
+            
         except ValueError as e:
-            self.printx(e, "Invalid target RPM value")
+            self.printx(e, "Invalid input for CHASE mode")
         except Exception as e:
             self.printx(e, "Exception when starting CHASE mode")
 
@@ -835,15 +975,625 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         Callback for CHASE stop button.
         """
         try:
+            # Stop feedback control if it's running
+            if hasattr(self, 'feedback_active') and self.feedback_active:
+                self._stopFeedbackChase()
+            
             # Send stop command (set duty cycle to 0)
             self._sendDirect(0, normalize = False)
             self.chaseStatusLabel.config(text = "Status: Ready")
             self.chaseStartButton.config(state = tk.NORMAL)
             self.chaseStopButton.config(state = tk.DISABLED)
+            
+            # Hide PI tuning frame
+            if hasattr(self, 'piTuningFrame'):
+                self.piTuningFrame.pack_forget()
+            
             self.printw("Stopped CHASE mode")
             
         except Exception as e:
             self.printx(e, "Exception when stopping CHASE mode")
+
+    def _onPIAutoTune(self, *_):
+        """
+        Callback for PI Auto Tune button.
+        """
+        try:
+            if not hasattr(self, 'target_rpm') or self.target_rpm is None:
+                self.printw("请先启动反馈控制模式才能进行自动调节")
+                return
+            
+            # Get optimal parameters
+            kp, ki = self._getOptimalPIParameters(self.target_rpm)
+            
+            # Update the parameters
+            self.kp = kp
+            self.ki = ki
+            
+            # Update UI displays
+            self.kpEntry.delete(0, tk.END)
+            self.kpEntry.insert(0, f"{kp:.4f}")
+            self.kiEntry.delete(0, tk.END)
+            self.kiEntry.insert(0, f"{ki:.4f}")
+            
+            self.kpScale.set(kp * 1000)  # Scale for better slider resolution
+            self.kiScale.set(ki * 1000)
+            
+            # Update current parameters display
+            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+            # Update performance status
+            self.piStatusLabel.config(text="状态: 自动调节完成", fg="green")
+            
+            self.printw(f"自动调节完成: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+        except Exception as e:
+            self.printx(e, "自动调节PI参数时发生异常")
+            if hasattr(self, 'piStatusLabel'):
+                self.piStatusLabel.config(text="状态: 自动调节失败", fg="red")
+
+    def _onPIReset(self, *_):
+        """
+        Callback for PI Reset to Default button.
+        """
+        try:
+            # Reset to default values
+            default_kp = 0.01
+            default_ki = 0.001
+            
+            self.kp = default_kp
+            self.ki = default_ki
+            
+            # Update UI displays
+            self.kpEntry.delete(0, tk.END)
+            self.kpEntry.insert(0, f"{default_kp:.4f}")
+            self.kiEntry.delete(0, tk.END)
+            self.kiEntry.insert(0, f"{default_ki:.4f}")
+            
+            self.kpScale.set(default_kp * 1000)
+            self.kiScale.set(default_ki * 1000)
+            
+            # Update current parameters display
+            self.piCurrentLabel.config(text=f"当前参数: Kp={default_kp:.4f}, Ki={default_ki:.4f}")
+            
+            # Update performance status
+            self.piStatusLabel.config(text="状态: 已重置为默认值", fg="blue")
+            
+            self.printw(f"PI参数已重置为默认值: Kp={default_kp:.4f}, Ki={default_ki:.4f}")
+            
+        except Exception as e:
+            self.printx(e, "重置PI参数时发生异常")
+            if hasattr(self, 'piStatusLabel'):
+                self.piStatusLabel.config(text="状态: 重置失败", fg="red")
+
+    def _onPIApply(self, *_):
+        """
+        Callback for PI Apply Parameters button.
+        """
+        try:
+            # Get values from entry fields
+            kp_str = self.kpEntry.get().strip()
+            ki_str = self.kiEntry.get().strip()
+            
+            if not kp_str or not ki_str:
+                raise ValueError("Kp和Ki参数不能为空")
+            
+            kp = float(kp_str)
+            ki = float(ki_str)
+            
+            # Validate parameters
+            kp, ki = self._validatePIParameters(kp, ki)
+            
+            # Apply the parameters
+            self.kp = kp
+            self.ki = ki
+            
+            # Update sliders to match
+            self.kpScale.set(kp * 1000)
+            self.kiScale.set(ki * 1000)
+            
+            # Update current parameters display
+            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+            # Update performance status
+            self.piStatusLabel.config(text="状态: 参数已应用", fg="green")
+            
+            self.printw(f"PI参数已应用: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+        except ValueError as e:
+            self.printx(e, "PI参数输入无效")
+            if hasattr(self, 'piStatusLabel'):
+                self.piStatusLabel.config(text="状态: 参数无效", fg="red")
+        except Exception as e:
+            self.printx(e, "应用PI参数时发生异常")
+            if hasattr(self, 'piStatusLabel'):
+                self.piStatusLabel.config(text="状态: 应用失败", fg="red")
+
+    def _onKpScaleChange(self, value):
+        """
+        Callback for Kp slider change.
+        """
+        try:
+            kp = float(value) / 1000.0  # Convert back from scaled value
+            kp = max(0.001, min(0.1, kp))  # Clamp to valid range
+            
+            # Update entry field
+            self.kpEntry.delete(0, tk.END)
+            self.kpEntry.insert(0, f"{kp:.4f}")
+            
+            # Update current parameters display
+            ki = float(self.kiEntry.get()) if self.kiEntry.get() else getattr(self, 'ki', 0.001)
+            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+        except Exception as e:
+            pass  # Ignore errors during slider updates
+
+    def _onKiScaleChange(self, value):
+        """
+        Callback for Ki slider change.
+        """
+        try:
+            ki = float(value) / 1000.0  # Convert back from scaled value
+            ki = max(0.0001, min(0.01, ki))  # Clamp to valid range
+            
+            # Update entry field
+            self.kiEntry.delete(0, tk.END)
+            self.kiEntry.insert(0, f"{ki:.4f}")
+            
+            # Update current parameters display
+            kp = float(self.kpEntry.get()) if self.kpEntry.get() else getattr(self, 'kp', 0.01)
+            self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
+            
+        except Exception as e:
+            pass  # Ignore errors during slider updates
+
+    def _showPITuning(self, *_):
+        """
+        Show PI tuning interface when feedback mode is active.
+        """
+        try:
+            if hasattr(self, 'feedback_active') and self.feedback_active:
+                # Show PI tuning frame
+                self.piTuningFrame.pack(fill=tk.X, padx=5, pady=5)
+                
+                # Update current parameters display
+                current_kp = getattr(self, 'kp', 0.01)
+                current_ki = getattr(self, 'ki', 0.001)
+                self.piCurrentLabel.config(text=f"当前参数: Kp={current_kp:.4f}, Ki={current_ki:.4f}")
+                
+                # Update entry fields and sliders
+                self.kpEntry.delete(0, tk.END)
+                self.kpEntry.insert(0, f"{current_kp:.4f}")
+                self.kiEntry.delete(0, tk.END)
+                self.kiEntry.insert(0, f"{current_ki:.4f}")
+                
+                self.kpScale.set(current_kp * 1000)
+                self.kiScale.set(current_ki * 1000)
+                
+                self.piStatusLabel.config(text="状态: PI调节界面已激活", fg="green")
+                
+            else:
+                self.printw("请先启动反馈控制模式才能显示PI调节界面")
+                
+        except Exception as e:
+            self.printx(e, "显示PI调节界面时发生异常")
+
+    def _onChaseTargetChange(self, *_):
+        """
+        Callback for CHASE target mode change (All/Selected).
+        """
+        target_mode = self.chaseTargetVar.get()
+        if target_mode == "all":
+            # Disable fan selection entry when "All Fans" is selected
+            self.chaseFanSelectionEntry.config(state = tk.DISABLED)
+        else:
+            # Enable fan selection entry when "Selected" is selected
+            self.chaseFanSelectionEntry.config(state = tk.NORMAL)
+
+    def _startFeedbackChase(self, target_rpm, selection_mode="all", selection_string=""):
+        """
+        Start feedback-controlled CHASE mode that replicates Direct Input control logic.
+        This method implements RPM feedback control similar to the PI control in Processor.cpp.
+        
+        Args:
+            target_rpm (float): Target RPM for the fans
+            selection_mode (str): "all" for all fans, "selected" for specific fans
+            selection_string (str): Binary string for fan selection (e.g., "11001010")
+        """
+        try:
+            # Initialize feedback control parameters
+            self.feedback_active = True
+            self.target_rpm = target_rpm
+            self.selection_mode = selection_mode
+            self.selection_string = selection_string
+            
+            # PI control parameters with auto-tuning capability
+            self.kp, self.ki = self._getOptimalPIParameters(target_rpm)
+            self.integral_error = 0.0
+            self.min_dc = 0.1  # Minimum duty cycle (10%)
+            self.max_dc = 1.0  # Maximum duty cycle (100%)
+            
+            # Performance tracking for auto-tuning
+            self.error_history = []
+            self.response_time_history = []
+            self.overshoot_history = []
+            self.last_tuning_time = tm.time()
+            self.tuning_interval = 30.0  # Re-tune every 30 seconds if needed
+            
+            # Current duty cycle for each fan (initialize to 50%)
+            self.current_dc = {}
+            
+            # Get fan mapping from display
+            if hasattr(self.display, 'currentWidget'):
+                current_widget = self.display.currentWidget()
+                if hasattr(current_widget, 'mapper') and hasattr(current_widget.mapper, 'maxFans'):
+                    max_fans = current_widget.mapper.maxFans
+                    for i in range(max_fans):
+                        self.current_dc[i] = 0.5  # Start at 50% duty cycle
+            
+            # Start feedback loop
+            self._scheduleFeedbackUpdate()
+            
+            # Show PI tuning interface
+            self._showPITuning()
+            
+            self.printw("Started feedback-controlled CHASE mode (Target: {} RPM, Kp: {:.4f}, Ki: {:.4f})".format(
+                int(target_rpm), self.kp, self.ki))
+            
+        except Exception as e:
+            self.printx(e, "Exception when starting feedback CHASE mode")
+            self.feedback_active = False
+
+    def _scheduleFeedbackUpdate(self):
+        """
+        Schedule the next feedback control update.
+        """
+        if self.feedback_active:
+            # Schedule update every 100ms (similar to embedded control loop)
+            self.master.after(100, self._updateFeedbackChase)
+
+    def _getOptimalPIParameters(self, target_rpm):
+        """
+        Calculate optimal PI parameters based on target RPM and system characteristics.
+        Uses Ziegler-Nichols tuning method adapted for fan control systems.
+        
+        Args:
+            target_rpm (float): Target RPM for optimization
+            
+        Returns:
+            tuple: (kp, ki) optimized parameters
+        """
+        # Base parameters for different RPM ranges
+        if target_rpm < 1000:
+            # Low RPM: More aggressive control needed
+            base_kp = 0.02
+            base_ki = 0.002
+        elif target_rpm < 3000:
+            # Medium RPM: Balanced control
+            base_kp = 0.015
+            base_ki = 0.0015
+        else:
+            # High RPM: Conservative control to avoid oscillation
+            base_kp = 0.01
+            base_ki = 0.001
+        
+        # Adaptive scaling based on system load
+        load_factor = min(target_rpm / 5000.0, 1.0)  # Normalize to max expected RPM
+        
+        # Apply Cohen-Coon tuning rules for PI control
+        kp = base_kp * (1.0 + 0.5 * load_factor)
+        ki = base_ki * (1.0 + 0.3 * load_factor)
+        
+        # Safety limits to prevent instability
+        kp = max(0.005, min(0.05, kp))  # Kp range: [0.005, 0.05]
+        ki = max(0.0001, min(0.01, ki))  # Ki range: [0.0001, 0.01]
+        
+        return kp, ki
+
+    def _autoTunePI(self, current_error, current_rpm):
+        """
+        Automatically tune PI parameters based on system performance.
+        Uses real-time performance metrics to optimize control.
+        
+        Args:
+            current_error (float): Current RPM error
+            current_rpm (float): Current measured RPM
+        """
+        current_time = tm.time()
+        
+        # Only tune if enough time has passed
+        if current_time - self.last_tuning_time < self.tuning_interval:
+            return
+        
+        # Collect performance metrics
+        self.error_history.append(abs(current_error))
+        
+        # Keep only recent history (last 20 samples)
+        if len(self.error_history) > 20:
+            self.error_history = self.error_history[-20:]
+        
+        # Calculate performance indicators
+        avg_error = sum(self.error_history) / len(self.error_history)
+        error_variance = sum((e - avg_error)**2 for e in self.error_history) / len(self.error_history)
+        
+        # Tuning logic based on performance
+        if avg_error > self.target_rpm * 0.1:  # High steady-state error
+            # Increase integral gain to reduce steady-state error
+            self.ki = min(self.ki * 1.2, 0.01)
+            self.printw(f"Auto-tune: Increased Ki to {self.ki:.4f} (high error)")
+            
+        elif error_variance > (self.target_rpm * 0.05)**2:  # High oscillation
+            # Reduce gains to improve stability
+            self.kp *= 0.9
+            self.ki *= 0.9
+            self.printw(f"Auto-tune: Reduced gains - Kp: {self.kp:.4f}, Ki: {self.ki:.4f} (oscillation)")
+            
+        elif avg_error < self.target_rpm * 0.02 and error_variance < (self.target_rpm * 0.02)**2:
+            # Good performance, slightly increase responsiveness
+            self.kp = min(self.kp * 1.05, 0.05)
+            self.printw(f"Auto-tune: Increased Kp to {self.kp:.4f} (good performance)")
+        
+        # Apply safety limits
+        self.kp = max(0.005, min(0.05, self.kp))
+        self.ki = max(0.0001, min(0.01, self.ki))
+        
+        self.last_tuning_time = current_time
+
+    def _validatePIParameters(self, kp, ki):
+        """
+        Validate and constrain PI parameters to safe operating ranges.
+        
+        Args:
+            kp (float): Proportional gain
+            ki (float): Integral gain
+            
+        Returns:
+            tuple: (validated_kp, validated_ki)
+        """
+        # Define safe operating ranges based on control theory
+        min_kp, max_kp = 0.001, 0.1
+        min_ki, max_ki = 0.00001, 0.02
+        
+        # Constrain parameters
+        validated_kp = max(min_kp, min(max_kp, kp))
+        validated_ki = max(min_ki, min(max_ki, ki))
+        
+        return validated_kp, validated_ki
+    
+    def _validatePIParameter(self, value, param_type):
+        """
+        Validate PI parameter input for Entry widgets.
+        
+        Args:
+            value (str): Input value from Entry widget
+            param_type (str): 'kp' or 'ki' to specify parameter type
+            
+        Returns:
+            bool: True if valid, False otherwise
+        """
+        if value == "" or value == ".":
+            return True  # Allow empty or partial decimal input
+            
+        try:
+            float_val = float(value)
+            if param_type == 'kp':
+                return 0.001 <= float_val <= 0.1
+            elif param_type == 'ki':
+                return 0.00001 <= float_val <= 0.02
+            return False
+        except ValueError:
+            return False
+        
+        # Warn if parameters were constrained
+        if validated_kp != kp:
+            self.printw(f"Warning: Kp constrained from {kp:.4f} to {validated_kp:.4f}")
+        if validated_ki != ki:
+            self.printw(f"Warning: Ki constrained from {ki:.4f} to {validated_ki:.4f}")
+        
+        return validated_kp, validated_ki
+
+    def _antiWindupProtection(self, integral_error, max_integral=None):
+        """
+        Implement anti-windup protection to prevent integral saturation.
+        
+        Args:
+            integral_error (float): Current integral error
+            max_integral (float): Maximum allowed integral value
+            
+        Returns:
+            float: Protected integral error
+        """
+        if max_integral is None:
+            # Calculate dynamic max_integral based on target RPM
+            max_integral = self.target_rpm * 0.1  # 10% of target RPM
+        
+        # Clamp integral error to prevent windup
+        protected_integral = max(-max_integral, min(max_integral, integral_error))
+        
+        # Log if windup protection activated
+        if protected_integral != integral_error:
+            self.printw(f"Anti-windup: Integral clamped from {integral_error:.2f} to {protected_integral:.2f}")
+        
+        return protected_integral
+
+    def _deadZoneControl(self, rpm_error, dead_zone_percent=2.0):
+        """
+        Implement dead zone control to prevent unnecessary adjustments for small errors.
+        
+        Args:
+            rpm_error (float): Current RPM error
+            dead_zone_percent (float): Dead zone as percentage of target RPM
+            
+        Returns:
+            float: Processed RPM error (0 if within dead zone)
+        """
+        dead_zone_threshold = self.target_rpm * (dead_zone_percent / 100.0)
+        
+        if abs(rpm_error) < dead_zone_threshold:
+            return 0.0
+        
+        return rpm_error
+
+    def _updateFeedbackChase(self):
+        """
+        Update feedback control loop - implements PI control similar to Processor.cpp.
+        """
+        if not self.feedback_active:
+            return
+            
+        try:
+            # Get current RPM feedback from the system
+            current_widget = self.display.currentWidget()
+            if not hasattr(current_widget, 'feedback') or current_widget.feedback is None:
+                # No feedback available, schedule next update
+                self._scheduleFeedbackUpdate()
+                return
+            
+            # Process each fan based on selection mode
+            if self.selection_mode == "all":
+                # Control all fans
+                self._updateAllFans(current_widget.feedback)
+            else:
+                # Control selected fans based on selection string
+                self._updateSelectedFans(current_widget.feedback)
+            
+            # Apply the updated duty cycles using display.set() method
+            self._applyFeedbackControl()
+            
+            # Schedule next update
+            self._scheduleFeedbackUpdate()
+            
+        except Exception as e:
+            self.printx(e, "Exception in feedback control update")
+            self._stopFeedbackChase()
+
+    def _updateAllFans(self, feedback):
+        """
+        Update duty cycle for all fans using enhanced PI control with optimization features.
+        """
+        for fan_id, current_rpm in enumerate(feedback):
+            if current_rpm is not None and current_rpm > 0:
+                # Calculate RPM error
+                rpm_error = self.target_rpm - current_rpm
+                
+                # Apply dead zone control to prevent unnecessary adjustments
+                processed_error = self._deadZoneControl(rpm_error)
+                
+                if processed_error != 0:  # Only update if outside dead zone
+                    # Update integral error with anti-windup protection
+                    self.integral_error += processed_error
+                    self.integral_error = self._antiWindupProtection(self.integral_error)
+                    
+                    # PI control calculation
+                    adjustment = self.kp * processed_error + self.ki * self.integral_error
+                    
+                    # Update duty cycle
+                    if fan_id in self.current_dc:
+                        new_dc = self.current_dc[fan_id] + adjustment
+                        # Limit duty cycle within bounds
+                        new_dc = max(self.min_dc, min(self.max_dc, new_dc))
+                        self.current_dc[fan_id] = new_dc
+                
+                # Auto-tune PI parameters based on performance
+                self._autoTunePI(rpm_error, current_rpm)
+
+    def _updateSelectedFans(self, feedback):
+        """
+        Update duty cycle for selected fans based on selection string with enhanced PI control.
+        """
+        for fan_id, current_rpm in enumerate(feedback):
+            # Check if this fan is selected
+            if fan_id < len(self.selection_string) and self.selection_string[fan_id] == '1':
+                if current_rpm is not None and current_rpm > 0:
+                    # Calculate RPM error
+                    rpm_error = self.target_rpm - current_rpm
+                    
+                    # Apply dead zone control
+                    processed_error = self._deadZoneControl(rpm_error)
+                    
+                    if processed_error != 0:  # Only update if outside dead zone
+                        # Update integral error (per fan) with anti-windup protection
+                        if not hasattr(self, 'fan_integral_errors'):
+                            self.fan_integral_errors = {}
+                        if fan_id not in self.fan_integral_errors:
+                            self.fan_integral_errors[fan_id] = 0.0
+                        
+                        self.fan_integral_errors[fan_id] += rpm_error
+                        
+                        # Apply anti-windup protection
+                        self.fan_integral_errors[fan_id] = self._antiWindupProtection(self.fan_integral_errors[fan_id])
+                    
+                    # PI control calculation
+                    adjustment = self.kp * processed_error + self.ki * self.fan_integral_errors[fan_id]
+                    
+                    # Update duty cycle
+                    if fan_id in self.current_dc:
+                        new_dc = self.current_dc[fan_id] + adjustment
+                        # Limit duty cycle within bounds
+                        new_dc = max(self.min_dc, min(self.max_dc, new_dc))
+                        self.current_dc[fan_id] = new_dc
+                        
+                        # Store error for auto-tuning
+                        if not hasattr(self, 'error_history'):
+                            self.error_history = []
+                        self.error_history.append(abs(processed_error))
+                        
+                        # Limit error history size
+                        if len(self.error_history) > 100:
+                            self.error_history = self.error_history[-50:]
+                    
+                    # Perform auto-tuning periodically
+                    current_time = tm.time()
+                    if (current_time - self.last_tuning_time) > self.tuning_interval:
+                        self._autoTunePI()
+                        self.last_tuning_time = current_time
+
+    def _applyFeedbackControl(self):
+        """
+        Apply the calculated duty cycles using the display system.
+        This replicates the Direct Input control logic.
+        """
+        try:
+            current_widget = self.display.currentWidget()
+            if hasattr(current_widget, 'map') and hasattr(current_widget, 'selected_g'):
+                # Create a function that returns the appropriate duty cycle for each fan
+                def rpm_feedback_func(r, c, l, s, f, d, p, R, C, L, S, F, P, t, k):
+                    """
+                    Feedback control function that returns duty cycle based on fan index.
+                    This mimics the _const function but with dynamic values.
+                    """
+                    fan_index = s  # Use fan index from parameters
+                    if fan_index in self.current_dc:
+                        return self.current_dc[fan_index]
+                    return 0.5  # Default 50% if not found
+                
+                # Apply the feedback function using the map method
+                # This replicates how Direct Input uses display.set() -> GridWidget.map()
+                current_widget.map(rpm_feedback_func, 0, 0)
+                
+        except Exception as e:
+            self.printx(e, "Exception when applying feedback control")
+
+    def _stopFeedbackChase(self):
+        """
+        Stop the feedback-controlled CHASE mode.
+        """
+        try:
+            self.feedback_active = False
+            
+            # Reset all fans to 0% duty cycle (stop)
+            self._sendDirect(0, normalize=False)
+            
+            # Clear feedback control state
+            if hasattr(self, 'current_dc'):
+                self.current_dc.clear()
+            if hasattr(self, 'fan_integral_errors'):
+                self.fan_integral_errors.clear()
+            
+            self.printw("Stopped feedback-controlled CHASE mode")
+            
+        except Exception as e:
+            self.printx(e, "Exception when stopping feedback CHASE mode")
 
     def _onTypeMenuChange(self, *_):
         self.flowType = self.fileTypes[self.typeMenuVar.get()]

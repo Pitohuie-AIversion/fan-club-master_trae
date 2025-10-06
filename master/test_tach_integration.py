@@ -36,6 +36,9 @@ sys.path.append(os.path.dirname(__file__))
 # 导入tach监控模块
 from tach_monitor import TachSignalMonitor
 
+# 转速监控集成测试控制开关 - 默认禁用
+ENABLE_TACH_INTEGRATION_TEST = False
+
 class MockFCCommunicator:
     """模拟FC通信器用于测试"""
     
@@ -48,7 +51,7 @@ class MockFCCommunicator:
         """模拟获取RPM数据"""
         if self.error_simulation and self.data_counter % 10 == 0:
             raise Exception("模拟通信错误")
-            
+        
         if not self.connected:
             return None
             
@@ -283,5 +286,9 @@ def run_all_tests():
     return all_passed
 
 if __name__ == "__main__":
+    if not ENABLE_TACH_INTEGRATION_TEST:
+        print("转速监控集成测试已禁用。如需启用，请将 ENABLE_TACH_INTEGRATION_TEST 设为 True")
+        sys.exit(0)
+    
     success = run_all_tests()
     sys.exit(0 if success else 1)

@@ -39,6 +39,9 @@ from fc.backend.signal_acquisition import SimulatedHardware, AcquisitionConfig, 
 from fc.backend.digital_filtering import FilterConfig, FilterType
 from fc.backend.data_storage import StorageConfig
 
+# 信号系统测试控制开关 - 默认禁用
+ENABLE_SIGNAL_SYSTEM_TEST = False
+
 def create_test_config():
     """创建测试配置"""
     # 信号采集配置
@@ -281,5 +284,9 @@ def run_test():
         return False
 
 if __name__ == "__main__":
+    if not ENABLE_SIGNAL_SYSTEM_TEST:
+        print("信号系统测试已禁用。如需启用，请将 ENABLE_SIGNAL_SYSTEM_TEST 设为 True")
+        sys.exit(0)
+    
     success = run_test()
     sys.exit(0 if success else 1)

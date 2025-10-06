@@ -261,7 +261,7 @@ DEV1 = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -369,7 +369,7 @@ BOX = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 200,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -480,7 +480,7 @@ DEV2 = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -588,7 +588,7 @@ DEV3 = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -696,7 +696,7 @@ BASE = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -906,7 +906,7 @@ CAST = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -4708,7 +4708,7 @@ CAST_SIDE = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -8632,7 +8632,7 @@ CANN = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,
@@ -8821,7 +8821,7 @@ TENX10 = {
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 100,
     ac.maxLength : 512,
-    ac.maxTimeouts : 10,
+    ac.maxTimeouts : 15,  # Increased from 10 to 15 for better tolerance
 
     ac.mainQueueSize : 10,
     ac.slaveQueueSize: 10,

@@ -46,12 +46,12 @@ extern const int
 
     // FAN MODES ---------------------------------------------------------------
     SINGLE,
-    DOUBLE,
+    DOUBLE;
 
-    // COMMAND TYPES -----------------------------------------------------------
-    MULTI = 'M',
-    CHASE = 'C',
-    PISET = 'P';
+// COMMAND KEYWORDS ------------------------------------------------------------
+const char MULTI = 'M';
+const char CHASE = 'C';
+const char PISET = 'P';
 
 
 // Process data structure ------------------------------------------------------

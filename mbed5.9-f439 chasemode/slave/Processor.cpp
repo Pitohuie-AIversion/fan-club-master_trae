@@ -45,10 +45,7 @@ const int
 const char
     
     // COMMAND KEYWORDS --------------------------------------------------------
-    WRITE = 'D',
-	MULTI = 'F',
-    CHASE = 'C',
-    PISET = 'P';
+    WRITE = 'W';
     
 
 //// CLASS IMPLEMENTATION //////////////////////////////////////////////////////
