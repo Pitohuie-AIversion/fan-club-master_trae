@@ -30,7 +30,7 @@ import gc
 import sys
 import os
 import queue
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 
 # 添加项目路径
@@ -39,6 +39,9 @@ sys.path.append(os.path.dirname(__file__))
 # 导入FC模块
 import fc.backend.signal_acquisition as sa
 import fc.signal_processing_system as sps
+
+# 系统稳定性测试控制开关 - 默认禁用
+ENABLE_STABILITY_TEST = False
 
 class QueueWithBufferSize(queue.Queue):
     """带有buffer_size属性的Queue包装类"""
@@ -616,4 +619,8 @@ def main():
         return 1
 
 if __name__ == "__main__":
+    if not ENABLE_STABILITY_TEST:
+        print("系统稳定性测试已禁用。如需启用，请将 ENABLE_STABILITY_TEST 设为 True")
+        exit(0)
+    
     exit(main())

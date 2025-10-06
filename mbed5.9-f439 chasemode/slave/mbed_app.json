@@ -1,0 +1,7 @@
+{
+	"target_overrides": {
+		"NUCLEO_F439ZI": {
+			"target.bootloader_img": "../slave_bootloader/BUILD/NUCLEO_F439ZI/GCC_ARM-RELEASE/slave_bootloader.bin"
+		}
+	}
+}

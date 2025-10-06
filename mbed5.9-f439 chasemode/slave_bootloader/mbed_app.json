@@ -1,0 +1,22 @@
+{
+  "target_overrides": {
+    "*": {
+      "platform.stdio-baud-rate": 115200,
+      "platform.default-serial-baud-rate": 115200,
+      "platform.stdio-convert-newlines": true,
+      "platform.stdio-buffered-serial": true
+    },
+    "NUCLEO_F429ZI": {
+      "target.restrict_size": "0x40000"
+    },
+    "NUCLEO_F439ZI": {
+      "target.restrict_size": "0x40000"
+    }
+  },
+  "config": {
+    "mesh-heap-size": {
+      "help": "Mesh API heap size",
+      "value": 32500
+    }
+  }
+}

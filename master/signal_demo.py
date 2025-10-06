@@ -36,8 +36,16 @@ sys.path.append(os.path.dirname(__file__))
 # 导入信号采集模块
 import fc.backend.signal_acquisition as sa
 
+# 模拟信号生成控制开关 - 默认禁用
+ENABLE_SIGNAL_DEMO = False
+
 def demo_signal_generation():
     """演示信号生成"""
+    if not ENABLE_SIGNAL_DEMO:
+        print("信号生成演示已禁用")
+        print("如需启用，请将 ENABLE_SIGNAL_DEMO 设置为 True")
+        return
+        
     print("信号生成演示")
     print("=" * 40)
     
