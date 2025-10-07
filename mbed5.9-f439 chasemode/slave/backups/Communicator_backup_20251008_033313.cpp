@@ -399,42 +399,6 @@ void Communicator::_listenerRoutine(void){ // // // // // // // // // // // // /
 					break;
 				} // End LAUNCH BCAST
 
-				case 'C': { // CHASE BCAST. Forward to processor
-					pl;printf("\n\r[%08dms][L] Chase command received",
-						tm);pu;
-					
-					// Parse fanID
-					splitPointer = strtok_r(NULL, "|", &splitPositionTracker);
-					if(splitPointer == NULL){
-						pl;printf("\n\r[%08dms][L] NULL Splitter on fanID"\
-							" (discarded)",tm);pu;
-						continue;
-					}
-					
-					int fanID = atoi(splitPointer);
-					
-					// Parse targetRPM
-					splitPointer = strtok_r(NULL, "|", &splitPositionTracker);
-					if(splitPointer == NULL){
-						pl;printf("\n\r[%08dms][L] NULL Splitter on targetRPM"\
-							" (discarded)",tm);pu;
-						continue;
-					}
-					
-					int targetRPM = atoi(splitPointer);
-					
-					// Construct command string and forward to processor
-					char command[MAX_MESSAGE_LENGTH];
-					snprintf(command, MAX_MESSAGE_LENGTH, "CHASE %d %d", fanID, targetRPM);
-					
-					pl;printf("\n\r[%08dms][L] Forwarding chase command: %s",
-						tm, command);pu;
-					
-					this->processor.process(command);
-					
-					break;
-				} // End CHASE BCAST
-
 				default: { // Unrecognized broadcast specifier
 					pl;printf("\n\r[%08dms][L] Unrecognized BC code \"%c\""\
 						" ignored",tm, specifier);pu;	

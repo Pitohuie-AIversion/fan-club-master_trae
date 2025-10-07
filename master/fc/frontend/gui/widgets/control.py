@@ -777,11 +777,16 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         self.piStatusFrame = ttk.Frame(self.piTuningFrame)
         self.piStatusFrame.pack(side = tk.TOP, fill = tk.X, expand = True, pady = 1)
 
-        self.piStatusLabel = ttk.Label(self.piStatusFrame, text = "当前参数: Kp=0.01, Ki=0.001", style = "Secondary.TLabel")
-        self.piStatusLabel.pack(side = tk.LEFT, **gus.padc)
+        # Current parameters display
+        self.piCurrentLabel = ttk.Label(self.piStatusFrame, text = "当前参数: Kp=0.01, Ki=0.001", style = "Secondary.TLabel")
+        self.piCurrentLabel.pack(side = tk.LEFT, **gus.padc)
 
         self.piPerformanceLabel = ttk.Label(self.piStatusFrame, text = "性能: 稳定", style = "Secondary.TLabel")
         self.piPerformanceLabel.pack(side = tk.RIGHT, **gus.padc)
+
+        # Status message display (separate from current parameters)
+        self.piStatusLabel = ttk.Label(self.piStatusFrame, text = "状态: 就绪", style = "Secondary.TLabel")
+        self.piStatusLabel.pack(side = tk.LEFT, padx=(10, 0))
 
         # Padding row:
         self.grid_rowconfigure(row, weight = 2)
