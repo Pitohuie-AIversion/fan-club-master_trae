@@ -49,7 +49,7 @@ extern const int
     DOUBLE;
 
 // COMMAND KEYWORDS ------------------------------------------------------------
-const char MULTI = 'M';
+const char MULTI = 'F';
 const char CHASE = 'C';
 const char PISET = 'P';
 

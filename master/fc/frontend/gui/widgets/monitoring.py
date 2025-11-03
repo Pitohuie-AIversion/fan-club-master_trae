@@ -147,21 +147,28 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
         self.update_thread = None
         self.tach_monitoring_active = False
         
-        # Signal acquisition engine
-        self.acquisition_engine = SignalAcquisitionEngine(pqueue)
-        self.acquisition_config = AcquisitionConfig()
-        self.acquisition_config.sampling_rate = 1000.0
-        self.acquisition_config.channels = [0, 1, 2]  # 3 channels
-        self.acquisition_engine.configure(self.acquisition_config)
+        # Signal acquisition engine - PERFORMANCE: Disable to improve performance
+        # self.acquisition_engine = SignalAcquisitionEngine(pqueue)
+        # self.acquisition_config = AcquisitionConfig()
+        # self.acquisition_config.sampling_rate = 1000.0
+        # self.acquisition_config.channels = [0, 1, 2]  # 3 channels
+        # self.acquisition_engine.configure(self.acquisition_config)
         
-        # Register data callback
-        self.acquisition_engine.add_data_callback(self._on_signal_data_received)
+        # Register data callback - PERFORMANCE: Disabled
+        # self.acquisition_engine.add_data_callback(self._on_signal_data_received)
+        
+        # Initialize as None to prevent errors
+        self.acquisition_engine = None
         
         # Build interface
         self._build_interface()
         
-        # Start data updates
-        self._start_monitoring()
+        # PERFORMANCE: Enable basic GUI updates for mouse interaction
+        # Start minimal GUI update loop to maintain responsiveness
+        self._schedule_gui_update()
+        
+        # PERFORMANCE: Disable automatic monitoring startup to improve performance
+        # self._start_monitoring()  # Commented out to prevent automatic startup
     
     def _build_interface(self):
         """Build monitoring interface"""
@@ -571,33 +578,38 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             self._start_monitoring()
     
     def _start_monitoring(self):
-        """Start monitoring"""
-        if not self.monitoring_active:
-            self.monitoring_active = True
-            self.start_button.configure(text="Stop Monitoring")
-            self.status_label.configure(text="Running", foreground=SUCCESS_MAIN)
-            
-            # Start signal acquisition engine
-            if self.acquisition_engine.start_acquisition():
-                self.printd("Signal acquisition engine started")
-            else:
-                self.printe("Signal acquisition engine failed to start")
-                self.monitoring_active = False
-                self.start_button.configure(text="Start Monitoring")
-                self.status_label.configure(text="Start Failed", foreground=ERROR_MAIN)
-                return
-            
-            # Start data update thread
-            self.update_thread = threading.Thread(target=self._update_loop, daemon=True)
-            self.update_thread.start()
-            
-            # Start GUI update
-            self._schedule_gui_update()
-            
-            # Start Tach monitoring
-            self._start_tach_monitoring()
-            
-            self.printd("Monitoring started")
+        """Start monitoring - PERFORMANCE: Disabled for better performance"""
+        # PERFORMANCE: Disable all monitoring functionality to improve performance
+        self.printd("Monitoring disabled for performance optimization")
+        return
+        
+        # Original monitoring code (commented out for performance)
+        # if not self.monitoring_active:
+        #     self.monitoring_active = True
+        #     self.start_button.configure(text="Stop Monitoring")
+        #     self.status_label.configure(text="Running", foreground=SUCCESS_MAIN)
+        #     
+        #     # Start signal acquisition engine
+        #     if self.acquisition_engine and self.acquisition_engine.start_acquisition():
+        #         self.printd("Signal acquisition engine started")
+        #     else:
+        #         self.printe("Signal acquisition engine failed to start")
+        #         self.monitoring_active = False
+        #         self.start_button.configure(text="Start Monitoring")
+        #         self.status_label.configure(text="Start Failed", foreground=ERROR_MAIN)
+        #         return
+        #     
+        #     # Start data update thread
+        #     self.update_thread = threading.Thread(target=self._update_loop, daemon=True)
+        #     self.update_thread.start()
+        #     
+        #     # Start GUI update
+        #     self._schedule_gui_update()
+        #     
+        #     # Start Tach monitoring
+        #     self._start_tach_monitoring()
+        #     
+        #     self.printd("Monitoring started")
     
     def _stop_monitoring(self):
         """Stop monitoring"""
@@ -634,38 +646,43 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
         self.printd("Data cleared")
     
     def _update_loop(self):
-        """Data update loop (runs in background thread)"""
-        start_time = time.time()
+        """Data update loop (runs in background thread) - PERFORMANCE: Disabled for better performance"""
+        # PERFORMANCE: Disable data update loop to improve performance
+        self.printd("Data update loop disabled for performance optimization")
+        return
         
-        while self.monitoring_active:
-            try:
-                current_time = time.time() - start_time
-                
-                # Get data from signal acquisition engine - batch processing
-                all_signal_data = []
-                # 批量获取数据，最多获取20批次以提高消费效率
-                for _ in range(20):
-                    signal_data = self.acquisition_engine.get_data(timeout=0.005)
-                    if signal_data:
-                        all_signal_data.extend(signal_data)
-                    else:
-                        break
-                
-                if all_signal_data:
-                    self._process_signal_data(all_signal_data, current_time)
-                
-                # Simulate system performance data (kept for demonstration)
-                self._generate_mock_system_data(current_time)
-                
-                # Generate Tach data (if enabled)
-                if self.tach_monitoring_active:
-                    self._generate_mock_tach_data(current_time)
-                
-                time.sleep(0.05)  # 50ms update interval - 更频繁的更新以消费更多数据
-                
-            except Exception as e:
-                self.printd(f"Data update error: {e}")
-                break
+        # Original data update loop code (commented out for performance)
+        # start_time = time.time()
+        # 
+        # while self.monitoring_active:
+        #     try:
+        #         current_time = time.time() - start_time
+        #         
+        #         # Get data from signal acquisition engine - batch processing
+        #         all_signal_data = []
+        #         # 批量获取数据，最多获取20批次以提高消费效率
+        #         for _ in range(20):
+        #             signal_data = self.acquisition_engine.get_data(timeout=0.005)
+        #             if signal_data:
+        #                 all_signal_data.extend(signal_data)
+        #             else:
+        #                 break
+        #         
+        #         if all_signal_data:
+        #             self._process_signal_data(all_signal_data, current_time)
+        #         
+        #         # Simulate system performance data (kept for demonstration)
+        #         self._generate_mock_system_data(current_time)
+        #         
+        #         # Generate Tach data (if enabled)
+        #         if self.tach_monitoring_active:
+        #             self._generate_mock_tach_data(current_time)
+        #         
+        #         time.sleep(0.05)  # 50ms update interval - 更频繁的更新以消费更多数据
+        #         
+        #     except Exception as e:
+        #         self.printd(f"Data update error: {e}")
+        #         break
     
     def _on_signal_data_received(self, samples):
         """Signal data reception callback function"""
@@ -718,40 +735,45 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             self._stop_tach_monitoring()
     
     def _start_tach_monitoring(self):
-        """Start Tach signal monitoring"""
-        if not self.tach_monitoring_active:
-            self.tach_monitoring_active = True
-            self.printd(f"Starting Tach monitoring for {len(self.tach_config.enabled_fans)} fans: {self.tach_config.enabled_fans[:5]}...")
-            
-            # Try to initialize FCCommunicator
-            if FC_COMM_AVAILABLE and self.fc_communicator is None:
-                try:
-                    self.fc_communicator = fcc.FCCommunicator()
-                    self.printd("FCCommunicator initialized successfully, will get real Tach data")
-                except Exception as e:
-                    self.printw(f"FCCommunicator initialization failed: {e}, using simulated data")
-                    self.fc_communicator = None
-            
-            # Initialize Tach data storage
-            for fan_id in self.tach_config.enabled_fans:
-                if fan_id not in self.tach_data:
-                    self.tach_data[fan_id] = {
-                        'timestamps': deque(maxlen=MAX_DATA_POINTS),
-                        'rpm_values': deque(maxlen=MAX_DATA_POINTS),
-                        'filtered_rpm': deque(maxlen=MAX_DATA_POINTS),
-                        'duty_cycles': deque(maxlen=MAX_DATA_POINTS),
-                        'timeouts': deque(maxlen=MAX_DATA_POINTS),
-                        'raw_signals': deque(maxlen=MAX_DATA_POINTS)
-                    }
-                
-                # Initialize filter
-                if fan_id not in self.tach_filters:
-                    self.tach_filters[fan_id] = {
-                        'buffer': deque(maxlen=self.tach_config.filter_window),
-                        'alpha': 0.1  # Low-pass filter parameter
-                    }
-            
-            self.printd("Tach signal monitoring started")
+        """Start Tach signal monitoring - PERFORMANCE: Disabled for better performance"""
+        # PERFORMANCE: Disable Tach monitoring to improve performance
+        self.printd("Tach monitoring disabled for performance optimization")
+        return
+        
+        # Original Tach monitoring code (commented out for performance)
+        # if not self.tach_monitoring_active:
+        #     self.tach_monitoring_active = True
+        #     self.printd(f"Starting Tach monitoring for {len(self.tach_config.enabled_fans)} fans: {self.tach_config.enabled_fans[:5]}...")
+        #     
+        #     # Try to initialize FCCommunicator
+        #     if FC_COMM_AVAILABLE and self.fc_communicator is None:
+        #         try:
+        #             self.fc_communicator = fcc.FCCommunicator()
+        #             self.printd("FCCommunicator initialized successfully, will get real Tach data")
+        #         except Exception as e:
+        #             self.printw(f"FCCommunicator initialization failed: {e}, using simulated data")
+        #             self.fc_communicator = None
+        #     
+        #     # Initialize Tach data storage
+        #     for fan_id in self.tach_config.enabled_fans:
+        #         if fan_id not in self.tach_data:
+        #             self.tach_data[fan_id] = {
+        #                 'timestamps': deque(maxlen=MAX_DATA_POINTS),
+        #                 'rpm_values': deque(maxlen=MAX_DATA_POINTS),
+        #                 'filtered_rpm': deque(maxlen=MAX_DATA_POINTS),
+        #                 'duty_cycles': deque(maxlen=MAX_DATA_POINTS),
+        #                 'timeouts': deque(maxlen=MAX_DATA_POINTS),
+        #                 'raw_signals': deque(maxlen=MAX_DATA_POINTS)
+        #             }
+        #         
+        #         # Initialize filter
+        #         if fan_id not in self.tach_filters:
+        #             self.tach_filters[fan_id] = {
+        #                 'buffer': deque(maxlen=self.tach_config.filter_window),
+        #                 'alpha': 0.1  # Low-pass filter parameter
+        #             }
+        
+        # self.printd("Tach signal monitoring started")
     
     def _stop_tach_monitoring(self):
         """Stop Tach signal monitoring"""
@@ -1059,7 +1081,8 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
         self.system_stats['timestamps'].append(timestamp)
     
     def _schedule_gui_update(self):
-        """Schedule GUI update"""
+        """Schedule GUI update - PERFORMANCE: Limited for better performance"""
+        # PERFORMANCE: Enable basic GUI updates but disable heavy monitoring data processing
         try:
             # Check if widget still exists before scheduling
             if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
@@ -1069,35 +1092,61 @@ class MonitoringWidget(ttk.Frame, pt.PrintClient):
             if not hasattr(self, 'master') or not hasattr(self.master, 'winfo_exists') or not self.master.winfo_exists():
                 return
                 
-            # Check if monitoring is still active and we have necessary methods
-            if not hasattr(self, 'monitoring_active') or not self.monitoring_active:
-                return
-                
-            if not hasattr(self, '_update_gui'):
-                return
-                
-            try:
-                self._update_gui()
-            except (tk.TclError, AttributeError):
-                # GUI update failed, stop monitoring
-                if hasattr(self, 'monitoring_active'):
-                    self.monitoring_active = False
-                return
-                
-            # Schedule next update with additional safety check
+            # Enable basic GUI responsiveness but skip heavy data updates
+            # This ensures mouse interaction works while maintaining performance
+            
+            # Schedule next update with longer interval for performance
             try:
                 if (hasattr(self, 'winfo_exists') and self.winfo_exists() and 
-                    hasattr(self, 'monitoring_active') and self.monitoring_active and
                     hasattr(self, 'after')):
-                    self.after(UPDATE_INTERVAL, self._schedule_gui_update)
+                    # Use longer interval (1000ms instead of default) for better performance
+                    self.after(1000, self._schedule_gui_update)
             except (tk.TclError, AttributeError, RuntimeError):
-                # Failed to schedule, stop monitoring
-                if hasattr(self, 'monitoring_active'):
-                    self.monitoring_active = False
+                # Failed to schedule, stop scheduling
+                pass
         except (tk.TclError, AttributeError, RuntimeError):
             # Widget has been destroyed or attribute error, stop scheduling
-            if hasattr(self, 'monitoring_active'):
-                self.monitoring_active = False
+            pass
+        
+        # Original GUI update scheduling code (commented out for performance)
+        # try:
+        #     # Check if widget still exists before scheduling
+        #     if not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+        #         return
+        #     
+        #     # Additional check for root window
+        #     if not hasattr(self, 'master') or not hasattr(self.master, 'winfo_exists') or not self.master.winfo_exists():
+        #         return
+        #         
+        #     # Check if monitoring is still active and we have necessary methods
+        #     if not hasattr(self, 'monitoring_active') or not self.monitoring_active:
+        #         return
+        #         
+        #     if not hasattr(self, '_update_gui'):
+        #         return
+        #         
+        #     try:
+        #         self._update_gui()
+        #     except (tk.TclError, AttributeError):
+        #         # GUI update failed, stop monitoring
+        #         if hasattr(self, 'monitoring_active'):
+        #             self.monitoring_active = False
+        #         return
+        #         
+        #     # Schedule next update with additional safety check
+        #     try:
+        #         if (hasattr(self, 'winfo_exists') and self.winfo_exists() and 
+        #             hasattr(self, 'monitoring_active') and self.monitoring_active and
+        #             hasattr(self, 'after')):
+        #             self.after(UPDATE_INTERVAL, self._schedule_gui_update)
+        #     except (tk.TclError, AttributeError, RuntimeError):
+        #         # Failed to schedule, stop monitoring
+        #         if hasattr(self, 'monitoring_active'):
+        #             self.monitoring_active = False
+        # except (tk.TclError, AttributeError, RuntimeError):
+        #     # Widget has been destroyed or attribute error, stop scheduling
+        #     if hasattr(self, 'monitoring_active'):
+        #         self.monitoring_active = False
     
     def _update_gui(self):
         """Update GUI display"""

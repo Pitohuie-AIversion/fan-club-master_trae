@@ -45,7 +45,7 @@ const int
 const char
     
     // COMMAND KEYWORDS --------------------------------------------------------
-    WRITE = 'W';
+    WRITE = 'D';
     
 
 //// CLASS IMPLEMENTATION //////////////////////////////////////////////////////
