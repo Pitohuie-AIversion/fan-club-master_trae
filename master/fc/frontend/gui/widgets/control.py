@@ -3957,16 +3957,14 @@ class LiveTable(pt.PrintClient, ttk.Frame):
             
             # Batch create new slave entries if needed
             if N > self.numSlaves:
-                new_slaves = []
                 for index in range(self.numSlaves, N):
                     stripe_tag = "stripe_even" if index % 2 == 0 else "stripe_odd"
                     tags = ('N', stripe_tag)
                     slave_id = table_insert('', 'end',
                         values = (index + 1,) + self.zeroes, tags = tags)
-                    new_slaves.append(slave_id)
+                    # Add new slave to dictionary with index as key
+                    self.slaves[index] = slave_id
                 
-                # Batch update slaves list
-                self.slaves.extend(new_slaves)
                 self.numSlaves = N
 
             # Cache constants for performance
