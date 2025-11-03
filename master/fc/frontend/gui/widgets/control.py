@@ -719,16 +719,16 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         vcmd_kp = (self.register(self._validatePIParameter), '%P', 'kp')
         self.kpEntry = ttk.Entry(self.kpFrame, width = 8, validate='key', validatecommand=vcmd_kp)
         self.kpEntry.pack(side = tk.LEFT, **gus.padc)
-        self.kpEntry.insert(0, "0.01")  # Default Kp value
+        self.kpEntry.insert(0, "0.5")  # Default Kp value - updated to match backend
         self.activeWidgets.append(self.kpEntry)
 
-        self.kpScale = ttk.Scale(self.kpFrame, from_ = 0.001, to = 0.1, 
+        self.kpScale = ttk.Scale(self.kpFrame, from_ = 0.1, to = 2.0, 
             command = self._onKpScaleChange, orient = tk.HORIZONTAL, length = 150)
         self.kpScale.pack(side = tk.LEFT, fill = tk.X, expand = True, **gus.padc)
-        self.kpScale.set(0.01)  # Default value
+        self.kpScale.set(0.5)  # Default value - updated to match backend
         self.activeWidgets.append(self.kpScale)
 
-        self.kpRangeLabel = ttk.Label(self.kpFrame, text = "(0.001-0.1)", style = "Secondary.TLabel")
+        self.kpRangeLabel = ttk.Label(self.kpFrame, text = "(0.1-2.0)", style = "Secondary.TLabel")
         self.kpRangeLabel.pack(side = tk.LEFT, **gus.padc)
 
         # Ki parameter adjustment
@@ -742,16 +742,16 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         vcmd_ki = (self.register(self._validatePIParameter), '%P', 'ki')
         self.kiEntry = ttk.Entry(self.kiFrame, width = 8, validate='key', validatecommand=vcmd_ki)
         self.kiEntry.pack(side = tk.LEFT, **gus.padc)
-        self.kiEntry.insert(0, "0.001")  # Default Ki value
+        self.kiEntry.insert(0, "0.1")  # Default Ki value - updated to match backend
         self.activeWidgets.append(self.kiEntry)
 
-        self.kiScale = ttk.Scale(self.kiFrame, from_ = 0.0001, to = 0.01, 
+        self.kiScale = ttk.Scale(self.kiFrame, from_ = 0.01, to = 0.5, 
             command = self._onKiScaleChange, orient = tk.HORIZONTAL, length = 150)
         self.kiScale.pack(side = tk.LEFT, fill = tk.X, expand = True, **gus.padc)
-        self.kiScale.set(0.001)  # Default value
+        self.kiScale.set(0.1)  # Default value - updated to match backend
         self.activeWidgets.append(self.kiScale)
 
-        self.kiRangeLabel = ttk.Label(self.kiFrame, text = "(0.0001-0.01)", style = "Secondary.TLabel")
+        self.kiRangeLabel = ttk.Label(self.kiFrame, text = "(0.01-0.5)", style = "Secondary.TLabel")
         self.kiRangeLabel.pack(side = tk.LEFT, **gus.padc)
 
         # PI tuning buttons
@@ -1089,7 +1089,7 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             # Validate parameters
             kp, ki = self._validatePIParameters(kp, ki)
             
-            # Apply the parameters
+            # Apply the parameters locally
             self.kp = kp
             self.ki = ki
             
@@ -1100,10 +1100,20 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
             # Update current parameters display
             self.piCurrentLabel.config(text=f"当前参数: Kp={kp:.4f}, Ki={ki:.4f}")
             
-            # Update performance status
-            self.piStatusLabel.config(text="状态: 参数已应用", fg="green")
-            
-            self.printw(f"PI参数已应用: Kp={kp:.4f}, Ki={ki:.4f}")
+            # Send PISET command to backend
+            try:
+                # Send to all fans (fanID=0 for broadcast, or iterate through all fans)
+                if hasattr(self.network, 'sendPISet'):
+                    self.network.sendPISet(fanID=0, kp=kp, ki=ki)
+                    self.piStatusLabel.config(text="状态: 参数已发送到后端", fg="green")
+                    self.printw(f"PI参数已发送到后端: Kp={kp:.4f}, Ki={ki:.4f}")
+                else:
+                    self.piStatusLabel.config(text="状态: 参数已应用(本地)", fg="orange")
+                    self.printw(f"PI参数已应用(仅本地): Kp={kp:.4f}, Ki={ki:.4f}")
+                    self.printw("警告: 网络通信模块不支持sendPISet方法")
+            except Exception as network_error:
+                self.printx(network_error, "发送PI参数到后端失败")
+                self.piStatusLabel.config(text="状态: 发送失败，仅本地应用", fg="orange")
             
         except ValueError as e:
             self.printx(e, "PI参数输入无效")
@@ -1355,13 +1365,19 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         Returns:
             tuple: (validated_kp, validated_ki)
         """
-        # Define safe operating ranges based on control theory
-        min_kp, max_kp = 0.001, 0.1
-        min_ki, max_ki = 0.00001, 0.02
+        # Define safe operating ranges based on backend documentation
+        min_kp, max_kp = 0.1, 2.0
+        min_ki, max_ki = 0.01, 0.5
         
         # Constrain parameters
         validated_kp = max(min_kp, min(max_kp, kp))
         validated_ki = max(min_ki, min(max_ki, ki))
+        
+        # Warn if parameters were constrained
+        if validated_kp != kp:
+            self.printw(f"Warning: Kp constrained from {kp:.4f} to {validated_kp:.4f}")
+        if validated_ki != ki:
+            self.printw(f"Warning: Ki constrained from {ki:.4f} to {validated_ki:.4f}")
         
         return validated_kp, validated_ki
     
@@ -1382,20 +1398,12 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
         try:
             float_val = float(value)
             if param_type == 'kp':
-                return 0.001 <= float_val <= 0.1
+                return 0.1 <= float_val <= 2.0
             elif param_type == 'ki':
-                return 0.00001 <= float_val <= 0.02
+                return 0.01 <= float_val <= 0.5
             return False
         except ValueError:
             return False
-        
-        # Warn if parameters were constrained
-        if validated_kp != kp:
-            self.printw(f"Warning: Kp constrained from {kp:.4f} to {validated_kp:.4f}")
-        if validated_ki != ki:
-            self.printw(f"Warning: Ki constrained from {ki:.4f} to {validated_ki:.4f}")
-        
-        return validated_kp, validated_ki
 
     def _antiWindupProtection(self, integral_error, max_integral=None):
         """

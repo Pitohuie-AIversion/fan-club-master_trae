@@ -2011,6 +2011,38 @@ class FCCommunicator(pt.PrintClient):
 
         # End sendChaseWithSelection ==============================================
 
+    def sendPISet(self, fanID, kp, ki, targets=None): # ========================
+        """
+        Send a PISET command to set PI controller parameters.
+            fanID := fan ID to configure (default 0)
+            kp := proportional gain value
+            ki := integral gain value
+            targets := list of slave indices to target. If None, broadcast to all.
+        """
+        try:
+            if targets is None:
+                # Broadcast to all slaves
+                # Format: P|passcode|PISET fanID kp ki
+                self.disconnectSocket.sendto(
+                    bytearray("P|{}|PISET {} {} {}".format(self.passcode, fanID, kp, ki), 'ascii'),
+                    (self.defaultBroadcastIP, self.broadcastPort))
+                self.printw("[sP] Sent PISET command (broadcast): fanID = {}, kp = {}, ki = {}".format(fanID, kp, ki))
+            else:
+                # Send to specific targets
+                for slaveIndex in targets:
+                    slave = self.getSlaveByIndex(slaveIndex)
+                    if slave is not None:
+                        # Format: p|passcode|PISET fanID kp ki|MAC
+                        self.disconnectSocket.sendto(
+                            bytearray("p|{}|PISET {} {} {}|{}".format(self.passcode, fanID, kp, ki, slave.getMAC()), 'ascii'),
+                            (self.defaultBroadcastIP, self.broadcastPort))
+                        self.printw("[sP] Sent PISET command to slave {}: fanID = {}, kp = {}, ki = {}".format(slaveIndex, fanID, kp, ki))
+
+        except Exception as e:
+            self.printx(e, "[sP] Exception in PISET routine:")
+
+        # End sendPISet ========================================================
+
     def sendDisconnect(self): # ================================================
         # ABOUT: Use disconenct socket to send a general "disconnect" message
         # that terminates any existing connection.
