@@ -2861,6 +2861,11 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         - g := int, G-coordinate index.
         - value := int or float, value to apply.
         """
+        # Add bounds checking to prevent IndexError
+        if g < 0 or g >= len(self.values_g):
+            self.printw(f"Grid index {g} out of bounds (array size: {len(self.values_g)}). Ignoring.")
+            return
+            
         self.values_g[g] = value
         fill = self.empty_color
 
@@ -2896,6 +2901,11 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
 
 
     def select_g(self, g):
+        # Add bounds checking to prevent IndexError
+        if g < 0 or g >= len(self.selected_g):
+            self.printw(f"Grid index {g} out of bounds for selection (array size: {len(self.selected_g)}). Ignoring.")
+            return
+            
         if not self.selected_g[g]:
             self.selected_count += 1
         self.selected_g[g] = True
@@ -2904,6 +2914,11 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
                 self.OUTLINE_SELECTED, self.WIDTH_SELECTED)
 
     def deselect_g(self, g):
+        # Add bounds checking to prevent IndexError
+        if g < 0 or g >= len(self.selected_g):
+            self.printw(f"Grid index {g} out of bounds for deselection (array size: {len(self.selected_g)}). Ignoring.")
+            return
+            
         if self.selected_g[g]:
             self.selected_count -= 1
         self.selected_g[g] = False
@@ -2985,9 +3000,11 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         l = self.layer
         offset = self.layer*self.RC
         for g in range(offset, offset + self.RC):
-            self.update_g(g, self.values_g[g])
-            if self.selected_g[g]:
-                self.select_g(g)
+            # Add bounds checking to prevent IndexError
+            if g < len(self.values_g):
+                self.update_g(g, self.values_g[g])
+                if g < len(self.selected_g) and self.selected_g[g]:
+                    self.select_g(g)
             else:
                 self.deselect_g(g)
 
