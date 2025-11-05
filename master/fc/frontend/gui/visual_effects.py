@@ -57,52 +57,61 @@ class GradientFrame(tk.Frame):
         self.canvas.bind('<Configure>', self._draw_gradient)
         
     def _draw_gradient(self, event=None):
-        """Draw gradient background on canvas."""
-        if not self.canvas:
-            return
-            
-        width = self.canvas.winfo_width()
-        height = self.canvas.winfo_height()
-        
-        if width <= 1 or height <= 1:
-            return
-            
-        self.canvas.delete('gradient')
-        
-        # Parse colors
-        color1, color2 = self.gradient_colors
-        r1, g1, b1 = self._hex_to_rgb(color1)
-        r2, g2, b2 = self._hex_to_rgb(color2)
-        
-        # Calculate gradient steps
-        steps = 50 if self.direction == 'vertical' else 50
-        
-        if self.direction == 'vertical':
-            step_height = height / steps
-            for i in range(steps):
-                ratio = i / (steps - 1)
-                r = int(r1 + (r2 - r1) * ratio)
-                g = int(g1 + (g2 - g1) * ratio)
-                b = int(b1 + (b2 - b1) * ratio)
-                color = f'#{r:02x}{g:02x}{b:02x}'
+        """Draw gradient background on canvas - 优化性能"""
+        try:
+            if not self.canvas or not hasattr(self, 'winfo_exists') or not self.winfo_exists():
+                return
                 
-                y1 = i * step_height
-                y2 = (i + 1) * step_height
-                self.canvas.create_rectangle(0, y1, width, y2, 
-                                           fill=color, outline=color, tags='gradient')
-        else:  # horizontal
-            step_width = width / steps
-            for i in range(steps):
-                ratio = i / (steps - 1)
-                r = int(r1 + (r2 - r1) * ratio)
-                g = int(g1 + (g2 - g1) * ratio)
-                b = int(b1 + (b2 - b1) * ratio)
-                color = f'#{r:02x}{g:02x}{b:02x}'
+            width = self.canvas.winfo_width()
+            height = self.canvas.winfo_height()
+            
+            if width <= 1 or height <= 1:
+                return
+            
+            # 检查是否需要重绘（尺寸是否改变）
+            if hasattr(self, '_last_size') and self._last_size == (width, height):
+                return
+            self._last_size = (width, height)
                 
-                x1 = i * step_width
-                x2 = (i + 1) * step_width
-                self.canvas.create_rectangle(x1, 0, x2, height, 
-                                           fill=color, outline=color, tags='gradient')
+            self.canvas.delete('gradient')
+            
+            # Parse colors
+            color1, color2 = self.gradient_colors
+            r1, g1, b1 = self._hex_to_rgb(color1)
+            r2, g2, b2 = self._hex_to_rgb(color2)
+            
+            # 减少渐变步数以提高性能
+            steps = 25 if self.direction == 'vertical' else 25
+            
+            if self.direction == 'vertical':
+                step_height = height / steps
+                for i in range(steps):
+                    ratio = i / (steps - 1)
+                    r = int(r1 + (r2 - r1) * ratio)
+                    g = int(g1 + (g2 - g1) * ratio)
+                    b = int(b1 + (b2 - b1) * ratio)
+                    color = f'#{r:02x}{g:02x}{b:02x}'
+                    
+                    y1 = i * step_height
+                    y2 = (i + 1) * step_height
+                    self.canvas.create_rectangle(0, y1, width, y2, 
+                                               fill=color, outline=color, tags='gradient')
+            else:  # horizontal
+                step_width = width / steps
+                for i in range(steps):
+                    ratio = i / (steps - 1)
+                    r = int(r1 + (r2 - r1) * ratio)
+                    g = int(g1 + (g2 - g1) * ratio)
+                    b = int(b1 + (b2 - b1) * ratio)
+                    color = f'#{r:02x}{g:02x}{b:02x}'
+                    
+                    x1 = i * step_width
+                    x2 = (i + 1) * step_width
+                    self.canvas.create_rectangle(x1, 0, x2, height, 
+                                               fill=color, outline=color, tags='gradient')
+        except (tk.TclError, AttributeError, RuntimeError):
+            # 忽略错误，避免卡顿
+            pass
     
     def _hex_to_rgb(self, hex_color: str) -> Tuple[int, int, int]:
         """Convert hex color to RGB tuple."""
@@ -173,74 +182,52 @@ class ShadowMixin:
 ## MICRO-INTERACTIONS ##########################################################
 
 class InteractiveWidget:
-    """Base class for widgets with micro-interactions."""
+    """Mixin for adding hover and click effects to widgets."""
     
     def __init__(self, *args, **kwargs):
-        self.hover_enabled = kwargs.pop('hover_effects', True)
-        self.click_effects = kwargs.pop('click_effects', True)
+        # 提取交互相关参数
+        self.hover_effects = kwargs.pop('hover_effects', False)  # 默认禁用
+        self.click_effects = kwargs.pop('click_effects', False)  # 默认禁用
         self.animation_manager = kwargs.pop('animation_manager', None)
+        
         super().__init__(*args, **kwargs)
         
-        if self.hover_enabled or self.click_effects:
+        # 只有在启用效果时才设置交互
+        if self.hover_effects or self.click_effects:
             self._setup_interactions()
     
     def _setup_interactions(self):
-        """Setup hover and click interactions."""
-        if self.hover_enabled:
-            self.bind('<Enter>', self._on_hover_enter)
-            self.bind('<Leave>', self._on_hover_leave)
+        """Setup hover and click interactions - 仅在启用时执行"""
+        if not (self.hover_effects or self.click_effects):
+            return
             
+        if self.hover_effects:
+            self.bind("<Enter>", self._on_hover_enter)
+            self.bind("<Leave>", self._on_hover_leave)
+        
         if self.click_effects:
-            self.bind('<Button-1>', self._on_click_down)
-            self.bind('<ButtonRelease-1>', self._on_click_up)
+            self.bind("<Button-1>", self._on_click_down)
+            self.bind("<ButtonRelease-1>", self._on_click_up)
     
     def _on_hover_enter(self, event):
         """Handle mouse enter event."""
-        if self.animation_manager:
-            # Animate scale up slightly
-            self.animation_manager.animate_property(
-                self, 'configure',
-                {'relief': 'flat'},
-                {'relief': 'raised'},
-                duration=150, easing=ease_in_out_cubic
-            )
+        # 简化或禁用动画效果
+        pass
     
     def _on_hover_leave(self, event):
         """Handle mouse leave event."""
-        if self.animation_manager:
-            # Animate back to normal
-            self.animation_manager.animate_property(
-                self, 'configure',
-                {'relief': 'raised'},
-                {'relief': 'flat'},
-                duration=150, easing=ease_in_out_cubic
-            )
+        # 简化或禁用动画效果
+        pass
     
     def _on_click_down(self, event):
         """Handle mouse click down."""
-        if self.animation_manager:
-            # Quick scale down effect
-            current_bg = self.cget('bg') if hasattr(self, 'cget') else '#ffffff'
-            darker_bg = self._darken_color(current_bg, 0.1)
-            
-            self.animation_manager.animate_color(
-                self, 'configure', 'bg',
-                current_bg, darker_bg,
-                duration=100, easing=ease_in_out_cubic
-            )
+        # 简化或禁用动画效果
+        pass
     
     def _on_click_up(self, event):
         """Handle mouse click up."""
-        if self.animation_manager:
-            # Restore original color
-            current_bg = self.cget('bg') if hasattr(self, 'cget') else '#ffffff'
-            original_bg = theme_manager.get_color('SURFACE_1')
-            
-            self.animation_manager.animate_color(
-                self, 'configure', 'bg',
-                current_bg, original_bg,
-                duration=150, easing=ease_in_out_cubic
-            )
+        # 简化或禁用动画效果
+        pass
     
     def _darken_color(self, hex_color: str, factor: float) -> str:
         """Darken a hex color by a factor (0.0 to 1.0)."""
@@ -311,42 +298,50 @@ class GradientButton(tk.Button, InteractiveWidget):
             
             if width <= 1 or height <= 1:
                 return
+            
+            # 防止重复绘制相同尺寸
+            if hasattr(self, '_last_button_size') and self._last_button_size == (width, height):
+                return
+            self._last_button_size = (width, height)
                 
             self.gradient_canvas.delete('all')
-        except (tk.TclError, AttributeError, RuntimeError):
-            return
-        
-        # Draw gradient
-        color1, color2 = self.gradient_colors
-        r1, g1, b1 = self._hex_to_rgb(color1)
-        r2, g2, b2 = self._hex_to_rgb(color2)
-        
-        steps = 20
-        step_height = height / steps
-        
-        for i in range(steps):
-            ratio = i / (steps - 1)
-            r = int(r1 + (r2 - r1) * ratio)
-            g = int(g1 + (g2 - g1) * ratio)
-            b = int(b1 + (b2 - b1) * ratio)
-            color = f'#{r:02x}{g:02x}{b:02x}'
             
-            y1 = i * step_height
-            y2 = (i + 1) * step_height
-            self.gradient_canvas.create_rectangle(
-                0, y1, width, y2,
-                fill=color, outline=color
-            )
-        
-        # Add button text
-        text = self.cget('text')
-        if text:
-            self.gradient_canvas.create_text(
-                width//2, height//2,
-                text=text,
-                fill=theme_manager.get_color('TEXT_ON_PRIMARY'),
-                font=self.cget('font')
-            )
+            # Draw gradient
+            color1, color2 = self.gradient_colors
+            r1, g1, b1 = self._hex_to_rgb(color1)
+            r2, g2, b2 = self._hex_to_rgb(color2)
+            
+            # 减少步数以提高性能
+            steps = 15
+            step_height = height / steps
+            
+            for i in range(steps):
+                ratio = i / (steps - 1)
+                r = int(r1 + (r2 - r1) * ratio)
+                g = int(g1 + (g2 - g1) * ratio)
+                b = int(b1 + (b2 - b1) * ratio)
+                color = f'#{r:02x}{g:02x}{b:02x}'
+                
+                y1 = i * step_height
+                y2 = (i + 1) * step_height
+                self.gradient_canvas.create_rectangle(
+                    0, y1, width, y2,
+                    fill=color, outline=color
+                )
+            
+            # Add button text
+            text = self.cget('text')
+            if text:
+                self.gradient_canvas.create_text(
+                    width//2, height//2,
+                    text=text,
+                    fill='white',
+                    font=self.cget('font')
+                )
+                
+        except (tk.TclError, AttributeError, RuntimeError):
+            # 忽略错误，避免卡顿
+            pass
     
     def _hex_to_rgb(self, hex_color: str) -> Tuple[int, int, int]:
         """Convert hex color to RGB tuple."""
@@ -381,11 +376,17 @@ class VisualEffectsManager:
     
     def __init__(self, root_widget):
         self.root = root_widget
-        self.animation_manager = AnimationManager(root_widget)
-        self.effects_enabled = True
+        # 禁用动画管理器以提高性能
+        self.animation_manager = None  # AnimationManager(root_widget)
+        self.effects_enabled = False  # 默认禁用视觉效果
         
     def create_gradient_frame(self, parent, gradient_type='primary', **kwargs):
         """Create a gradient frame with predefined color schemes."""
+        # 如果效果被禁用，返回普通Frame
+        if not self.effects_enabled:
+            return tk.Frame(parent, **{k: v for k, v in kwargs.items() 
+                                     if k not in ['gradient_colors', 'direction']})
+        
         gradient_schemes = {
             'primary': (theme_manager.get_color('PRIMARY_500'), theme_manager.get_color('PRIMARY_600')),
             'surface': (theme_manager.get_color('SURFACE_1'), theme_manager.get_color('SURFACE_2')),
@@ -400,11 +401,22 @@ class VisualEffectsManager:
     
     def create_elevated_frame(self, parent, elevation='medium', **kwargs):
         """Create an elevated frame with shadow effects."""
+        # 如果效果被禁用，返回普通Frame
+        if not self.effects_enabled:
+            return tk.Frame(parent, **{k: v for k, v in kwargs.items() 
+                                     if k not in ['shadow', 'shadow_blur', 'shadow_offset', 'shadow_color', 
+                                                 'hover_effects', 'click_effects', 'animation_manager']})
+        
         kwargs['animation_manager'] = self.animation_manager
         return ElevatedFrame(parent, elevation, **kwargs)
     
     def create_gradient_button(self, parent, style='primary', **kwargs):
         """Create a gradient button with micro-interactions."""
+        # 如果效果被禁用，返回普通Button
+        if not self.effects_enabled:
+            return tk.Button(parent, **{k: v for k, v in kwargs.items() 
+                                      if k not in ['gradient_colors', 'animation_manager']})
+        
         gradient_schemes = {
             'primary': (theme_manager.get_color('PRIMARY_500'), theme_manager.get_color('PRIMARY_600')),
             'success': ('#4caf50', '#388e3c'),

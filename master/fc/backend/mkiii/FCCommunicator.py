@@ -77,6 +77,14 @@ import fc.printer as pt
 import fc.backend.mkiii.exceptions as fcex
 import psutil  # For system performance monitoring
 
+# Import stability optimizer
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+from stability_optimizer import stability_optimizer
+from debug_monitor import debug_monitor
+from error_recovery import error_recovery_manager
+
 ## CONSTANT DEFINITIONS ########################################################
 
 class FCPerformanceMonitor:
@@ -237,13 +245,23 @@ class FCCommunicator(pt.PrintClient):
             self.performance_monitor = FCPerformanceMonitor()
             self.performance_monitor.start_timing('communicator_init')
 
+            # Initialize stability optimizer
+            self.stability_optimizer = stability_optimizer
+            # 优化：禁用稳定性监控以减少CPU占用
+            # self.stability_optimizer.start_monitoring()
+            
+            # 优化：禁用调试监控以减少CPU占用
+            # debug_monitor.start_monitoring()
+            # debug_monitor.record_thread_activity("FCCommunicator_init")
+
             # Store parameters -------------------------------------------------
             self.profile = profile
 
             # Network:
             self.broadcastPeriodS = profile[ac.broadcastPeriodMS]/1000
             self.periodMS = profile[ac.periodMS]
-            self.periodS = self.periodMS/1000
+            # 优化超时设置 - 确保最小超时时间
+            self.periodS = max(self.periodMS/1000, 2.0)  # 最小2秒超时，避免频繁超时
             self.broadcastPort = profile[ac.broadcastPort]
             self.passcode = profile[ac.passcode]
             
@@ -296,6 +314,9 @@ class FCCommunicator(pt.PrintClient):
 
             # Initialize Slave-list-related data:
             self.slavesLock = mt.Lock()
+            # 注册锁到稳定性优化器
+            self.stability_optimizer.register_lock('slavesLock', self.slavesLock)
+            
             # Performance optimization: MAC to index mapping for O(1) lookup
             self.macToIndexMap = {}
             
@@ -315,6 +336,7 @@ class FCCommunicator(pt.PrintClient):
                 s.CMD_BIP : self.__handle_input_CMD_BIP,
                 s.CMD_N : self.__handle_input_CMD_N,
                 s.CMD_S : self.__handle_input_CMD_S,
+                s.CMD_CHASE : self.__handle_input_CMD_CHASE,
                 s.CMD_PERF_STATS : self.__handle_input_CMD_PERF_STATS,
                 s.CMD_PERF_RESET : self.__handle_input_CMD_PERF_RESET,
                 s.CMD_PERF_ENABLE : self.__handle_input_CMD_PERF_ENABLE,
@@ -341,6 +363,8 @@ class FCCommunicator(pt.PrintClient):
             self.listenerSocket = socket.socket(
                 socket.AF_INET, socket.SOCK_DGRAM)
 
+            # 优化listener socket超时
+            self.stability_optimizer.optimize_socket_timeout(self.listenerSocket, "heartbeat")
 
             # Configure socket as "reusable" (in case of improper closure):
             self.listenerSocket.setsockopt(
@@ -377,6 +401,8 @@ class FCCommunicator(pt.PrintClient):
             self.broadcastSocketPort = self.broadcastSocket.getsockname()[1]
 
             self.broadcastLock = mt.Lock()
+            # 注册广播锁到稳定性优化器
+            self.stability_optimizer.register_lock('broadcastLock', self.broadcastLock)
 
             self.printr("\tbroadcastSocket initialized on " + \
                 str(self.broadcastSocket.getsockname()))
@@ -778,6 +804,37 @@ class FCCommunicator(pt.PrintClient):
         self.disable_performance_monitoring()
         self.prints("Performance monitoring disabled")
 
+    def __handle_input_CMD_CHASE(self, D):
+        """
+        Process a CHASE command to start RPM control mode.
+        See fc.standards for the expected form of D.
+        """
+        try:
+            # Extract target RPM from command data
+            targetRPM = D[s.CMD_I_TGT_OFFSET]  # Assuming target RPM is at offset position
+            
+            # Handle targets parameter - if TGT_ALL or not specified, pass None for broadcast
+            if len(D) > s.CMD_I_TGT_CODE:
+                target_code = D[s.CMD_I_TGT_CODE]
+                if target_code == s.TGT_ALL:
+                    targets = None  # None means broadcast to all slaves
+                elif target_code == s.TGT_SELECTED:
+                    # Extract specific target indices from the command data
+                    targets = D[s.CMD_I_TGT_OFFSET + 1:] if len(D) > s.CMD_I_TGT_OFFSET + 1 else None
+                else:
+                    targets = None  # Default to broadcast
+            else:
+                targets = None  # Default to broadcast
+            
+            # Call the existing sendChase method
+            self.sendChase(targetRPM, targets)
+            self.prints("CHASE command processed: target RPM = {}".format(targetRPM))
+            
+        except (IndexError, ValueError) as e:
+            self.printe("Invalid CHASE command format: {}".format(e))
+        except Exception as e:
+            self.printx(e, "Exception in CHASE command handler")
+
     def _getSlaveIndexByMAC(self, mac):
         """
         Performance-optimized method to get slave index by MAC address.
@@ -867,7 +924,7 @@ class FCCommunicator(pt.PrintClient):
                 # Extract DC values for this slave's fans
                 slaveDCs = C[i:i+slaveFans]
                 # Pad with zeros if needed to match maxFans
-                paddedDCs = slaveDCs + [0] * (self.maxFans - len(slaveDCs))
+                paddedDCs = list(slaveDCs) + [0] * (self.maxFans - len(slaveDCs))
                 # Create template for this slave's fan count
                 slaveTemplate = "{}" + ",{}" * (self.maxFans - 1)
                 slave.setMOSI((
@@ -1225,14 +1282,16 @@ class FCCommunicator(pt.PrintClient):
             misoS = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             misoS.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             misoS.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            misoS.settimeout(self.periodS*2)
+            # 使用稳定性优化器设置超时
+            self.stability_optimizer.optimize_socket_timeout(misoS, "data")
             misoS.bind(('', 0))
 
             # MOSI:
             mosiS = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             mosiS.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             mosiS.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            mosiS.settimeout(self.periodS)
+            # 使用稳定性优化器设置超时
+            self.stability_optimizer.optimize_socket_timeout(mosiS, "heartbeat")
             mosiS.bind(('', 0))
 
             # Assign sockets:
@@ -1281,12 +1340,16 @@ class FCCommunicator(pt.PrintClient):
 
 
             # Slave loop =======================================================
+            # 优化：禁用线程活动记录以减少CPU占用
+                # debug_monitor.record_thread_activity(f"_slaveRoutine_start_{slave.getIndex()}")
             while(True):
 
                 try:
                 #slave.acquire()
 
                     status = slave.getStatus()
+                    # 优化：禁用网络事件记录以减少CPU占用
+                    # debug_monitor.record_network_event(f"slave_{slave.getIndex()}_status", status)
 
                     # Act according to Slave's state:
                     if status == s.SS_KNOWN: # = = = = = = = = = = = = = = = =
@@ -1709,9 +1772,32 @@ class FCCommunicator(pt.PrintClient):
         outgoing = "{}|{}".format(slave.getMOSIIndex(), message)
 
         # Send message:
-        for i in range(repeat):
-            slave._mosiSocket().sendto(bytearray(outgoing,'ascii'),
-                (slave.ip, slave.getMOSIPort()))
+        success = False
+        for attempt in range(max(1, repeat)):
+            try:
+                slave._mosiSocket().sendto(bytearray(outgoing,'ascii'),
+                    (slave.ip, slave.getMOSIPort()))
+                success = True
+                break
+            except socket.error as e:
+                # 使用稳定性优化器进行网络重试
+                if attempt < repeat - 1:
+                    retry_success = self.stability_optimizer.retry_network_operation(
+                        lambda: slave._mosiSocket().sendto(bytearray(outgoing,'ascii'),
+                            (slave.ip, slave.getMOSIPort())),
+                        "send_message"
+                    )
+                    if retry_success:
+                        success = True
+                        break
+                else:
+                    # 记录发送失败
+                    slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
+                    self.error_handler.handle_communication_error(e, "message send", slave_info)
+                    self.performance_monitor.record_error()
+        
+        if not success:
+            self.printw("Failed to send message to slave after {} attempts".format(repeat))
         
         # End performance monitoring and record message
         self.performance_monitor.end_timing('message_send_time')
@@ -1877,6 +1963,13 @@ class FCCommunicator(pt.PrintClient):
             # Log timeout for debugging if needed
             slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
             self.error_handler.log_timeout("receive operation", slave_info)
+            # 优化：禁用错误记录以减少CPU占用
+            # debug_monitor.record_error("socket_timeout", f"slave_{slave.getIndex()}_receive_timeout")
+            
+            # 使用错误恢复机制
+            context = {'slave_index': slave.getIndex(), 'operation': 'receive'}
+            error_recovery_manager.handle_error("socket_timeout", Exception("Socket timeout in receive"), context)
+            
             self.performance_monitor.end_timing('message_receive_time')
             return None
             
@@ -1884,6 +1977,13 @@ class FCCommunicator(pt.PrintClient):
             # Handle other socket errors
             slave_info = {'mac': slave.getMAC(), 'ip': slave.getIP()}
             error = self.error_handler.handle_network_error(e, "receive operation", slave_info)
+            # 优化：禁用错误记录以减少CPU占用
+            # debug_monitor.record_error("socket_error", f"slave_{slave.getIndex()}_network_error: {str(e)}")
+            
+            # 使用错误恢复机制
+            context = {'slave_index': slave.getIndex(), 'operation': 'receive', 'error_details': str(e)}
+            error_recovery_manager.handle_error("socket_error", e, context)
+            
             self.printw("Network error in receive: {}".format(error))
             self.performance_monitor.end_timing('message_receive_time')
             self.performance_monitor.record_error()
@@ -2061,16 +2161,22 @@ class FCCommunicator(pt.PrintClient):
     def setSlaveStatus(self, slave, newStatus, lock = True, netargs = None): # =
         # Thread-safe slave status update with proper locking
         
-        with self.slavesLock:
-            # Update status:
-            if netargs is None:
-                slave.setStatus(newStatus, lock = lock)
-            else:
-                slave.setStatus(newStatus, netargs[0], netargs[1], netargs[2],
-                    netargs[3], lock = lock)
+        # 使用稳定性优化器安全获取锁
+        if self.stability_optimizer.safe_acquire_lock('slavesLock', self.slavesLock, timeout=5.0):
+            try:
+                # Update status:
+                if netargs is None:
+                    slave.setStatus(newStatus, lock = lock)
+                else:
+                    slave.setStatus(newStatus, netargs[0], netargs[1], netargs[2],
+                        netargs[3], lock = lock)
 
-            # Send update to handlers:
-            self.slaveUpdateQueue.put_nowait(self.getSlaveStateVector(slave))
+                # Send update to handlers:
+                self.slaveUpdateQueue.put_nowait(self.getSlaveStateVector(slave))
+            finally:
+                self.stability_optimizer.safe_release_lock('slavesLock', self.slavesLock)
+        else:
+            self.printw("Warning: Failed to acquire slavesLock within timeout, skipping status update")
         # End setSlaveStatus ===================================================
 
     def getSlaveStateVector(self, slave):

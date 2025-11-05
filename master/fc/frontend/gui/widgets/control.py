@@ -2978,10 +2978,19 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
             # Check if widget still exists before scheduling
             if not self.winfo_exists():
                 return
-            self.after(self.RESIZE_MS, self._adjust)
+            
+            # Cancel any existing scheduled adjustment to prevent accumulation
+            if hasattr(self, '_adjust_timer') and self._adjust_timer:
+                self.after_cancel(self._adjust_timer)
+                self._adjust_timer = None
+            
+            # Schedule the adjustment with improved debouncing
+            self._adjust_timer = self.after(self.RESIZE_MS, self._adjust)
             self.unbind("<Configure>")
-        except tk.TclError:
-            # Widget has been destroyed, ignore
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or other error, ignore
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
             pass
 
     def _updateStyle(self, event = None):
@@ -3006,8 +3015,22 @@ class GridWidget(gd.BaseGrid, pt.PrintClient):
         self.control_buffer = [0]*self.size_k
 
     def _adjust(self, *E):
-        self.redraw()
-        self.bind("<Configure>", self._scheduleAdjust)
+        try:
+            # Clear the timer reference
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
+            
+            # Check if widget still exists before adjusting
+            if not self.winfo_exists():
+                return
+                
+            self.redraw()
+            self.bind("<Configure>", self._scheduleAdjust)
+        except (tk.TclError, AttributeError):
+            # Widget has been destroyed or other error, ignore
+            if hasattr(self, '_adjust_timer'):
+                self._adjust_timer = None
+            pass
 
     @staticmethod
     def _onLeftClick(grid, i):
@@ -3951,16 +3974,14 @@ class LiveTable(pt.PrintClient, ttk.Frame):
             
             # Batch create new slave entries if needed
             if N > self.numSlaves:
-                new_slaves = []
                 for index in range(self.numSlaves, N):
                     stripe_tag = "stripe_even" if index % 2 == 0 else "stripe_odd"
                     tags = ('N', stripe_tag)
                     slave_id = table_insert('', 'end',
                         values = (index + 1,) + self.zeroes, tags = tags)
-                    new_slaves.append(slave_id)
+                    # Add new slave to dictionary with index as key
+                    self.slaves[index] = slave_id
                 
-                # Batch update slaves list
-                self.slaves.extend(new_slaves)
                 self.numSlaves = N
 
             # Cache constants for performance
