@@ -9008,7 +9008,7 @@ ARRAY_21X21 = {
     ac.platform : ac.UNKNOWN,
 
     # Network Configuration - Optimized for large scale array
-    ac.broadcastIP : "192.168.21.255",
+    ac.broadcastIP : "192.168.0.255",
     ac.broadcastPort  : 65000,
     ac.broadcastPeriodMS : 1000,
     ac.periodMS : 50,  # Faster response for large array
@@ -9047,7 +9047,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,  # Lower minimum duty cycle
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : False,
             ac.MD_row : -1,
             ac.MD_column : -1,
@@ -9061,7 +9061,7 @@ ARRAY_21X21 = {
         # Row 0 (Fans 0-20)
         {
             ac.SV_name : "Row_00",
-            ac.SV_mac : "00:80:e1:21:00:01",
+            ac.SV_mac : "00:80:e1:46:00:38",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9075,7 +9075,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 0,
             ac.MD_column : 0,
@@ -9087,7 +9087,7 @@ ARRAY_21X21 = {
         # Row 1 (Fans 21-41)
         {
             ac.SV_name : "Row_01",
-            ac.SV_mac : "00:80:e1:21:00:02",
+            ac.SV_mac : "00:80:e1:49:00:22",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9101,7 +9101,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 1,
             ac.MD_column : 0,
@@ -9113,7 +9113,7 @@ ARRAY_21X21 = {
         # Row 2 (Fans 42-62)
         {
             ac.SV_name : "Row_02",
-            ac.SV_mac : "00:80:e1:21:00:03",
+            ac.SV_mac : "00:80:e1:25:00:44",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9127,7 +9127,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 2,
             ac.MD_column : 0,
@@ -9139,7 +9139,7 @@ ARRAY_21X21 = {
         # Row 3 (Fans 63-83)
         {
             ac.SV_name : "Row_03",
-            ac.SV_mac : "00:80:e1:21:00:04",
+            ac.SV_mac : "00:80:e1:27:00:29",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9153,7 +9153,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 3,
             ac.MD_column : 0,
@@ -9165,7 +9165,7 @@ ARRAY_21X21 = {
         # Row 4 (Fans 84-104)
         {
             ac.SV_name : "Row_04",
-            ac.SV_mac : "00:80:e1:21:00:05",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9179,7 +9179,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 4,
             ac.MD_column : 0,
@@ -9191,7 +9191,7 @@ ARRAY_21X21 = {
         # Row 5 (Fans 105-125)
         {
             ac.SV_name : "Row_05",
-            ac.SV_mac : "00:80:e1:21:00:06",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9205,7 +9205,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 5,
             ac.MD_column : 0,
@@ -9217,7 +9217,7 @@ ARRAY_21X21 = {
         # Row 6 (Fans 126-146)
         {
             ac.SV_name : "Row_06",
-            ac.SV_mac : "00:80:e1:21:00:07",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9231,7 +9231,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 6,
             ac.MD_column : 0,
@@ -9243,7 +9243,7 @@ ARRAY_21X21 = {
         # Row 7 (Fans 147-167)
         {
             ac.SV_name : "Row_07",
-            ac.SV_mac : "00:80:e1:21:00:08",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9257,7 +9257,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 7,
             ac.MD_column : 0,
@@ -9269,7 +9269,7 @@ ARRAY_21X21 = {
         # Row 8 (Fans 168-188)
         {
             ac.SV_name : "Row_08",
-            ac.SV_mac : "00:80:e1:21:00:09",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9283,7 +9283,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 8,
             ac.MD_column : 0,
@@ -9295,7 +9295,7 @@ ARRAY_21X21 = {
         # Row 9 (Fans 189-209)
         {
             ac.SV_name : "Row_09",
-            ac.SV_mac : "00:80:e1:21:00:0A",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9309,7 +9309,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 9,
             ac.MD_column : 0,
@@ -9321,7 +9321,7 @@ ARRAY_21X21 = {
         # Row 10 (Fans 210-230)
         {
             ac.SV_name : "Row_10",
-            ac.SV_mac : "00:80:e1:21:00:0B",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9335,7 +9335,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 10,
             ac.MD_column : 0,
@@ -9347,7 +9347,7 @@ ARRAY_21X21 = {
         # Row 11 (Fans 231-251)
         {
             ac.SV_name : "Row_11",
-            ac.SV_mac : "00:80:e1:21:00:0C",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9361,7 +9361,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 11,
             ac.MD_column : 0,
@@ -9373,7 +9373,7 @@ ARRAY_21X21 = {
         # Row 12 (Fans 252-272)
         {
             ac.SV_name : "Row_12",
-            ac.SV_mac : "00:80:e1:21:00:0D",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9387,7 +9387,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 12,
             ac.MD_column : 0,
@@ -9399,7 +9399,7 @@ ARRAY_21X21 = {
         # Row 13 (Fans 273-293)
         {
             ac.SV_name : "Row_13",
-            ac.SV_mac : "00:80:e1:21:00:0E",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9413,7 +9413,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 13,
             ac.MD_column : 0,
@@ -9425,7 +9425,7 @@ ARRAY_21X21 = {
         # Row 14 (Fans 294-314)
         {
             ac.SV_name : "Row_14",
-            ac.SV_mac : "00:80:e1:21:00:0F",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9439,7 +9439,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 14,
             ac.MD_column : 0,
@@ -9451,7 +9451,7 @@ ARRAY_21X21 = {
         # Row 15 (Fans 315-335)
         {
             ac.SV_name : "Row_15",
-            ac.SV_mac : "00:80:e1:21:00:10",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9465,7 +9465,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 15,
             ac.MD_column : 0,
@@ -9477,7 +9477,7 @@ ARRAY_21X21 = {
         # Row 16 (Fans 336-356)
         {
             ac.SV_name : "Row_16",
-            ac.SV_mac : "00:80:e1:21:00:11",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9491,7 +9491,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 16,
             ac.MD_column : 0,
@@ -9503,7 +9503,7 @@ ARRAY_21X21 = {
         # Row 17 (Fans 357-377)
         {
             ac.SV_name : "Row_17",
-            ac.SV_mac : "00:80:e1:21:00:12",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9517,7 +9517,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 17,
             ac.MD_column : 0,
@@ -9529,7 +9529,7 @@ ARRAY_21X21 = {
         # Row 18 (Fans 378-398)
         {
             ac.SV_name : "Row_18",
-            ac.SV_mac : "00:80:e1:21:00:13",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9543,7 +9543,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 18,
             ac.MD_column : 0,
@@ -9555,7 +9555,7 @@ ARRAY_21X21 = {
         # Row 19 (Fans 399-419)
         {
             ac.SV_name : "Row_19",
-            ac.SV_mac : "00:80:e1:21:00:14",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9569,7 +9569,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 19,
             ac.MD_column : 0,
@@ -9581,7 +9581,7 @@ ARRAY_21X21 = {
         # Row 20 (Fans 420-440)
         {
             ac.SV_name : "Row_20",
-            ac.SV_mac : "00:80:e1:21:00:15",
+            ac.SV_mac : "None",
             ac.SV_index : -1,
             ac.SV_fanModel : "HighPerformance",
             ac.SV_fanMode : ac.SINGLE,
@@ -9595,7 +9595,7 @@ ARRAY_21X21 = {
             ac.SV_minRPM : 1200,
             ac.SV_minDC : 0.05,
             ac.SV_maxFans : 21,
-            ac.SV_pinout : "21X21_CUSTOM",
+            ac.SV_pinout : "BASE",
             ac.MD_assigned : True,
             ac.MD_row : 20,
             ac.MD_column : 0,
