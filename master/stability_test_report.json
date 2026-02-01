@@ -1,0 +1,69 @@
+{
+  "timestamp": 1759231521.8880565,
+  "test_duration": 300,
+  "total_tests": 6,
+  "passed_tests": 6,
+  "failed_tests": 0,
+  "test_results": {
+    "网络超时测试": {
+      "passed": true,
+      "details": {
+        "timeout_tests": 10,
+        "successful_recoveries": 10,
+        "failed_recoveries": 0,
+        "recovery_rate": 1.0
+      }
+    },
+    "线程死锁测试": {
+      "passed": true,
+      "details": {
+        "deadlock_tests": 5,
+        "detected_deadlocks": 0,
+        "resolved_deadlocks": 0
+      }
+    },
+    "内存泄漏测试": {
+      "passed": true,
+      "details": {
+        "initial_memory": 22.75,
+        "final_memory": 23.06640625,
+        "memory_increase": 0.31640625,
+        "max_memory_increase": 50
+      }
+    },
+    "错误恢复测试": {
+      "passed": true,
+      "details": {
+        "error_types_tested": 5,
+        "successful_recoveries": 5,
+        "failed_recoveries": 0,
+        "recovery_rate": 1.0
+      }
+    },
+    "系统资源监控测试": {
+      "passed": true,
+      "details": {
+        "monitoring_duration": 10,
+        "cpu_samples": 10,
+        "memory_samples": 10,
+        "avg_cpu": 11.23,
+        "avg_memory": 60.11
+      }
+    },
+    "并发连接测试": {
+      "passed": true,
+      "details": {
+        "concurrent_threads": 10,
+        "successful_connections": 10,
+        "failed_connections": 0,
+        "timeout_errors": 0,
+        "success_rate": 1.0
+      }
+    }
+  },
+  "system_info": {
+    "cpu_count": 12,
+    "memory_total": 31.856868743896484,
+    "python_version": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]"
+  }
+}

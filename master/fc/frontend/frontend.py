@@ -84,8 +84,13 @@ class FCFrontend(pt.PrintServer):
         # Backend components initialization
         self.mapper = mr.Mapper(self.archive)
 
-        self.network = cm.FCCommunicator(self.feedback_send, self.slave_send,
-            self.network_send, archive, pqueue)
+        self.network = cm.FCCommunicator(
+            self.feedback_send,
+            self.slave_send,
+            self.network_send,
+            archive,
+            pqueue
+        )
         self.external = ex.ExternalControl(self.mapper, archive, pqueue)
         self.addFeedbackClient(self.external)
         self.addNetworkClient(self.external)

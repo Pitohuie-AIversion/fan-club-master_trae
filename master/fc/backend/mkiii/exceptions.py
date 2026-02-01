@@ -138,6 +138,17 @@ class ErrorHandler:
         except Exception as e:
             self.log_exception(e, context)
             return default_return
+    
+    def log_timeout(self, operation: str, slave_info: Optional[dict] = None) -> None:
+        """Log timeout events with slave information."""
+        if slave_info:
+            slave_mac = slave_info.get('mac', 'unknown')
+            slave_ip = slave_info.get('ip', 'unknown')
+            msg = f"Timeout in {operation} for slave MAC:{slave_mac} IP:{slave_ip}"
+        else:
+            msg = f"Timeout in {operation}"
+        
+        self.logger.debug(msg)
 
 
 def create_error_handler(logger_name: str = 'FCCommunicator') -> ErrorHandler:

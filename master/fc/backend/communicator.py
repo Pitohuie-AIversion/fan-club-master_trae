@@ -175,6 +175,18 @@ class FCCommunicator(pt.PrintClient):
         """
         self.commandIn(s.CMD_BIP, ip)
     
+    def sendChase(self, targetRPM, targets=None):
+        """
+        Send CHASE command to start chase mode with specified target RPM.
+        
+        Args:
+            targetRPM: Target RPM for chase mode
+            targets: Optional target specification (defaults to all)
+        """
+        if targets is None:
+            targets = s.TGT_ALL
+        self.commandIn(s.CMD_CHASE, targets, (targetRPM,))
+
     def get_performance_stats(self):
         """
         Get performance statistics from the backend communicator.

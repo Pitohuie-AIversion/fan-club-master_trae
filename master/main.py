@@ -29,7 +29,8 @@ VERSION = "0.17"
 # # 可选启动配置（只保留其中一行，注释或删除其它行即可）
 # # 可选启动配置（只保留其中一行，注释或删除其它行即可）
 # INIT_PROFILE = "MODULE"
-INIT_PROFILE = "TENX10"
+# INIT_PROFILE = "TENX10"
+INIT_PROFILE = "ARRAY_21X21"
 # INIT_PROFILE = "DEV1"
 # INIT_PROFILE = "BOX"
 # INIT_PROFILE = "DEV2"

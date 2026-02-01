@@ -181,9 +181,26 @@ class EnhancedTooltip:
         self.hide_timer = self.widget.after(100, self._hide_tooltip)
     
     def _on_motion(self, event=None):
-        """鼠标移动时的处理"""
+        """鼠标移动时的处理 - 优化性能"""
+        # 只有在工具提示已显示时才更新位置，减少不必要的处理
+        if self.tooltip_window and hasattr(self, '_last_motion_time'):
+            import time
+            current_time = time.time()
+            # 限制更新频率，避免过于频繁的位置更新
+            if current_time - self._last_motion_time < 0.05:  # 50ms间隔
+                return
+            self._last_motion_time = current_time
+            
         if self.tooltip_window:
-            self._update_position(event)
+            try:
+                self._update_position(event)
+            except (tk.TclError, AttributeError):
+                # 忽略错误，避免卡顿
+                pass
+        else:
+            # 记录时间但不处理
+            import time
+            self._last_motion_time = time.time()
     
     def _cancel_timers(self):
         """取消所有定时器"""

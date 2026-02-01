@@ -587,8 +587,35 @@ class SignalAcquisitionEngine(pt.PrintClient):
             # 根据配置选择硬件类型
             self.hardware = self._create_hardware_interface()
         
-        # 数据队列和回调 - 增加队列大小以处理高频数据
-        self.data_queue = queue.Queue(maxsize=2000)  # 增加队列大小以缓解溢出
+        # 导入优化队列
+        try:
+            import sys
+            import os
+            sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            from queue_optimization import OptimizedQueue, QueueMonitor
+            self.use_optimized_queue = True
+        except ImportError:
+            self.use_optimized_queue = False
+            self.printr("优化队列模块不可用，使用标准队列")
+        
+        # 数据队列和回调 - 使用优化队列或标准队列
+        if self.use_optimized_queue:
+            self.data_queue = OptimizedQueue(
+                initial_size=2000,
+                max_size=8000,  # 增加最大容量
+                auto_expand=True,
+                consumer_threads=3  # 使用3个消费者线程
+            )
+            # 启动队列监控
+            self.queue_monitor = QueueMonitor(
+                self.data_queue,
+                warning_threshold=0.8,
+                critical_threshold=0.95
+            )
+        else:
+            self.data_queue = queue.Queue(maxsize=4000)  # 增加标准队列大小
+            self.queue_monitor = None
+        
         self.acquisition_thread = None
         self.is_running = False
         self.callbacks = []  # 数据回调函数列表
@@ -653,6 +680,29 @@ class SignalAcquisitionEngine(pt.PrintClient):
             self.statistics['samples_acquired'] = 0
             self.statistics['errors'] = 0
             
+            # 启动优化队列的消费者线程（如果使用）
+            if self.use_optimized_queue:
+                # 定义数据处理函数
+                def process_samples(samples):
+                    """处理采集到的样本数据"""
+                    try:
+                        # 调用回调函数
+                        for callback in self.callbacks:
+                            try:
+                                callback(samples)
+                            except Exception as e:
+                                self.statistics['callback_errors'] += 1
+                                self.printe(f"回调函数错误: {e}")
+                    except Exception as e:
+                        self.printe(f"样本处理错误: {e}")
+                
+                # 启动消费者线程
+                self.data_queue.start_consumers(process_samples)
+                
+                # 优化：禁用队列监控以减少CPU占用
+                # if self.queue_monitor:
+                #     self.queue_monitor.start_monitoring()
+            
             self.acquisition_thread = threading.Thread(
                 target=self._acquisition_loop,
                 daemon=True
@@ -674,6 +724,13 @@ class SignalAcquisitionEngine(pt.PrintClient):
         
         try:
             self.is_running = False
+            
+            # 停止优化队列的消费者线程和监控（如果使用）
+            if self.use_optimized_queue:
+                if hasattr(self.data_queue, 'stop_consumers'):
+                    self.data_queue.stop_consumers()
+                if self.queue_monitor and hasattr(self.queue_monitor, 'stop_monitoring'):
+                    self.queue_monitor.stop_monitoring()
             
             # 等待采集线程结束
             if self.acquisition_thread and self.acquisition_thread.is_alive():
@@ -701,7 +758,12 @@ class SignalAcquisitionEngine(pt.PrintClient):
     def get_data(self, timeout: float = 0.1) -> List[SampleData]:
         """获取采集数据"""
         try:
-            return self.data_queue.get(timeout=timeout)
+            if self.use_optimized_queue:
+                # 优化队列有自己的get方法
+                return self.data_queue.get(timeout=timeout)
+            else:
+                # 标准队列
+                return self.data_queue.get(timeout=timeout)
         except queue.Empty:
             return []
     
@@ -774,17 +836,23 @@ class SignalAcquisitionEngine(pt.PrintClient):
                     
                     # 将数据放入队列
                     try:
-                        self.data_queue.put(samples, timeout=0.001)
+                        if self.use_optimized_queue:
+                            # 使用优化队列的put方法
+                            self.data_queue.put(samples, timeout=0.001)
+                        else:
+                            # 使用标准队列
+                            self.data_queue.put(samples, timeout=0.001)
                         
-                        # 队列使用率监控
-                        queue_size = self.data_queue.qsize()
-                        queue_usage = queue_size / self.data_queue.maxsize
-                        current_time = time.time()
-                        
-                        if (queue_usage >= self.queue_warning_threshold and 
-                            current_time - self.last_queue_warning_time >= self.queue_warning_interval):
-                            self.printr(f"队列使用率过高: {queue_usage:.1%} ({queue_size}/{self.data_queue.maxsize})")
-                            self.last_queue_warning_time = current_time
+                        # 队列使用率监控（仅在非优化队列模式下）
+                        if not self.use_optimized_queue:
+                            queue_size = self.data_queue.qsize()
+                            queue_usage = queue_size / self.data_queue.maxsize
+                            current_time = time.time()
+                            
+                            if (queue_usage >= self.queue_warning_threshold and 
+                                current_time - self.last_queue_warning_time >= self.queue_warning_interval):
+                                self.printr(f"队列使用率过高: {queue_usage:.1%} ({queue_size}/{self.data_queue.maxsize})")
+                                self.last_queue_warning_time = current_time
                             
                     except queue.Full:
                         self.statistics['queue_overflows'] += 1
@@ -794,13 +862,14 @@ class SignalAcquisitionEngine(pt.PrintClient):
                             self.printr("数据队列已满，丢弃数据")
                             self.last_queue_full_log_time = current_time
                     
-                    # 调用回调函数
-                    for callback in self.callbacks:
-                        try:
-                            callback(samples)
-                        except Exception as e:
-                            self.statistics['callback_errors'] += 1
-                            self.printe(f"回调函数错误: {e}")
+                    # 调用回调函数（仅在非优化队列模式下）
+                    if not self.use_optimized_queue:
+                        for callback in self.callbacks:
+                            try:
+                                callback(samples)
+                            except Exception as e:
+                                self.statistics['callback_errors'] += 1
+                                self.printe(f"回调函数错误: {e}")
                 
                 # 控制采集频率
                 time.sleep(0.001)  # 1ms延迟

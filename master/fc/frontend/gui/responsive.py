@@ -142,11 +142,23 @@ class ResponsiveLayoutManager:
         """Handle window resize events with enhanced debouncing."""
         # Only handle resize events for the root window
         if event.widget == self.root:
-            current_width = self.root.winfo_width()
-            current_height = self.root.winfo_height()
-            
-            # Use the new debounced resize method
-            self._debounced_resize(current_width, current_height)
+            # Skip processing during window movement to prevent freezing
+            try:
+                # Check if this is just a window move (position change without size change)
+                current_width = self.root.winfo_width()
+                current_height = self.root.winfo_height()
+                
+                # Skip if dimensions haven't changed significantly (likely just a move)
+                if (hasattr(self, 'last_width') and hasattr(self, 'last_height') and
+                    abs(current_width - self.last_width) < 10 and 
+                    abs(current_height - self.last_height) < 10):
+                    return
+                
+                # Use the new debounced resize method
+                self._debounced_resize(current_width, current_height)
+            except (tk.TclError, AttributeError):
+                # Widget destroyed or error, ignore
+                pass
     
     def _update_layout(self):
         """Update layout based on current window size with enhanced logic."""
@@ -262,44 +274,58 @@ class ResponsiveLayoutManager:
             # Cancel previous timer if exists
             if hasattr(self, 'resize_timer') and self.resize_timer:
                 self.root.after_cancel(self.resize_timer)
+                self.resize_timer = None
             
             # Calculate size difference
             width_diff = abs(width - self.last_width) if hasattr(self, 'last_width') else 0
             height_diff = abs(height - self.last_height) if hasattr(self, 'last_height') else 0
             
-            # Skip micro-adjustments
+            # Skip micro-adjustments to prevent excessive processing
             if width_diff < 5 and height_diff < 5:
                 return
             
-            # Determine delay based on change magnitude
+            # Use longer delays to prevent freezing during window operations
             if width_diff > 100 or height_diff > 100:
-                delay = 50  # Fast response for major changes
+                delay = 200  # Increased delay for major changes
             elif width_diff > 30 or height_diff > 30:
-                delay = 100  # Medium delay for moderate changes
+                delay = 300  # Increased delay for moderate changes
             else:
-                delay = 150  # Longer delay for small changes
+                delay = 500  # Much longer delay for small changes
             
-            # Schedule the actual update
+            # Schedule the actual update with increased delay
             self.resize_timer = self.root.after(delay, lambda: self._execute_resize_update(width, height))
             
         except Exception as e:
             print(f"Error in debounced resize: {e}")
+            # Clear timer on error
+            if hasattr(self, 'resize_timer'):
+                self.resize_timer = None
     
     def _execute_resize_update(self, width, height):
         """Execute the actual resize update."""
         try:
+            # Check if widget still exists before processing
+            if not self.root.winfo_exists():
+                return
+                
             # Update stored dimensions
             self.last_width = width
             self.last_height = height
             
-            # Perform the layout update
+            # Perform the layout update with error handling
             self._update_layout()
             
             # Clear the timer
             self.resize_timer = None
             
+        except (tk.TclError, AttributeError) as e:
+            print(f"Error executing resize update (widget destroyed): {e}")
+            # Clear timer on widget destruction
+            self.resize_timer = None
         except Exception as e:
             print(f"Error executing resize update: {e}")
+            # Clear timer on any error
+            self.resize_timer = None
     
     def _apply_responsive_styles(self):
         """Apply responsive styles with smooth transitions."""

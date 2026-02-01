@@ -105,7 +105,7 @@ class FilterConfigWidget(ttk.Frame, pt.PrintClient):
         
         # 滤波器配置相关
         self.filtered_data = {}  # 存储滤波后的数据
-        self.update_rate = 10.0  # 10Hz更新率
+        self.update_rate = 2.0  # 优化：从10Hz降低到2Hz减少CPU占用
         
         # 从monitoring组件获取enabled_fans配置，如果不可用则使用默认值
         if self.monitoring_widget and hasattr(self.monitoring_widget, 'tach_config'):
