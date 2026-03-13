@@ -490,7 +490,19 @@ class ExternalControl(pt.PrintClient):
 
     def _handleEvaluate(self, index_new, code, expression):
         self.printr("Executing externally received expression: \n\t"+expression)
-        return eval(expression)
+        # Safe evaluation with restricted builtins and limited scope
+        safe_builtins = {
+            'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
+            'min': min, 'max': max, 'abs': abs, 'round': round
+        }
+        safe_globals = {'__builtins__': safe_builtins}
+        safe_locals = {}
+        
+        try:
+            return eval(expression, safe_globals, safe_locals)
+        except Exception as e:
+            self.printr(f"Safe evaluation failed: {e}")
+            return None
 
     @staticmethod
     def _listenerRoutine(socket, method, stop, set_in, set_out, repeat, pqueue):

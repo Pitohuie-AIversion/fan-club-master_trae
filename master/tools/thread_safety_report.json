@@ -1,0 +1,2587 @@
+{
+  "summary": {
+    "total_issues": 297,
+    "severity_counts": {
+      "MEDIUM": 74,
+      "HIGH": 222,
+      "INFO": 1
+    },
+    "type_counts": {
+      "queue_usage": 4,
+      "instance_variable_write": 91,
+      "pipe_usage": 7,
+      "pipe_send": 7,
+      "read_modify_write": 52,
+      "pipe_receive": 2,
+      "queue_get": 1,
+      "multiple_locks": 14,
+      "lock_with_loop": 6,
+      "non_thread_safe_collection": 4,
+      "unprotected_shared_access": 20,
+      "thread_creation": 1,
+      "infinite_loop": 6,
+      "locking": 21,
+      "flag_check": 5,
+      "unlocking": 22,
+      "flag_modification": 12,
+      "check_then_act": 22
+    }
+  },
+  "issues": [
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/main.py",
+      "line": 108,
+      "column": 5,
+      "type": "queue_usage",
+      "severity": "MEDIUM",
+      "description": "队列使用，需要确保线程安全的put/get",
+      "code": "pqueue = mp.Queue()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 50,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.feedbackPipeSend = feedbackPipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 51,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.slavePipeSend = slavePipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 52,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.networkPipeSend = networkPipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 53,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.archive = archive"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 54,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.process = None"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 55,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.watchdog = None"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 57,
+      "column": 9,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "self.commandPipeRecv, self.commandPipeSend = mp.Pipe(False)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 57,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.commandPipeRecv, self.commandPipeSend = mp.Pipe(False)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 58,
+      "column": 9,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "self.controlPipeRecv, self.controlPipeSend = mp.Pipe(False)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 58,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.controlPipeRecv, self.controlPipeSend = mp.Pipe(False)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 71,
+      "column": 17,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.process = mp.Process("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 84,
+      "column": 17,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.watchdog = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 106,
+      "column": 17,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.process = None"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 127,
+      "column": 13,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.commandPipeSend.send((command, target) + rest)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 136,
+      "column": 13,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.controlPipeSend.send((s.CTL_DC_VECTOR, s.TGT_ALL) + tuple(C))"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 266,
+      "column": 17,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.networkPipeSend.send((False, None, None, None, None))"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/communicator.py",
+      "line": 54,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "s = None\n        self.watchdog = None\n\n        self.commandPipeRecv, self.commandPipeSend = mp.Pipe("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 86,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self._metrics = {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 95,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self._start_times = {}"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 96,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self._enabled = True"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 168,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self._enabled = True"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 172,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self._enabled = False"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 224,
+      "column": 13,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "commandPipeRecv := receive command vectors from FE (mp Pipe())"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 225,
+      "column": 13,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "controlPipeRecv := receive control vectors from FE (mp Pipe())"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 226,
+      "column": 13,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "feedbackPipeSend := send feedback vectors to FE (mp Pipe())"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 227,
+      "column": 13,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "slavePipeSend := send slave vectors to FE (mp Pipe())"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 228,
+      "column": 13,
+      "type": "pipe_usage",
+      "severity": "MEDIUM",
+      "description": "管道使用，需要确保正确关闭",
+      "code": "networkPipeSend := send network vectors to FE (mp Pipe())"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 229,
+      "column": 13,
+      "type": "queue_usage",
+      "severity": "MEDIUM",
+      "description": "队列使用，需要确保线程安全的put/get",
+      "code": "pqueue := mp Queue() instance for I-P printing  (see fc.utils)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 237,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.performance_monitor = FCPerformanceMonitor()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 241,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.profile = profile"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 244,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastPeriodS = profile[ac.broadcastPeriodMS]/1000"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 245,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.periodMS = profile[ac.periodMS]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 246,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.periodS = self.periodMS/1000"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 247,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastPort = profile[ac.broadcastPort]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 248,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.passcode = profile[ac.passcode]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 251,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.defaultIPAddress = profile[ac.defaultIPAddress]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 252,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.defaultBroadcastIP = profile[ac.defaultBroadcastIP]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 253,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.misoQueueSize = profile[ac.misoQueueSize]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 254,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.maxTimeouts = profile[ac.maxTimeouts]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 255,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.maxLength = profile[ac.maxLength]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 256,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashFlag = False"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 257,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.targetVersion = None"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 258,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashMessage = None"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 259,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastMode = s.BMODE_BROADCAST"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 263,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.defaultSlave = profile[ac.defaultSlave]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 265,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.maxFans = profile[ac.maxFans]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 266,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.fanRange = range(self.maxFans)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 267,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.dcTemplate = \"{},\"*self.maxFans"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 268,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.fanMode = profile[ac.defaultSlave][ac.SV_fanMode]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 269,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.targetRelation = self.defaultSlave[ac.SV_targetRelation]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 270,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.fanFrequencyHZ = self.defaultSlave[ac.SV_fanFrequencyHZ]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 271,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.counterCounts = self.defaultSlave[ac.SV_counterCounts]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 272,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.pulsesPerRotation = self.defaultSlave[ac.SV_pulsesPerRotation]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 273,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.maxRPM = self.defaultSlave[ac.SV_maxRPM]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 274,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.minRPM = self.defaultSlave[ac.SV_minRPM]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 275,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.minDC = self.defaultSlave[ac.SV_minDC]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 276,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.chaserTolerance = self.defaultSlave[ac.SV_chaserTolerance]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 277,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.maxFanTimeouts = hc.DEF_MAX_FAN_TIMEOUTS"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 278,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.pinout = profile[ac.pinouts][self.defaultSlave[ac.SV_pinout]]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 279,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.decimals = profile[ac.dcDecimals]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 281,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.fullSelection = ''"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 286,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.commandPipeRecv = commandPipeRecv"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 287,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.controlPipeRecv = controlPipeRecv"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 288,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.feedbackPipeSend = feedbackPipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 289,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.slavePipeSend = slavePipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 290,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.networkPipeSend = networkPipeSend"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 291,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.stopped = mt.Event()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 294,
+      "column": 13,
+      "type": "queue_usage",
+      "severity": "MEDIUM",
+      "description": "队列使用，需要确保线程安全的put/get",
+      "code": "self.newSlaveQueue = queue.Queue()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 294,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.newSlaveQueue = queue.Queue()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 295,
+      "column": 13,
+      "type": "queue_usage",
+      "severity": "MEDIUM",
+      "description": "队列使用，需要确保线程安全的put/get",
+      "code": "self.slaveUpdateQueue = queue.Queue()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 295,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.slaveUpdateQueue = queue.Queue()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 298,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.slavesLock = mt.Lock()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 300,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.macToIndexMap = {}"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 303,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.error_handler = fcex.create_error_handler('FCCommunicator')"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 306,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.commandHandlers = {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 324,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.controlHandlers = {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 341,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.listenerSocket = socket.socket("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 356,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.listenerPort = self.listenerSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 361,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastSocket = socket.socket("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 375,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastIP = self.profile[ac.broadcastIP]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 377,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastSocketPort = self.broadcastSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 379,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastLock = mt.Lock()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 385,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.rebootSocket = socket.socket("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 400,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.rebootSocketPort = self.rebootSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 402,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.rebootLock = mt.Lock()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 408,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.disconnectSocket = socket.socket("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 423,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.disconnectSocketPort = self.disconnectSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 425,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.disconnectLock = mt.Lock()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 434,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashHTTPHandler = http.server.SimpleHTTPRequestHandler"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 439,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.httpd = TCPServerType("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 451,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashServerThread = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 456,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.httpPort = self.httpd.socket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 464,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastSwitch = True"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 466,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastSwitchLock = mt.Lock() # thread-safe access"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 468,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastThread = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 482,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.listenerThread = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 490,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.outputThread  = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 495,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.inputThread = mt.Thread("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 504,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.slaves = [None]*len(saved)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 586,
+      "column": 25,
+      "type": "pipe_receive",
+      "severity": "MEDIUM",
+      "description": "管道接收，需要确保超时处理",
+      "code": "D = self.commandPipeRecv.recv()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 589,
+      "column": 25,
+      "type": "pipe_receive",
+      "severity": "MEDIUM",
+      "description": "管道接收，需要确保超时处理",
+      "code": "C = self.controlPipeRecv.recv()"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 676,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.targetVersion = D[s.CMD_I_FU_VERSION]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 683,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashFlag = True"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 687,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashMessage = \"U|{}|{}|{}|{}|{}\".format("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 703,
+      "column": 9,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.flashFlag = False"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 720,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastMode = new_mode"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 734,
+      "column": 13,
+      "type": "instance_variable_write",
+      "severity": "HIGH",
+      "description": "实例变量写入，需要确保线程安全",
+      "code": "self.broadcastIP = ip"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 758,
+      "column": 9,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.feedbackPipeSend.send(('PERF_STATS', stats))"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 786,
+      "column": 9,
+      "type": "queue_get",
+      "severity": "MEDIUM",
+      "description": "队列取出，需要确保超时处理",
+      "code": "return self.macToIndexMap.get(mac, None)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 906,
+      "column": 21,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.feedbackPipeSend.send(F_r + F_d)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 2109,
+      "column": 9,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.networkPipeSend.send("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 2120,
+      "column": 9,
+      "type": "pipe_send",
+      "severity": "MEDIUM",
+      "description": "管道发送，需要确保接收端存在",
+      "code": "self.slavePipeSend.send(S)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 86,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "cs = {\n            'message_send_time': [],\n            'message_receive_time': [],\n            'net"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 298,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".Lock()\n            # Performance optimization: MAC to index mapping for O(1) lookup\n            sel"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 402,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".Lock()\n\n            self.printr(\"\\trebootSocket initialized on \" + \\\n                str(self.reboo"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 298,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".Lock()\n            # Performance optimization: MAC to index mapping for O(1) lookup\n            sel"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 108,
+      "type": "non_thread_safe_collection",
+      "severity": "MEDIUM",
+      "description": "非线程安全的集合操作，可能导致数据竞争",
+      "code": "self._metrics[operation].append(duration)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 111,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self._metrics[operation] = self._metrics[operation][-1000:]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 130,
+      "type": "non_thread_safe_collection",
+      "severity": "MEDIUM",
+      "description": "非线程安全的集合操作，可能导致数据竞争",
+      "code": "self._metrics['thread_cpu_usage'].append(cpu_percent)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 134,
+      "type": "non_thread_safe_collection",
+      "severity": "MEDIUM",
+      "description": "非线程安全的集合操作，可能导致数据竞争",
+      "code": "self._metrics['memory_usage'].append(memory_info.percent)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 139,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self._metrics[key] = self._metrics[key][-100:]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 246,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.periodS = self.periodMS/1000"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 266,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.fanRange = range(self.maxFans)"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 267,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.dcTemplate = \"{},\"*self.maxFans"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 269,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.targetRelation = self.defaultSlave[ac.SV_targetRelation]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 270,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.fanFrequencyHZ = self.defaultSlave[ac.SV_fanFrequencyHZ]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 271,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.counterCounts = self.defaultSlave[ac.SV_counterCounts]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 272,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.pulsesPerRotation = self.defaultSlave[ac.SV_pulsesPerRotation]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 273,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.maxRPM = self.defaultSlave[ac.SV_maxRPM]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 274,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.minRPM = self.defaultSlave[ac.SV_minRPM]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 275,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.minDC = self.defaultSlave[ac.SV_minDC]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 276,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.chaserTolerance = self.defaultSlave[ac.SV_chaserTolerance]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 278,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.pinout = profile[ac.pinouts][self.defaultSlave[ac.SV_pinout]]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 356,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.listenerPort = self.listenerSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 375,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.broadcastIP = self.profile[ac.broadcastIP]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 377,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.broadcastSocketPort = self.broadcastSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 400,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.rebootSocketPort = self.rebootSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 423,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.disconnectSocketPort = self.disconnectSocket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 456,
+      "type": "unprotected_shared_access",
+      "severity": "HIGH",
+      "description": "未受保护的共享变量访问，可能导致竞态条件",
+      "code": "self.httpPort = self.httpd.socket.getsockname()[1]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/master/fc/backend/mkiii/FCCommunicator.py",
+      "line": 1081,
+      "type": "non_thread_safe_collection",
+      "severity": "MEDIUM",
+      "description": "非线程安全的集合操作，可能导致数据竞争",
+      "code": "self.slaves.append("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/main.cpp",
+      "line": 122,
+      "column": 2,
+      "type": "thread_creation",
+      "severity": "INFO",
+      "description": "线程创建，需要确保线程安全",
+      "code": "Thread mainThread(osPriorityNormal, STACK_SIZE*1024);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/main.cpp",
+      "line": 126,
+      "column": 2,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 210,
+      "column": 2,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){ // Listener routine loop ======================================"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 317,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->listenerConnectedFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 318,
+      "column": 6,
+      "type": "flag_check",
+      "severity": "HIGH",
+      "description": "标志位检查，需要确保线程安全",
+      "code": "if(not this->listenerConnectedFlag){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 337,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->listenerConnectedFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 389,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->mosiDisconnectFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 390,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->mosiDisconnectFlag = true;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 391,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->mosiDisconnectFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 511,
+      "column": 2,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 538,
+      "column": 3,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->misoLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 539,
+      "column": 3,
+      "type": "flag_check",
+      "severity": "HIGH",
+      "description": "标志位检查，需要确保线程安全",
+      "code": "if(this->misoConnectedFlag){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 549,
+      "column": 3,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->misoLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 584,
+      "column": 2,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 597,
+      "column": 4,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->mosiDisconnectFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 599,
+      "column": 4,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->mosiDisconnectFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 634,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->misoLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 652,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->mosiConnectedFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 654,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->listenerConnectedFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 655,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->listenerConnectedFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 656,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->listenerConnectedFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 658,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->mosiDisconnectFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 661,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->misoConnectedFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 664,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->misoLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 675,
+      "column": 3,
+      "type": "flag_check",
+      "severity": "HIGH",
+      "description": "标志位检查，需要确保线程安全",
+      "code": "} else if(this->mosiConnectedFlag) {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 909,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->misoLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 928,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->mosiConnectedFlag = true;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 930,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->listenerConnectedFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 931,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->listenerConnectedFlag = true;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 932,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->listenerConnectedFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 934,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->mosiDisconnectFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 937,
+      "column": 6,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->misoConnectedFlag = true;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 942,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->misoLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 995,
+      "column": 2,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->sendLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1028,
+      "column": 2,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->sendLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1060,
+      "column": 2,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 125,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "result = -1;\n\tunsigned int count = 1;\n\t\n\t// Set LED\n\tthis->_setRed(L_ON);\n\n\twhile(result < 0){ // Et"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 197,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "setup ============================================================\n\tpl;printf(\"\\n\\r[%08dms][L] \\\"Lis"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 503,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "ID = uint32_t(Thread::gettid());\n\n\t// Initialize placeholders --------------------------------------"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 566,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "masterTimeouts = 0;\n\tint maxMasterTimeouts ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 571,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "specifier = '\\0';\n\tchar *splitPointer = NULL;\n\tchar *savePointer = NULL;\n\tbool disconnect = false;\n\n"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 784,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(buffer, \",\", &savePointer);\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 791,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "parsedMISOPort = atoi(splitPointer);\n\n\t\t\t\tif (parsedMISOPort  ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 801,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(NULL, \",\", &savePointer);\n\t\t\t\t\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 809,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "parsedMOSIPort = atoi(splitPointer);\n\t\t\t\tif (parsedMOSIPort ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 818,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(NULL, \",\", &savePointer);\n\t\t\t\t\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 827,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "parsedPeriodMS = atoi(splitPointer);\n\t\t\t\t\n\t\t\t\tif (parsedPeriodMS ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 837,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(NULL, \",\", &savePointer);\n\t\t\t\t\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 846,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "parsedBPeriodMS = atoi(splitPointer);\n\t\t\t\t\n\t\t\t\tif (parsedBPeriodMS ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 856,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(NULL, \",|\", &savePointer);\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 864,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "parsedMaxMasterTimeouts = atoi(splitPointer);\n\n\t\t\t\tif (parsedMaxMasterTimeouts ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 878,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(NULL, \"|\", &savePointer);\n\t\t\t\t\n\t\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 886,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "s = this->processor.process(\n\t\t\t\t\tsplitPointer, true);\n\t\t\t\t\n\t\t\t\t/* DEBUG\n\t\t\t\tpl;printf(\n\t\t\t\t\t\"\\n\\r[%"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 919,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "MasterTimeouts = parsedMaxMasterTimeouts;\n\t\t\t\t\n\t\t\t\t\t// Send handshake acknowledgement\n\t\t\t\t\tthis->_se"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 928,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "ConnectedFlag = true;\n\n\t\t\t\t\tthis->listenerConnectedFlagLock.lock();\n\t\t\t\t\tthis->listenerConnectedFlag"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 934,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "Flag = false;\n\t\t\t\t\tdisconnect = false;\n\n\t\t\t\t\tthis->misoConnectedFlag ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 958,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "specifier == 'X'){\n\t\t\t// Redundant disconnect message. Ignore\n\t\t\tpl;printf(\n\t\t\t\t\"\\n\\r[%08dms][I][D] "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1081,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "splitPointer = strtok_r(buffer, \"|\", &splitPosition);\n\t\t\tif(splitPointer ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1088,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "index = uint32_t(atoi(splitPointer))) != 0 \n\t\t\t\tand index < this->mosiIndex){\n\t\t\t\t// Outdated messag"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1218,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "red = !this->red;\n\t\t\tthis->xred ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1223,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "red = true;\n\t\t\tthis->xred ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1228,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "red = false;\n\t\t\tthis->xred ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1242,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "green = !this->green;\n\t\t\t#ifndef JPL\n\t\t\tthis->xgreen ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1249,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "green = true;\n\t\t\t#ifndef JPL\n\t\t\tthis->xgreen ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1256,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "green = false;\n\t\t\t#ifndef JPL\n\t\t\tthis->xgreen ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1269,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "red = !this->red;\n\tthis->xred ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1278,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "green = !this->green;\n\t#ifndef JPL\n\tthis->xgreen ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 303,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (port != lastListenerPort){\n\n\t\t\t\t\t\t//this->errorLock.lock();\n\t\t\t\t\t\tmasterListener.set_ip_address("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 318,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(not this->listenerConnectedFlag){\n\t\t\t\t\t\tchar reply[MAX_MESSAGE_LENGTH];\n\n\t\t\t\t\t\tint n ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 593,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(not disconnect){\n\t\t\t// NOTE: Do not perform this check if the disconnect flag is \n\t\t\t// already s"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 603,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (result <= 0) {\t\t\n\n\t\t\t// Check network status:\n\t\t\t// NOTE: CANNOT TEST NETWORK STATUS W/ MBED 5.4"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 627,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(masterTimeouts >= maxMasterTimeouts or disconnect){\n\t\t\t\t\t// Master timed out. Disconnect.\n\t\t\t\t\tpl"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 675,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(this->mosiConnectedFlag) {\n\t\t\t// Message received while connected \n\n\t\t\t// Reset timeout counter:\n"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 907,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(processorSuccess){\n\t\t\t\t\t\n\t\t\t\t\tthis->misoLock.lock();\n\n\t\t\t\t\t// Apply configuration\n\t\t\t\t\tthis->mast"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 1066,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(result <= 0){\n\t\t\t// Timeout or connection error (leave connection error detection to\n\t\t\t// listen"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 305,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\t\tmasterListener.set_ip_address(\n\t\t\t\t\t\t\tmasterBroadcast.get_ip_address()\n\t\t\t\t\t\t);\n\t\t\t\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 389,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\tthis->mosiDisconnectFlag = true;\n\t\t\t\t\tthis->mosiDisconnectFlagLock.unlock();\n\n\t\t\t\t\tbre"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 597,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\tdisconnect = this->mosiDisconnectFlag;\n\t\t\tthis->mosiDisconnectFlagLock.unlock();\n\t\t} // "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 654,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\tthis->listenerConnectedFlag = false;\n\t\t\t\t\tthis->listenerConnectedFlagLock.unlock();\n\n\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 930,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\tthis->listenerConnectedFlag = true;\n\t\t\t\t\tthis->listenerConnectedFlagLock.unlock();\n\n\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 305,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".lock();\n\t\t\t\t\t\tmasterListener.set_ip_address(\n\t\t\t\t\t\t\tmasterBroadcast.get_ip_address()\n\t\t\t\t\t\t);\n\t\t\t\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 538,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".lock();\n\t\tif(this->misoConnectedFlag){\n\t\t\t// Connected. Send update to Master.\n\n\t\t\t// Fetch message"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Communicator.cpp",
+      "line": 597,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".lock();\n\t\t\tdisconnect = this->mosiDisconnectFlag;\n\t\t\tthis->mosiDisconnectFlagLock.unlock();\n\t\t} // "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 108,
+      "column": 4,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->arrayLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 130,
+      "column": 5,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 290,
+      "column": 8,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->arrayLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 295,
+      "column": 8,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 340,
+      "column": 8,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->arrayLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 345,
+      "column": 8,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 390,
+      "column": 4,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 535,
+      "column": 2,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->outFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 537,
+      "column": 2,
+      "type": "flag_check",
+      "severity": "HIGH",
+      "description": "标志位检查，需要确保线程安全",
+      "code": "if(this->outFlag){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 553,
+      "column": 3,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->outFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 563,
+      "column": 2,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->outFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 588,
+      "column": 3,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->threadLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 623,
+      "column": 5,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->outFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 625,
+      "column": 5,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->outFlag = false;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 626,
+      "column": 5,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->outFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 637,
+      "column": 3,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->threadLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 657,
+      "column": 5,
+      "type": "infinite_loop",
+      "severity": "HIGH",
+      "description": "无限循环，需要确保有退出条件和线程安全",
+      "code": "while(true){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 670,
+      "column": 3,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->threadLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 690,
+      "column": 4,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->outFlagLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 692,
+      "column": 4,
+      "type": "flag_check",
+      "severity": "HIGH",
+      "description": "标志位检查，需要确保线程安全",
+      "code": "if(not this->outFlag) {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 712,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->arrayLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 725,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 754,
+      "column": 6,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->arrayLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 757,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->arrayLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 761,
+      "column": 5,
+      "type": "flag_modification",
+      "severity": "HIGH",
+      "description": "标志位修改，需要确保线程间同步",
+      "code": "this->outFlag = true;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 765,
+      "column": 4,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->outFlagLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 769,
+      "column": 6,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->threadLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 35,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "G = 2,\n    ACTIVE = 1,\n    OFF = 0,\n\tON = 1,\n\tTOGGLE = 3,\n\n    // FAN MODES ------------------------"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 554,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "success = true;\n\n\t}else{\n\t\t// If there is no message to send, use the default:\n\t\tbuffer[0] = 'M';\n\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 583,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "status == this->status){\n        // If this status change is redundant, ignore it:\n        return;\n "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 610,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "status = status;\n\t\t\t\t#ifndef JPL\n\n\t\t\t\tthis->psuOff.write(true);\n\t\t\t\t#endif\n\t\t\t\tthis->_setLED(OFF);\n\n"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 678,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "i = 0; i < MAX_FANS; i++){\n                this->fanArray[i].write(0);\n\n            } // End set all"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 784,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "led = !this->led;\n\t\t\t#ifndef JPL\n\t\t\tthis->xled ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 791,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "led = true;\n\t\t\t#ifndef JPL\n\t\t\tthis->xled ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 798,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "led = false;\n\t\t\t#ifndef JPL\n\t\t\tthis->xled ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 811,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "led = !this->led;\n\t#ifndef JPL\n\tthis->xled ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 100,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(not configure){\n\t\t// Standard usage. Execute command\n\t\t\n\t\t// Check for redundancy:\n\t\tif(strcmp(th"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 149,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(splitPtr == NULL){\n\t\t\t\t\t\t// Error:\n\t\t\t\t\t\tpl;printf(\n\t\t\t\t\t\t\t\"\\n\\r[%08dms][P] ERROR: NULL splitPtr "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 175,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(splitPtr == NULL){\n\t\t\t\t\t\t// Error:\n\t\t\t\t\t\tpl;printf(\n\t\t\t\t\t\t\t\"\\n\\r[%08dms][P] ERROR: NULL splitPtr "
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 255,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(dcCount == this->activeFans){\n\t\t\t\t\t\t// Success. assign duty cycles\n\t\t\t\t\t\t\n\t\t\t\t\t\tfor(int i ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 288,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (fanID >= 0 && fanID < this->activeFans) {\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tthis->arrayLock.lock();\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 338,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (fanID >= 0 && fanID < this->activeFans) {\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tthis->arrayLock.lock();\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 537,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(this->outFlag){\n\t\t// NOTE (From a previous version):\n\t\t// ---------------------------------------"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 673,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(this->status ==  OFF){\n\t\t\t// Reset values\n\n            // Processor off, set all fans to zero. (S"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 692,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(not this->outFlag) {\n\t\t\t\t// If the output buffer is free, write to it.\n\n\t\t\t\tint n = 0; // Keep tr"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 108,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\n\t\t\t// Updated record of latest command:\n\t\t\tstrcpy(this->pastCommand, givenCommand);\n\t\t\tstr"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 234,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\n\t\t\t\t\t// Get duty cycles:\n\t\t\t\t\tint dcCount = 0;\n\t\t\t\t\tfloat dutyCycles[MAX_FANS] = {0};\n\n\t\t\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 340,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t// Set PI gains for the specified fan\n\t\t\t\t\t\t\tbool success_piset = this->fanA"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 588,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\n\t\t// Change status:\n\t\tswitch(status){\n\t\t\t\n\t\t\tcase ACTIVE: // Processor active ------------"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 670,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\n        // Check if active = = = = = = = = = = = = = = = = = = = = = = = = = = =\n\t\tif(this"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 712,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\t\t\t\tfanPtr = &(this->fanArray[i]);\n\t\t\t\t\trpm = fanPtr->read(\n\t\t\t\t\t\tthis->timer, \n\t\t\t\t\t\tthis"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 108,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".lock();\n\n\t\t\t// Updated record of latest command:\n\t\t\tstrcpy(this->pastCommand, givenCommand);\n\t\t\tstr"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Processor.cpp",
+      "line": 290,
+      "type": "lock_with_loop",
+      "severity": "MEDIUM",
+      "description": "在循环中获取锁，可能导致性能问题",
+      "code": ".lock();\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t// Set target RPM for the specified fan\n\t\t\t\t\t\t\tbool success_chase = this->fa"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 417,
+      "column": 3,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->dcLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 419,
+      "column": 3,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->dcLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 439,
+      "column": 3,
+      "type": "locking",
+      "severity": "MEDIUM",
+      "description": "互斥锁锁定，需要确保有对应的解锁",
+      "code": "this->dcLock.lock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 441,
+      "column": 3,
+      "type": "unlocking",
+      "severity": "MEDIUM",
+      "description": "互斥锁解锁，需要确保之前已锁定",
+      "code": "this->dcLock.unlock();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 24,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "TARGET = -1;\n// PINOUTS /////////////////////////////////////////////////////////////////////\n\nPinNa"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 279,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "RPM = minRPM;\n\tthis->minDC = minDC;\n\n\tthis->timeout_us =\n\t\t(minRPM > 0? 60000000.0/minRPM : DEFAULT_"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 466,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "chasing = false;\n\t\tthis->integral = 0.0f;\n\t\tthis->lastError = 0.0f;\n\t} else {\n\t\t// Start chasing\n\t\tt"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 472,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "integral = 0.0f;\n\t\tthis->lastError = 0.0f;\n\t\tthis->chaseTimer.reset();\n\t\tthis->chaseTimer.start();\n\t"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 523,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "maxIntegral = 200.0f; // Cap maximum\n\tif (maxIntegral < 50.0f) maxIntegral ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 527,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "integral = maxIntegral;\n\tif (this->integral < -maxIntegral) this->integral ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 538,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "DC = this->getDC();\n\tfloat scaleFactor = 1000.0f + (abs(error) / (float)this->target) * 500.0f; // M"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 543,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "newDC = 0.0f;\n\tif (newDC > 1.0f) newDC ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 576,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "kp=%.3f (valid: 0.1-2.0), ki=%.3f (valid: 0.01-0.5)\", kp, ki);pu;\n\t\treturn false;\n\t}\n\t\n\tthis->kp ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 581,
+      "type": "read_modify_write",
+      "severity": "HIGH",
+      "description": "读-修改-写操作，可能存在竞态条件",
+      "code": "ki = ki;\n\t\n\t// Reset integral term to avoid parameter change jumps\n\tthis->integral = 0.0f;\n\t\n\tpl;pri"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 315,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (this->initialized){\n\t\t// Initialize counters and timer\n\n\t\t// Counter:\n\t\tthis->counts = 0;\n\n\t\tthi"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 411,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if(this->initialized and this->dc != newDC){\n\t\t//             \\-----------/  Avoid redundancy\n\t\t//pl"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 464,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (targetRPM == NO_TARGET) {\n\t\t// Stop chasing\n\t\tthis->chasing ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 547,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (this->target > 0 && newDC < this->minDC) {\n\t\tnewDC ="
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 574,
+      "type": "check_then_act",
+      "severity": "HIGH",
+      "description": "检查-然后-行动模式，可能存在竞态条件",
+      "code": "if (kp < 0.1f || kp > 2.0f || ki < 0.01f || ki > 0.5f) {\n\t\t// Parameters out of valid range\n\t\tpl;pri"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f439 chasemode/slave/Fan.cpp",
+      "line": 417,
+      "type": "multiple_locks",
+      "severity": "HIGH",
+      "description": "多个锁的获取，可能存在死锁风险",
+      "code": ".lock();\n\t\tthis->dc = newDC;\n\t\tthis->dcLock.unlock();\n\n        return true;\n    }\n    else{\n\n       "
+    }
+  ]
+}

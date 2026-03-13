@@ -831,9 +831,21 @@ class PythonEditor(ttk.Frame):
         Evaluate the expression in the input field and return its value.
         """
         raw = self.input.get(1.0, tk.END)
-        result = eval(raw)
-        self._output(result)
-        return result
+        # Safe evaluation with restricted builtins and limited scope
+        safe_builtins = {
+            'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
+            'min': min, 'max': max, 'abs': abs, 'round': round
+        }
+        safe_globals = {'__builtins__': safe_builtins}
+        safe_locals = {}
+        
+        try:
+            result = eval(raw, safe_globals, safe_locals)
+            self._output(result)
+            return result
+        except Exception as e:
+            self._output(f"Evaluation error: {e}")
+            return None
 
     def _edit(self, *E):
         """

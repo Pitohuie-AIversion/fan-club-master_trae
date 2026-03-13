@@ -1639,7 +1639,9 @@ class MainControlWidget(ttk.Frame, pt.PrintClient):
 
         try:
             if self.flowType == self.FT_LIST:
-                values_raw = eval("[" + self.loadedFlow  +"]")
+                # Safe parsing of list data using ast.literal_eval instead of eval
+                import ast
+                values_raw = ast.literal_eval("[" + self.loadedFlow + "]")
                 self.n = len(values_raw)
 
             elif self.flowType == self.FT_TV:

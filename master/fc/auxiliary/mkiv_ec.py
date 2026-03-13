@@ -296,7 +296,19 @@ class FCClient:
         Request the value of a 'top level' profile attribute.
         - attribute := str, name of the profile value.
         """
-        return eval(self._sendToListener(CODE_PROFILE, attribute))
+        # Safe evaluation with restricted scope
+        safe_builtins = {
+            'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
+            'min': min, 'max': max, 'abs': abs, 'round': round
+        }
+        safe_globals = {'__builtins__': safe_builtins}
+        safe_locals = {}
+        
+        try:
+            return eval(self._sendToListener(CODE_PROFILE, attribute), safe_globals, safe_locals)
+        except Exception as e:
+            print(f"Safe evaluation failed: {e}")
+            return None
 
     def requestReset(self):
         """
@@ -557,7 +569,27 @@ class FCClient:
         """
         if vector is None:
             return None
-        return [eval(raw_value) for raw_value in vector.split(LIST_SEPARATOR)]
+        # Safe parsing using ast.literal_eval for simple values
+        import ast
+        result = []
+        for raw_value in vector.split(LIST_SEPARATOR):
+            try:
+                # Try to parse as literal first (numbers, strings, etc.)
+                result.append(ast.literal_eval(raw_value.strip()))
+            except (ValueError, SyntaxError):
+                # If literal parsing fails, try safe eval with restricted scope
+                safe_builtins = {
+                    'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
+                    'min': min, 'max': max, 'abs': abs, 'round': round
+                }
+                safe_globals = {'__builtins__': safe_builtins}
+                safe_locals = {}
+                try:
+                    result.append(eval(raw_value.strip(), safe_globals, safe_locals))
+                except Exception as e:
+                    print(f"Failed to evaluate value '{raw_value}': {e}")
+                    result.append(None)
+        return result
 
 # TEST RUN #####################################################################
 if __name__ == '__main__':
