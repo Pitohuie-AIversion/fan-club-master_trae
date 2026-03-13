@@ -29,15 +29,18 @@
 ## IMPORTS #####################################################################
 import base64 as b64
 
+
 ################################################################################
 def encode(path):
-    with open(path, 'rb') as image:
+    with open(path, "rb") as image:
         encoded = b64.b64encode(image.read())
     return encoded
+
 
 def decode(data):
     return b64.b64decode(data)
 
+
 def save(data, filename, varname):
-    with open(filename, 'wt') as F:
+    with open(filename, "wt") as F:
         F.write("{} = {}".format(varname, data))

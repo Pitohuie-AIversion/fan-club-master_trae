@@ -28,20 +28,22 @@
 ## IMPORTS #####################################################################
 
 import inspect
-    # Print line numbers. See:
-    #   http://code.activestate.com/recipes/
-    #       145297-grabbing-the-current-line-number-easily/
+
+# Print line numbers. See:
+#   http://code.activestate.com/recipes/
+#       145297-grabbing-the-current-line-number-easily/
 import sys
 import traceback
 import platform as plt
 
 ## GLOBAL CONSTANTS ############################################################
-WINDOWS = 'WIN'
-MAC = 'MAC'
-LINUX = 'LNX'
-UNKNOWN = 'UNK'
+WINDOWS = "WIN"
+MAC = "MAC"
+LINUX = "LNX"
+UNKNOWN = "UNK"
 
 ## AUXILIARY FUNCTIONS #########################################################
+
 
 ## Multiplatform facilities ----------------------------------------------------
 def platform():
@@ -51,14 +53,15 @@ def platform():
 
     """
     S = plt.system()
-    if S == 'Windows':
+    if S == "Windows":
         return WINDOWS
-    elif S == 'Linux':
+    elif S == "Linux":
         return LINUX
-    elif S == 'Darwin':
+    elif S == "Darwin":
         return MAC
     else:
         return UNKNOWN
+
 
 ## Debug utilities -------------------------------------------------------------
 def ln():
@@ -68,7 +71,8 @@ def ln():
     """
     return inspect.currentframe().f_back.f_lineno
 
-def l(message = "", prefix = '', postfix = '\n'):
+
+def l(message="", prefix="", postfix="\n"):
     """
     Print the number of the line in which the function is called.
     - MESSAGE specifies an optional text to include when printing.
@@ -76,4 +80,4 @@ def l(message = "", prefix = '', postfix = '\n'):
     - PREFIX defaults an empty string.
     - POSTFIX defaults to newline.
     """
-    print(prefix, "L:", ln(), message, end = postfix)
+    print(prefix, "L:", ln(), message, end=postfix)

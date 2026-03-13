@@ -33,18 +33,20 @@ import threading as mt
 from fc import standards as s, printer as pt
 from fc.backend.mkiii import FCCommunicator as fcc
 
+
 ## HELPER CLASSES ##############################################################
 class FCCommunicator(pt.PrintClient):
     """
     Abstractions to be used by the FC front-end to interface with the
     communications back-end.
     """
+
     SYMBOL = "[NW]"
 
-    def __init__(self, feedbackPipeSend, slavePipeSend, networkPipeSend,
-        archive, pqueue):
-        """
-        """
+    def __init__(
+        self, feedbackPipeSend, slavePipeSend, networkPipeSend, archive, pqueue
+    ):
+        """ """
         pt.PrintClient.__init__(self, pqueue)
 
         self.feedbackPipeSend = feedbackPipeSend
@@ -69,29 +71,31 @@ class FCCommunicator(pt.PrintClient):
             if not self.active():
                 self.printr("Starting CM back-end")
                 self.process = mp.Process(
-                    name = "FC_Comms_Backend",
-                    target = self._b_routine,
-                    args = (self.archive.profile(),
-                            self.commandPipeRecv,
-                            self.controlPipeRecv,
-                            self.feedbackPipeSend,
-                            self.slavePipeSend,
-                            self.networkPipeSend,
-                            self.pqueue),
-                    daemon = True)
+                    name="FC_Comms_Backend",
+                    target=self._b_routine,
+                    args=(
+                        self.archive.profile(),
+                        self.commandPipeRecv,
+                        self.controlPipeRecv,
+                        self.feedbackPipeSend,
+                        self.slavePipeSend,
+                        self.networkPipeSend,
+                        self.pqueue,
+                    ),
+                    daemon=True,
+                )
                 self.process.start()
 
                 self.watchdog = mt.Thread(
-                    name = "FC BE Watchdog",
-                    target = self._w_routine,
-                    daemon = True)
+                    name="FC BE Watchdog", target=self._w_routine, daemon=True
+                )
                 self.watchdog.start()
             else:
                 self.printw("Tried to start already active back-end")
         except Exception as e:
             self.printx(e, "Exception when starting back-end")
 
-    def stop(self, timeout = s.MP_STOP_TIMEOUT_S):
+    def stop(self, timeout=s.MP_STOP_TIMEOUT_S):
         """
         Stop this Communicator (shut down the communication daemon). Does
         nothing if this instance is not active.
@@ -115,7 +119,7 @@ class FCCommunicator(pt.PrintClient):
         """
         return self.process is not None and self.process.is_alive()
 
-    def commandIn(self, command, target = s.TGT_ALL, rest = ()):
+    def commandIn(self, command, target=s.TGT_ALL, rest=()):
         """
         Send a general command with command code COMMAND with target code
         TARGET, followed by the values in VALUES (required only
@@ -125,7 +129,6 @@ class FCCommunicator(pt.PrintClient):
         # Optimized: cache active status check for better performance
         if self.process is not None and self.process.is_alive():
             self.commandPipeSend.send((command, target) + rest)
-
 
     def controlIn(self, C):
         """
@@ -158,8 +161,7 @@ class FCCommunicator(pt.PrintClient):
         Send a command to start the bootloader using the binary file at
         FILENAME with version code VERSION and byte size SIZE.
         """
-        self.commandIn(s.CMD_FUPDATE_START, s.TGT_ALL,
-            (version, filename, size))
+        self.commandIn(s.CMD_FUPDATE_START, s.TGT_ALL, (version, filename, size))
 
     def stopBootloader(self):
         """
@@ -174,13 +176,13 @@ class FCCommunicator(pt.PrintClient):
             "<broadcast>"
         """
         self.commandIn(s.CMD_BIP, ip)
-    
+
     def get_performance_stats(self):
         """
         Get performance statistics from the backend communicator.
         Returns a dictionary with performance metrics or None if not available.
         """
-        if hasattr(self, 'process') and self.process and self.process.is_alive():
+        if hasattr(self, "process") and self.process and self.process.is_alive():
             try:
                 # Send a command to get performance stats
                 self.commandIn(s.CMD_PERF_STATS)
@@ -189,12 +191,12 @@ class FCCommunicator(pt.PrintClient):
                 self.printw(f"Failed to request performance stats: {e}")
                 return False
         return False
-    
+
     def reset_performance_stats(self):
         """
         Reset performance statistics in the backend communicator.
         """
-        if hasattr(self, 'process') and self.process and self.process.is_alive():
+        if hasattr(self, "process") and self.process and self.process.is_alive():
             try:
                 self.commandIn(s.CMD_PERF_RESET)
                 return True
@@ -202,12 +204,12 @@ class FCCommunicator(pt.PrintClient):
                 self.printw(f"Failed to reset performance stats: {e}")
                 return False
         return False
-    
+
     def enable_performance_monitoring(self):
         """
         Enable performance monitoring in the backend.
         """
-        if hasattr(self, 'process') and self.process and self.process.is_alive():
+        if hasattr(self, "process") and self.process and self.process.is_alive():
             try:
                 self.commandIn(s.CMD_PERF_ENABLE)
                 return True
@@ -215,12 +217,12 @@ class FCCommunicator(pt.PrintClient):
                 self.printw(f"Failed to enable performance monitoring: {e}")
                 return False
         return False
-    
+
     def disable_performance_monitoring(self):
         """
         Disable performance monitoring in the backend.
         """
-        if hasattr(self, 'process') and self.process and self.process.is_alive():
+        if hasattr(self, "process") and self.process and self.process.is_alive():
             try:
                 self.commandIn(s.CMD_PERF_DISABLE)
                 return True
@@ -231,17 +233,30 @@ class FCCommunicator(pt.PrintClient):
 
     # Internal methods .........................................................
     @staticmethod
-    def _b_routine(profile, commandPipeRecv, controlPipeRecv, feedbackPipeSend,
-        slavePipeSend, networkPipeSend, pqueue):
+    def _b_routine(
+        profile,
+        commandPipeRecv,
+        controlPipeRecv,
+        feedbackPipeSend,
+        slavePipeSend,
+        networkPipeSend,
+        pqueue,
+    ):
         """
         Back-end routine. To be executed by the B.E. process.
         """
         P = pt.printers(pqueue, "[CR]")
         P[pt.R]("Comms. backend process started")
         try:
-            comms = fcc.FCCommunicator(profile, commandPipeRecv,
-                controlPipeRecv, feedbackPipeSend, slavePipeSend,
-                networkPipeSend, pqueue)
+            comms = fcc.FCCommunicator(
+                profile,
+                commandPipeRecv,
+                controlPipeRecv,
+                feedbackPipeSend,
+                slavePipeSend,
+                networkPipeSend,
+                pqueue,
+            )
             comms.join()
         except Exception as e:
             P[pt.X](e, "Fatal error in comms. backend process")
@@ -267,5 +282,3 @@ class FCCommunicator(pt.PrintClient):
         except (OSError, BrokenPipeError) as e:
             # Pipe is already closed, ignore the error
             self.printd(f"Network pipe already closed: {e}")
-
-

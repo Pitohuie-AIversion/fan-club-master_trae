@@ -39,8 +39,9 @@ class Mapper:
     network coordinates K with ordered pairs (s, f) and indices k and
     grid coordinates G with ordered triples (l, r, c) and indices g.
     """
-    SPLITTER_CELL = ','
-    SPLITTER_LAYER = '-'
+
+    SPLITTER_CELL = ","
+    SPLITTER_LAYER = "-"
 
     def __init__(self, archive):
         """
@@ -66,21 +67,21 @@ class Mapper:
         """
         Given a k-tuple (s, f), return the corresponding g-tuple (l, r, c).
         """
-        k = s*self.maxFans + f
+        k = s * self.maxFans + f
         g = self.KG[k]
-        l = g//self.RC
-        r = (g%self.RC)//self.C
-        c = (g%self.RC)%self.C
+        l = g // self.RC
+        r = (g % self.RC) // self.C
+        c = (g % self.RC) % self.C
         return l, r, c
 
     def tuple_GK(self, l, r, c):
         """
         Given a g-tuple (l, r, c), return the corresponding k-tuple (s, f).
-            """
-        g = l*self.RC + r*self.C + c
+        """
+        g = l * self.RC + r * self.C + c
         k = self.GK[g]
-        s = k//self.maxFans
-        f = k%self.maxFans
+        s = k // self.maxFans
+        f = k % self.maxFans
         return s, f
 
     def profileChange(self):
@@ -96,13 +97,13 @@ class Mapper:
         """
         Return a zero-vector of size K*2.
         """
-        return [0]*(2*self.getSize_K())
+        return [0] * (2 * self.getSize_K())
 
     def getZero_G(self):
         """
         Return a zero-vector of size G*2.
         """
-        return [0]*(2*self.getSize_G())
+        return [0] * (2 * self.getSize_G())
 
     # Internal methods ---------------------------------------------------------
 
@@ -117,17 +118,17 @@ class Mapper:
         self.L = self.array[ac.FA_layers]
         self.R = self.array[ac.FA_rows]
         self.C = self.array[ac.FA_columns]
-        self.RC = self.R*self.C
+        self.RC = self.R * self.C
 
         slaves = self.archive[ac.savedSlaves]
         self.nslaves = len(slaves)
         self.maxFans = self.archive[ac.maxFans]
 
-        self.size_k = self.nslaves*self.maxFans
-        self.KG = [std.PAD]*(self.size_k)
+        self.size_k = self.nslaves * self.maxFans
+        self.KG = [std.PAD] * (self.size_k)
 
-        self.size_g = self.L*self.R*self.C
-        self.GK = [std.PAD]*(self.size_g)
+        self.size_g = self.L * self.R * self.C
+        self.GK = [std.PAD] * (self.size_g)
 
         for s, slave in enumerate(slaves):
             row_base, column_base = slave[ac.MD_row], slave[ac.MD_column]
@@ -135,22 +136,25 @@ class Mapper:
             ncolumns_slave = slave[ac.MD_columns]
             mapping = slave[ac.MD_mapping]
 
-            base_KG = s*self.maxFans
-            base_GK = column_base + row_base*self.C
+            base_KG = s * self.maxFans
+            base_GK = column_base + row_base * self.C
 
             for i_cell, cell in enumerate(mapping.split(self.SPLITTER_CELL)):
                 for layer, fan in enumerate(cell.split(self.SPLITTER_LAYER)):
 
-                    row_cell = i_cell//ncolumns_slave
-                    column_cell = i_cell%ncolumns_slave
+                    row_cell = i_cell // ncolumns_slave
+                    column_cell = i_cell % ncolumns_slave
 
-
-                    if fan != '' and row_cell + row_base < self.R \
-                        and column_cell + column_base < self.C:
+                    if (
+                        fan != ""
+                        and row_cell + row_base < self.R
+                        and column_cell + column_base < self.C
+                    ):
 
                         index_KG = base_KG + int(fan)
-                        index_GK = layer*self.RC + base_GK \
-                            + row_cell*self.C + column_cell
+                        index_GK = (
+                            layer * self.RC + base_GK + row_cell * self.C + column_cell
+                        )
 
                         self.KG[index_KG] = index_GK
                         self.GK[index_GK] = index_KG
@@ -160,7 +164,7 @@ class Mapper:
     def _testMapping(self):
         print("** Testing FC mapping for profile '{}'".format(archive[ac.name]))
 
-        print("* Building mappingstd... ", end = '')
+        print("* Building mappingstd... ", end="")
         f_GK = self.tuple_GK
         A = self.archive[ac.fanArray]
         archive = self.archive
@@ -171,14 +175,14 @@ class Mapper:
 
         print("* Printing Grid Mapping")
         for l in range(L):
-            print("- Layer {}/{}:".format(l+1, L))
-            print("___", end = '')
+            print("- Layer {}/{}:".format(l + 1, L))
+            print("___", end="")
             for c in range(C):
-                print("|__{:02d}__".format(c), end = '')
-            print('')
+                print("|__{:02d}__".format(c), end="")
+            print("")
             for r in range(R):
-                print("{:02d}|".format(r), end = '')
+                print("{:02d}|".format(r), end="")
                 for c in range(C):
                     # s,f -> _00:00_ (7)
-                    print(" {:02d}:{:02d} ".format(*f_GK(l, r, c)), end = '')
-                print('')
+                    print(" {:02d}:{:02d} ".format(*f_GK(l, r, c)), end="")
+                print("")

@@ -1,17 +1,19 @@
 {
   "summary": {
-    "total_issues": 78,
+    "total_issues": 336,
     "severity_counts": {
-      "MEDIUM": 71,
-      "LOW": 3,
-      "HIGH": 4
+      "MEDIUM": 308,
+      "LOW": 16,
+      "HIGH": 11,
+      "CRITICAL": 1
     },
     "type_counts": {
-      "array_bounds": 56,
-      "pointer_dereference": 13,
-      "string_compare": 3,
-      "string_length": 2,
-      "use_after_free": 4
+      "array_bounds": 239,
+      "pointer_dereference": 59,
+      "string_compare": 16,
+      "string_length": 10,
+      "use_after_free": 11,
+      "buffer_overflow": 1
     }
   },
   "issues": [
@@ -698,6 +700,2261 @@
       "severity": "MEDIUM",
       "description": "指针解引用赋值，需要确保指针有效",
       "code": "PinName* oldTachPin = this->tachPin;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 207,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char dataReceived[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 240,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dataReceived[bytesReceived] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 269,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 320,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char reply[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 425,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char processed[MAX_MESSAGE_LENGTH] = {0}; // Feedback to be sent to Master"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 427,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 428,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 489,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char buffer[MAX_MESSAGE_LENGTH] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 606,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 685,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 916,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char outgoing[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 967,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char \tbuffer[MAX_MESSAGE_LENGTH] = {0},"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 989,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 996,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[result] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 1028,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 1046,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 1051,
+      "column": 5,
+      "type": "buffer_overflow",
+      "severity": "CRITICAL",
+      "description": "使用不安全的strcpy函数，可能导致缓冲区溢出",
+      "code": "strcpy(message, splitPosition);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 243,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPointer = NULL; // Save splitting position in strtok_r"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 244,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPositionTracker = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 491,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 492,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *savePointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 968,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPointer = NULL,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 969,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 988,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 1028,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 279,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer, PASSCODE) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 368,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Communicator.cpp",
+      "line": 1044,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "if(strlen(splitPosition) == 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 80,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->inBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 81,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->pastCommand[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 143,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "switch(splitPtr[0]){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 199,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(splitPtr[i] - '0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 203,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycle);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 242,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float dutyCycles[MAX_FANS] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 247,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount] = atof(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 251,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 263,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycles[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 302,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "tm, splitPtr[0]);pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 332,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char pwmPinout[25] = {0}, tachPinout[25] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 345,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "|| pwmPinout[0] == '\\0' || tachPinout[0] == '\\0') {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 418,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "i, int(pwmPinout[i]-'A'), int(tachPinout[i]-'[') );pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 421,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].configure("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 422,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "PWMS[pwmPinout[i] - 'A'],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 423,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "TACHS[tachPinout[i] - '['],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 469,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 473,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 479,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 480,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 545,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 575,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char rpmBuffer[MAX_MESSAGE_LENGTH]; // Save last RPM value"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 600,
+      "column": 17,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(0);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 634,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "fanPtr = &(this->fanArray[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 660,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "pl;printf(\"\\n\\r\\t[P][D] output buffer: %s\","
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 664,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\"|%.4f\", this->fanArray[0].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 671,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\",%.4f\", this->fanArray[i].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 119,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 120,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPtr = strtok_r(this->inBuffer, \":\", &splitPosition);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 469,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 625,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "Fan *fanPtr = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 106,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "if(strcmp(this->pastCommand, givenCommand) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9-f429/slave/Processor.cpp",
+      "line": 192,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "int numFans = strlen(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 224,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char dataReceived[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 257,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dataReceived[bytesReceived] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 286,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 337,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char reply[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 442,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char processed[MAX_MESSAGE_LENGTH] = {0}; // Feedback to be sent to Master"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 444,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 445,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 506,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char buffer[MAX_MESSAGE_LENGTH] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 623,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 702,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 933,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char outgoing[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 984,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char \tbuffer[MAX_MESSAGE_LENGTH] = {0},"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1006,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1013,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[result] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1045,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1063,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1252,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete ethernet;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1253,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete slaveMISO;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1254,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete slaveMOSI;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1255,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete slaveListener;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1256,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete masterMISO;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1257,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete masterMOSI;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1258,
+      "column": 2,
+      "type": "use_after_free",
+      "severity": "HIGH",
+      "description": "使用delete释放内存，需要确保没有后续使用",
+      "code": "delete masterListener;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 260,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPointer = NULL; // Save splitting position in strtok_r"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 261,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPositionTracker = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 508,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 509,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *savePointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 985,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPointer = NULL,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 986,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1005,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1045,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 296,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer, PASSCODE) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 385,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Communicator.cpp",
+      "line": 1061,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "if(strlen(splitPosition) == 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 80,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->inBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 81,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->pastCommand[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 143,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "switch(splitPtr[0]){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 199,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(splitPtr[i] - '0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 203,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycle);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 242,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float dutyCycles[MAX_FANS] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 247,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount] = atof(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 251,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 263,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycles[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 302,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "tm, splitPtr[0]);pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 332,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char pwmPinout[25] = {0}, tachPinout[25] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 345,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "|| pwmPinout[0] == '\\0' || tachPinout[0] == '\\0') {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 418,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "i, int(pwmPinout[i]-'A'), int(tachPinout[i]-'[') );pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 421,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].configure("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 422,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "PWMS[pwmPinout[i] - 'A'],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 423,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "TACHS[tachPinout[i] - '['],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 469,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 473,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 479,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 480,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 545,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 575,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char rpmBuffer[MAX_MESSAGE_LENGTH]; // Save last RPM value"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 600,
+      "column": 17,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(0);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 634,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "fanPtr = &(this->fanArray[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 660,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "pl;printf(\"\\n\\r\\t[P][D] output buffer: %s\","
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 664,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\"|%.4f\", this->fanArray[0].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 671,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\",%.4f\", this->fanArray[i].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 119,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 120,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPtr = strtok_r(this->inBuffer, \":\", &splitPosition);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 469,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 625,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "Fan *fanPtr = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 106,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "if(strcmp(this->pastCommand, givenCommand) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed6.16/slave/Processor.cpp",
+      "line": 192,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "int numFans = strlen(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 219,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char dataReceived[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 252,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dataReceived[bytesReceived] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 281,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 332,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char reply[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 439,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char fanIDStr[16];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 450,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char targetRPMStr[16];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 455,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char chaseCommand[64];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 496,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char processed[MAX_MESSAGE_LENGTH] = {0}; // Feedback to be sent to Master"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 498,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 499,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 560,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char buffer[MAX_MESSAGE_LENGTH] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 632,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char tempBuffer[MAX_MESSAGE_LENGTH] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 718,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 797,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1090,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char outgoing[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1155,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char \tbuffer[MAX_MESSAGE_LENGTH] = {0},"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1177,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1184,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[result] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1216,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1234,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 255,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPointer = NULL; // Save splitting position in strtok_r"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 256,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPositionTracker = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 562,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 563,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *savePointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1156,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPointer = NULL,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1157,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1176,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1216,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 291,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer, PASSCODE) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 381,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Communicator.cpp",
+      "line": 1232,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "if(strlen(splitPosition) == 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 80,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->inBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 81,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->pastCommand[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 170,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "commandChar = splitPtr[0];  // 使用第一个字符"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 229,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(splitPtr[i] - '0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 233,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycle);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 272,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float dutyCycles[MAX_FANS] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 277,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount] = atof(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 281,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 293,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycles[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 381,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "int currentRPM = this->fanArray[fanID].read("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 389,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float currentDC = this->fanArray[fanID].getDC();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 408,
+      "column": 9,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[fanID].write(newDC);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 441,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "tm, splitPtr[0]);pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 471,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char pwmPinout[25] = {0}, tachPinout[25] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 484,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "|| pwmPinout[0] == '\\0' || tachPinout[0] == '\\0') {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 557,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "i, int(pwmPinout[i]-'A'), int(tachPinout[i]-'[') );pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 560,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].configure("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 561,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "PWMS[pwmPinout[i] - 'A'],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 562,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "TACHS[tachPinout[i] - '['],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 608,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 612,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 618,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 619,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 684,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 714,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char rpmBuffer[MAX_MESSAGE_LENGTH]; // Save last RPM value"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 739,
+      "column": 17,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(0);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 773,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "fanPtr = &(this->fanArray[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 799,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "pl;printf(\"\\n\\r\\t[P][D] output buffer: %s\","
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 803,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\"|%.4f\", this->fanArray[0].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 810,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\",%.4f\", this->fanArray[i].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 134,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 608,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "const char* source = (this->outBuffer[0] != '\\0') ? this->outBuffer : \"M\";"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 764,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "Fan *fanPtr = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 118,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "if(strcmp(this->pastCommand, givenCommand) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 222,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "int numFans = strlen(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/mbed5.9/slave/Processor.cpp",
+      "line": 345,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "if (strcmp(splitPtr, \"None\") == 0 || strcmp(splitPtr, \"none\") == 0) {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/main.cpp",
+      "line": 71,
+      "column": 9,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "printf(\"\\n\\r[WARN] Failed to load configuration, using defaults\");"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 223,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char dataReceived[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 256,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dataReceived[bytesReceived] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 285,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 336,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char reply[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 441,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char processed[MAX_MESSAGE_LENGTH] = {0}; // Feedback to be sent to Master"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 443,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 444,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "processed[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 505,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char buffer[MAX_MESSAGE_LENGTH] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 622,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 701,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(buffer[0] == '\\0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 932,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char outgoing[MAX_MESSAGE_LENGTH];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 992,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char \tbuffer[MAX_MESSAGE_LENGTH] = {0},"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1014,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1021,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[result] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1053,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1071,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "message[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 259,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPointer = NULL; // Save splitting position in strtok_r"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 260,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPositionTracker = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 507,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 508,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *savePointer = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 993,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPointer = NULL,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 994,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1013,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1053,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "*specifier = splitPointer[0];"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 295,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer, PASSCODE) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 384,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "} else if (strcmp(splitPointer,"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Communicator.cpp",
+      "line": 1069,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "if(strlen(splitPosition) == 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 80,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->inBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 81,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->pastCommand[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 143,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "switch(splitPtr[0]){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 199,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "if(splitPtr[i] - '0'){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 203,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycle);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 242,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float dutyCycles[MAX_FANS] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 247,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount] = atof(splitPtr);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 251,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "dutyCycles[dcCount]"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 263,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(dutyCycles[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 330,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "int currentRPM = this->fanArray[fanID].read("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 338,
+      "column": 8,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "float currentDC = this->fanArray[fanID].getDC();"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 356,
+      "column": 9,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[fanID].write(newDC);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 389,
+      "column": 7,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "tm, splitPtr[0]);pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 419,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char pwmPinout[25] = {0}, tachPinout[25] = {0};"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 433,
+      "column": 4,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "|| pwmPinout[0] == '\\0' || tachPinout[0] == '\\0') {"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 506,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "i, int(pwmPinout[i]-'A'), int(tachPinout[i]-'[') );pu;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 509,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].configure("
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 510,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "PWMS[pwmPinout[i] - 'A'],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 511,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "TACHS[tachPinout[i] - '['],"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 557,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "strncpy(buffer, this->outBuffer[0] != '\\0'? this->outBuffer : \"M\", MAX_MESSAGE_LENGTH - 1);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 560,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 566,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[0] = 'M';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 567,
+      "column": 3,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "buffer[1] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 632,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->outBuffer[0] = '\\0';"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 662,
+      "column": 2,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "char rpmBuffer[MAX_MESSAGE_LENGTH]; // Save last RPM value"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 687,
+      "column": 17,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "this->fanArray[i].write(0);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 721,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "fanPtr = &(this->fanArray[i]);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 747,
+      "column": 5,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "pl;printf(\"\\n\\r\\t[P][D] output buffer: %s\","
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 751,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\"|%.4f\", this->fanArray[0].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 758,
+      "column": 6,
+      "type": "array_bounds",
+      "severity": "MEDIUM",
+      "description": "数组访问，需要确保索引在有效范围内",
+      "code": "\",%.4f\", this->fanArray[i].getDC());"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 119,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char *splitPosition = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 120,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "char* splitPtr = strtok_r(this->inBuffer, \":\", &splitPosition);"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 712,
+      "type": "pointer_dereference",
+      "severity": "MEDIUM",
+      "description": "指针解引用赋值，需要确保指针有效",
+      "code": "Fan *fanPtr = NULL;"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 106,
+      "type": "string_compare",
+      "severity": "LOW",
+      "description": "使用strcmp需要确保两个字符串都以null结尾",
+      "code": "if(strcmp(this->pastCommand, givenCommand) != 0){"
+    },
+    {
+      "file": "d:/2025/chendashuai_wind_turnnal/fan-club-master/fan-club-master_trae/slave/Processor.cpp",
+      "line": 192,
+      "type": "string_length",
+      "severity": "MEDIUM",
+      "description": "使用strlen需要确保字符串以null结尾",
+      "code": "int numFans = strlen(splitPtr);"
     }
   ]
 }

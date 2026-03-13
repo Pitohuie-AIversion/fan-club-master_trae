@@ -42,6 +42,7 @@ from fc.frontend.gui.theme import BG_ACCENT
 ## GLOBALS #####################################################################
 NOTHING = lambda: None
 
+
 ## WIDGETS #####################################################################
 class Loader(ttk.Frame):
     """
@@ -67,14 +68,13 @@ class Loader(ttk.Frame):
         for i, filetype in enumerate(filetypes):
             error = None
             if len(filetype[1]) <= 0:
-                error = "Extension too short (length {}) ".format(
-                    len(filetype[1]))
-            elif filetype[1][0] != '.':
+                error = "Extension too short (length {}) ".format(len(filetype[1]))
+            elif filetype[1][0] != ".":
                 error = "Badly formatted filetype (missing dot) "
             if error:
                 raise ValueError(error + "({})".format(i))
             else:
-                self.filetypes.append((filetype[0], '*' + filetype[1]))
+                self.filetypes.append((filetype[0], "*" + filetype[1]))
 
         self.filetypes.append(("All files", "*.*"))
 
@@ -88,15 +88,16 @@ class Loader(ttk.Frame):
         the path to the chosen file.
         """
 
-        filename = fdg.askopenfilename(initialdir = self.directory,
-            title = self.TITLE, filetypes = self.filetypes)
+        filename = fdg.askopenfilename(
+            initialdir=self.directory, title=self.TITLE, filetypes=self.filetypes
+        )
         if not filename:
             return None
-        splitted = filename.split('/')[:-1]
-        self.directory = ("{}/"*len(splitted)).format(*splitted)
+        splitted = filename.split("/")[:-1]
+        self.directory = ("{}/" * len(splitted)).format(*splitted)
         return filename
 
-    def saveDialog(self, default = None):
+    def saveDialog(self, default=None):
         """
         Launch a Tkinter file dialog to choose a file to which to write and
         return the chosen filename as a string, or None if the user cancelled
@@ -104,18 +105,21 @@ class Loader(ttk.Frame):
 
         DEFAULT (optional) allows the caller to specify an initial filename.
         """
-        args = {} if not default else {'initialfile' : default}
+        args = {} if not default else {"initialfile": default}
 
         filename = fdg.asksaveasfilename(
-            initialdir = self.directory,
-            title = self.TITLE, filetypes = self.filetypes, **args)
-        splitted = filename.split('/')[:-1]
-        self.directory = ("{}/"*len(splitted)).format(*splitted)
+            initialdir=self.directory,
+            title=self.TITLE,
+            filetypes=self.filetypes,
+            **args,
+        )
+        splitted = filename.split("/")[:-1]
+        self.directory = ("{}/" * len(splitted)).format(*splitted)
         if not filename:
             return None
         return filename
 
-    def load(self, filename = None):
+    def load(self, filename=None):
         """
         Load the file given by FILENAME and return its contents (as a string) in
         a tuple, of the form:
@@ -128,11 +132,28 @@ class Loader(ttk.Frame):
             filename = self.loadDialog()
         if not filename:
             return None
-        with open(filename, 'r') as f:
+
+        # 验证文件路径安全性
+        import os
+
+        resolved_path = os.path.abspath(os.path.realpath(filename))
+        current_dir = os.getcwd()
+
+        # 检查文件是否在允许的目录内
+        if not resolved_path.startswith(current_dir):
+            raise IOError("文件路径必须在当前工作目录内")
+
+        # 检查文件扩展名
+        allowed_extensions = [".txt", ".py", ".json", ".fcpy", ".md", ".log"]
+        file_ext = os.path.splitext(filename)[1].lower()
+        if file_ext not in allowed_extensions:
+            raise IOError(f"不允许的文件类型: {file_ext}")
+
+        with open(filename, "r", encoding="utf-8") as f:
             contents = f.read()
         return (contents, filename)
 
-    def save(self, contents, filename = None, default = None):
+    def save(self, contents, filename=None, default=None):
         """
         Write CONTENTS into a FILENAME. If FILENAME is None, asks the user
         by calling saveDialog. If the result is None again, the operation is
@@ -152,7 +173,23 @@ class Loader(ttk.Frame):
         if not filename:
             return None
 
-        with open(filename, 'w') as f:
+        # 验证文件路径安全性
+        import os
+
+        resolved_path = os.path.abspath(os.path.realpath(filename))
+        current_dir = os.getcwd()
+
+        # 检查文件是否在允许的目录内
+        if not resolved_path.startswith(current_dir):
+            raise IOError("文件路径必须在当前工作目录内")
+
+        # 检查文件扩展名
+        allowed_extensions = [".txt", ".py", ".json", ".fcpy", ".md", ".log"]
+        file_ext = os.path.splitext(filename)[1].lower()
+        if file_ext not in allowed_extensions:
+            raise IOError(f"不允许的文件类型: {file_ext}")
+
+        with open(filename, "w", encoding="utf-8") as f:
             return f.write(contents)
 
 
@@ -161,7 +198,7 @@ class LoaderWidget(Loader):
     Loader with a minimal Tkinter GUI (just buttons).
     """
 
-    def __init__(self, master, filetypes, onSave, onLoad, default = NOTHING):
+    def __init__(self, master, filetypes, onSave, onLoad, default=NOTHING):
         """
         Create a new Loader widget in MASTER that reads and writes files of
         types FILETYPES. (See Loader.) When the user clicks on the Save or
@@ -196,14 +233,14 @@ class LoaderWidget(Loader):
         Enable interactive components.
         """
         for widget in self.interactive:
-            widget.config(state = tk.NORMAL)
+            widget.config(state=tk.NORMAL)
 
     def disable(self):
         """
         Disable interactive components.
         """
         for widget in self.interactive:
-            widget.config(state = tk.DISABLED)
+            widget.config(state=tk.DISABLED)
 
     def _load(self, *E):
         """
@@ -215,7 +252,7 @@ class LoaderWidget(Loader):
         """
         Save button callback.
         """
-        self.save(self.onSave(), default = self.default())
+        self.save(self.onSave(), default=self.default())
 
     def _addInteractive(self, widget):
         """
@@ -223,21 +260,27 @@ class LoaderWidget(Loader):
         """
         self.interactive.append(widget)
 
-    def _buildLoadButton(self, text = "Load"):
-        self.loadButton = ib.create_icon_button(self, text=text, icon="load", command=self._load, style="Secondary")
-        self.loadButton.pack(side = tk.LEFT, **gus.padc)
+    def _buildLoadButton(self, text="Load"):
+        self.loadButton = ib.create_icon_button(
+            self, text=text, icon="load", command=self._load, style="Secondary"
+        )
+        self.loadButton.pack(side=tk.LEFT, **gus.padc)
         self.interactive.append(self.loadButton)
 
-    def _buildSaveButton(self, text = "Save"):
-        self.saveButton = ib.create_icon_button(self, text=text, icon="save", command=self._save, style="Secondary")
-        self.saveButton.pack(side = tk.LEFT, **gus.padc)
+    def _buildSaveButton(self, text="Save"):
+        self.saveButton = ib.create_icon_button(
+            self, text=text, icon="save", command=self._save, style="Secondary"
+        )
+        self.saveButton.pack(side=tk.LEFT, **gus.padc)
         self.interactive.append(self.saveButton)
+
 
 class FlowLoaderWidget(LoaderWidget):
     """
     Shorthand for a LoaderWidget that loads flows from CSV files.
     Does not allow saving.
     """
+
     EXTENSION = ".csv"
     FILETYPES = (("CSV", EXTENSION),)
 
@@ -246,8 +289,9 @@ class FlowLoaderWidget(LoaderWidget):
         See LoaderWidget.
         """
         LoaderWidget.__init__(self, master, self.FILETYPES, lambda: None, onLoad)
-        self.default = lambda: "FCMkIV_flow_{}{}".format(tm.strftime(
-            "%a_%d_%b_%Y_%H-%M-%S", tm.localtime()), self.EXTENSION)
+        self.default = lambda: "FCMkIV_flow_{}{}".format(
+            tm.strftime("%a_%d_%b_%Y_%H-%M-%S", tm.localtime()), self.EXTENSION
+        )
 
     def _save(self, *_):
         """
@@ -263,4 +307,3 @@ class FlowLoaderWidget(LoaderWidget):
 
     def _buildLoadButton(self):
         LoaderWidget._buildLoadButton(self, "Choose File")
-

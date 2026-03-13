@@ -38,6 +38,7 @@ import fc.backend.external as ex
 import fc.backend.mapper as mr
 import fc.standards as std
 
+
 ################################################################################
 class FCFrontend(pt.PrintServer):
     """
@@ -60,6 +61,7 @@ class FCFrontend(pt.PrintServer):
     as PrintServer --that is, they now refer to both inter-process
     communications and terminal output. See fc.utils.PrintServer.
     """
+
     SYMBOL = "[FE]"
 
     def __init__(self, archive, pqueue):
@@ -84,15 +86,15 @@ class FCFrontend(pt.PrintServer):
         # Backend components initialization
         self.mapper = mr.Mapper(self.archive)
 
-        self.network = cm.FCCommunicator(self.feedback_send, self.slave_send,
-            self.network_send, archive, pqueue)
+        self.network = cm.FCCommunicator(
+            self.feedback_send, self.slave_send, self.network_send, archive, pqueue
+        )
         self.external = ex.ExternalControl(self.mapper, archive, pqueue)
         self.addFeedbackClient(self.external)
         self.addNetworkClient(self.external)
         self.addSlaveClient(self.external)
         self.archiveClient(self.mapper)
         self.archiveClient(self.external)
-
 
     # "PUBLIC" INTERFACE -------------------------------------------------------
     def run(self):
@@ -243,10 +245,8 @@ class FCFrontend(pt.PrintServer):
         self.feedback_recv, self.feedback_send = mp.Pipe(False)
         self.network_recv, self.network_send = mp.Pipe(False)
         self.slave_recv, self.slave_send = mp.Pipe(False)
-        self.send_pipes = (
-            self.feedback_send, self.network_send, self.slave_send)
-        self.recv_pipes = (
-            self.feedback_recv, self.network_recv, self.slave_recv)
+        self.send_pipes = (self.feedback_send, self.network_send, self.slave_send)
+        self.recv_pipes = (self.feedback_recv, self.network_recv, self.slave_recv)
 
     def __buildLocks(self):
         """
@@ -272,9 +272,10 @@ class FCFrontend(pt.PrintServer):
         Meant to be called only during construction.
         """
         self.threads = (
-            mt.Thread(target = self._feedbackRoutine, daemon = True),
-            mt.Thread(target = self._slaveRoutine, daemon = True),
-            mt.Thread(target = self._networkRoutine, daemon = True))
+            mt.Thread(target=self._feedbackRoutine, daemon=True),
+            mt.Thread(target=self._slaveRoutine, daemon=True),
+            mt.Thread(target=self._networkRoutine, daemon=True),
+        )
 
     def _startThreads(self):
         """
@@ -348,4 +349,3 @@ class FCFrontend(pt.PrintServer):
                 self.printx(e, "Exception in FE network routine")
         self.printr("Network state watchdog terminated.")
         print("Network state watchdog terminated.")
-

@@ -43,6 +43,7 @@ from fc.frontend.gui.theme import SURFACE_1, PRIMARY_500
 ## AUXILIARY GLOBALS ###########################################################
 DEFAULT_TIMEOUT = 3
 
+
 ## MAIN ########################################################################
 class SplashFrame(ttk.Frame):
     """
@@ -56,7 +57,7 @@ class SplashFrame(ttk.Frame):
         style = ttk.Style(master)
         style.configure("Splash.TFrame", background=SURFACE_1, borderwidth=0, padding=0)
         ttk.Frame.__init__(self, master, style="Splash.TFrame")
-        self.pack(side = tk.TOP, fill = tk.BOTH, expand = tk.YES)
+        self.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
         # Ensure root background matches splash background to avoid white edge
         try:
@@ -66,7 +67,7 @@ class SplashFrame(ttk.Frame):
 
         # Build content first so we can size the window to fit content exactly
         self.widget = widget(self)
-        self.widget.pack(fill = tk.BOTH, expand = True)
+        self.widget.pack(fill=tk.BOTH, expand=True)
 
         # Compute size based on content if not explicitly provided
         self.master.update_idletasks()
@@ -96,27 +97,26 @@ class SplashFrame(ttk.Frame):
         self.master.overrideredirect(True)
         # Keep on top during splash to avoid visual artifacts
         try:
-            self.master.attributes('-topmost', True)
+            self.master.attributes("-topmost", True)
         except tk.TclError:
             pass
         self.lift()
+
 
 class FCSplashWidget(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master, style="Splash.TFrame")
 
-        self.image = tk.PhotoImage(data = stp.SPLASH)
+        self.image = tk.PhotoImage(data=stp.SPLASH)
         # Make the splash image larger by using its native resolution (remove subsample)
         # If further scaling is needed in the future, consider PhotoImage.zoom(...)
 
         # use ttk.Label for image; place over ttk frame for consistent theming
         self.label = ttk.Label(
-            self,
-            image = self.image,
-            anchor = tk.CENTER,
-            style = "Splash.TLabel"
+            self, image=self.image, anchor=tk.CENTER, style="Splash.TLabel"
         )
-        self.label.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
+        self.label.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
 
 class SerialSplash:
     """
@@ -124,12 +124,12 @@ class SerialSplash:
     compatibility).
     """
 
-    def __init__(self, version = "[...]", widget = FCSplashWidget, **kwargs):
+    def __init__(self, version="[...]", widget=FCSplashWidget, **kwargs):
         self.version = version
         self.widget = widget
         self.kwargs = kwargs
 
-    def run(self, timeout = DEFAULT_TIMEOUT):
+    def run(self, timeout=DEFAULT_TIMEOUT):
         """
         Display the splash screen for TIMEOUT seconds. If omitted, TIMEOUT
         defaults to DEFAULT_TIMEOUT.
@@ -141,17 +141,18 @@ class SerialSplash:
         except tk.TclError:
             pass
         root.bind("<Button-1>", lambda e: root.destroy())
-        splash = SplashFrame(master = root, widget = self.widget, **self.kwargs)
+        splash = SplashFrame(master=root, widget=self.widget, **self.kwargs)
         start = tm.time()
 
         # Safe after call with error handling
         try:
             if root.winfo_exists():
-                root.after(1000*timeout, root.destroy)
+                root.after(1000 * timeout, root.destroy)
         except (tk.TclError, AttributeError):
             # Widget has been destroyed or error occurred, ignore
             pass
         root.mainloop()
+
 
 class ParallelSplash:
     """
@@ -160,7 +161,7 @@ class ParallelSplash:
     """
 
     @staticmethod
-    def _routine(lock, widget, timeout, kwargs = {}):
+    def _routine(lock, widget, timeout, kwargs={}):
         """
         To be executed by the separate process that displays the splash screen.
         """
@@ -171,13 +172,13 @@ class ParallelSplash:
         except tk.TclError:
             pass
         root.bind("<Button-1>", lambda e: root.destroy())
-        splash = SplashFrame(master = root, widget = widget, **kwargs)
+        splash = SplashFrame(master=root, widget=widget, **kwargs)
         start = tm.time()
 
         def r():
             acquired = False
-            while (tm.time()-start < timeout) if timeout is not None else True:
-                tm.sleep(.01)
+            while (tm.time() - start < timeout) if timeout is not None else True:
+                tm.sleep(0.01)
                 if lock.acquire(False):
                     acquired = True
                     break
@@ -185,14 +186,12 @@ class ParallelSplash:
                 lock.release()
             root.destroy()
 
-        thread = mt.Thread(name = "FC Splash Screen Watchdog", target = r,
-            daemon = True)
+        thread = mt.Thread(name="FC Splash Screen Watchdog", target=r, daemon=True)
 
         thread.start()
         root.mainloop()
 
-    def __init__(self, version, timeout = None, widget = FCSplashWidget,
-        **kwargs):
+    def __init__(self, version, timeout=None, widget=FCSplashWidget, **kwargs):
         """
         WIDGET is a class that inherits from Tkinter's Frame class, to be
         instantiated with no arguments (other than a parent Frame), and packed
@@ -229,7 +228,7 @@ class ParallelSplash:
         if self.isActive():
             self.lock.release()
 
-    def join(self, timeout = None):
+    def join(self, timeout=None):
         """
         Block until the splash screen process ends on its own. Terminate after
         TIMEOUT seconds (wait forever if no TIMEOUT is given). Returns
@@ -255,7 +254,9 @@ class ParallelSplash:
 
     def _setProcess(self):
         self.lock = mp.Lock()
-        self.process = mp.Process(name = "FC Splash Screen",
-            target = self._routine,
-            args = (self.lock, self.widget, self.timeout, self.kwargs),
-            daemon = True)
+        self.process = mp.Process(
+            name="FC Splash Screen",
+            target=self._routine,
+            args=(self.lock, self.widget, self.timeout, self.kwargs),
+            daemon=True,
+        )

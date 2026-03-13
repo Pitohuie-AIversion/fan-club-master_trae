@@ -38,11 +38,13 @@ from typing import Optional, Any
 
 class FCCommunicatorError(Exception):
     """Base exception class for FCCommunicator errors."""
+
     pass
 
 
 class NetworkError(FCCommunicatorError):
     """Raised when network communication fails."""
+
     def __init__(self, message: str, slave_info: Optional[dict] = None):
         super().__init__(message)
         self.slave_info = slave_info
@@ -50,15 +52,21 @@ class NetworkError(FCCommunicatorError):
 
 class SlaveConnectionError(NetworkError):
     """Raised when slave connection fails or times out."""
-    def __init__(self, message: str, slave_mac: Optional[str] = None, 
-                 slave_ip: Optional[str] = None):
-        super().__init__(message, {'mac': slave_mac, 'ip': slave_ip})
+
+    def __init__(
+        self,
+        message: str,
+        slave_mac: Optional[str] = None,
+        slave_ip: Optional[str] = None,
+    ):
+        super().__init__(message, {"mac": slave_mac, "ip": slave_ip})
         self.slave_mac = slave_mac
         self.slave_ip = slave_ip
 
 
 class MessageParsingError(FCCommunicatorError):
     """Raised when message parsing fails."""
+
     def __init__(self, message: str, raw_message: Optional[str] = None):
         super().__init__(message)
         self.raw_message = raw_message
@@ -66,11 +74,13 @@ class MessageParsingError(FCCommunicatorError):
 
 class ConfigurationError(FCCommunicatorError):
     """Raised when configuration is invalid."""
+
     pass
 
 
 class ThreadError(FCCommunicatorError):
     """Raised when thread operations fail."""
+
     def __init__(self, message: str, thread_name: Optional[str] = None):
         super().__init__(message)
         self.thread_name = thread_name
@@ -78,49 +88,55 @@ class ThreadError(FCCommunicatorError):
 
 class ErrorHandler:
     """Centralized error handling and logging utility."""
-    
-    def __init__(self, logger_name: str = 'FCCommunicator'):
+
+    def __init__(self, logger_name: str = "FCCommunicator"):
         self.logger = logging.getLogger(logger_name)
-        
-    def handle_network_error(self, error: Exception, context: str = "", 
-                           slave_info: Optional[dict] = None) -> NetworkError:
+
+    def handle_network_error(
+        self, error: Exception, context: str = "", slave_info: Optional[dict] = None
+    ) -> NetworkError:
         """Handle network-related errors with proper logging."""
         if isinstance(error, socket.timeout):
             msg = f"Network timeout in {context}"
-            exc = SlaveConnectionError(msg, 
-                                     slave_info.get('mac') if slave_info else None,
-                                     slave_info.get('ip') if slave_info else None)
+            exc = SlaveConnectionError(
+                msg,
+                slave_info.get("mac") if slave_info else None,
+                slave_info.get("ip") if slave_info else None,
+            )
         elif isinstance(error, socket.error):
             msg = f"Socket error in {context}: {error}"
             exc = NetworkError(msg, slave_info)
         else:
             msg = f"Network error in {context}: {error}"
             exc = NetworkError(msg, slave_info)
-            
+
         self.logger.error(msg, exc_info=True)
         return exc
-    
-    def handle_parsing_error(self, error: Exception, raw_message: str = "", 
-                           context: str = "") -> MessageParsingError:
+
+    def handle_parsing_error(
+        self, error: Exception, raw_message: str = "", context: str = ""
+    ) -> MessageParsingError:
         """Handle message parsing errors."""
         msg = f"Message parsing failed in {context}: {error}"
         exc = MessageParsingError(msg, raw_message)
         self.logger.warning(msg)
         return exc
-    
-    def handle_thread_error(self, error: Exception, thread_name: str = "", 
-                          context: str = "") -> ThreadError:
+
+    def handle_thread_error(
+        self, error: Exception, thread_name: str = "", context: str = ""
+    ) -> ThreadError:
         """Handle thread-related errors."""
         msg = f"Thread error in {context} (thread: {thread_name}): {error}"
         exc = ThreadError(msg, thread_name)
         self.logger.error(msg, exc_info=True)
         return exc
-    
-    def log_exception(self, error: Exception, context: str = "", 
-                     level: str = "error") -> None:
+
+    def log_exception(
+        self, error: Exception, context: str = "", level: str = "error"
+    ) -> None:
         """Log exception with context information."""
         msg = f"Exception in {context}: {error}"
-        
+
         if level == "error":
             self.logger.error(msg, exc_info=True)
         elif level == "warning":
@@ -129,9 +145,16 @@ class ErrorHandler:
             self.logger.info(msg)
         else:
             self.logger.debug(msg)
-    
-    def safe_execute(self, func, *args, default_return=None, 
-                    context: str = "", **kwargs):
+
+    def log_timeout(self, context: str = "", slave_info: Optional[dict] = None) -> None:
+        msg = f"Network timeout in {context}"
+        if slave_info:
+            msg = f"{msg} | slave={slave_info}"
+        self.logger.warning(msg)
+
+    def safe_execute(
+        self, func, *args, default_return=None, context: str = "", **kwargs
+    ):
         """Safely execute a function with error handling."""
         try:
             return func(*args, **kwargs)
@@ -140,7 +163,7 @@ class ErrorHandler:
             return default_return
 
 
-def create_error_handler(logger_name: str = 'FCCommunicator') -> ErrorHandler:
+def create_error_handler(logger_name: str = "FCCommunicator") -> ErrorHandler:
     """Factory function to create error handler instances."""
     return ErrorHandler(logger_name)
 
@@ -149,9 +172,6 @@ def setup_logging(level: int = logging.INFO) -> None:
     """Setup logging configuration for error handling."""
     logging.basicConfig(
         level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler('fc_communicator.log')
-        ]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(), logging.FileHandler("fc_communicator.log")],
     )

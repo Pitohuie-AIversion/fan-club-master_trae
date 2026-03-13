@@ -29,9 +29,10 @@
 import sys
 import traceback
 import io as io
-    # StringIO to redirect stdout. See:
-    # https://stackoverflow.com/questions/1218933/
-    #   can-i-redirect-the-stdout-in-python-into-some-sort-of-string-buffer
+
+# StringIO to redirect stdout. See:
+# https://stackoverflow.com/questions/1218933/
+#   can-i-redirect-the-stdout-in-python-into-some-sort-of-string-buffer
 import multiprocessing as mp
 import threading as mt
 import time as tm
@@ -51,8 +52,7 @@ WRN = sys.stdout
 ERR = sys.stderr
 OUT = sys.stdout
 
-HEADER = \
-r"""
+HEADER = r"""
 --------------------------------------------------------------------------------
 -- WESTLAKE UNIVERSITY -- ADVANCED SYSTEMS LABORATORY                        --
 -- CENTER FOR AUTONOMOUS SYSTEMS AND TECHNOLOGIES                             --
@@ -77,20 +77,20 @@ r"""
 # Inter-process printing constants ---------------------------------------------
 
 # Message codes:
-R = 100001 # Regular
-W = 100002 # Warning
-E = 100003 # Error
-S = 100004 # Success
-D = 100000 # Debug
-X = 100005 # Exception
+R = 100001  # Regular
+W = 100002  # Warning
+E = 100003  # Error
+S = 100004  # Success
+D = 100000  # Debug
+X = 100005  # Exception
 
 # Message code to string marks:
 CODE_TO_STR = {
-    R : "",
-    W : "[WARNING]",
-    E : "[*ERROR*]",
-    S : "",
-    D : "[_DEBUG_]",
+    R: "",
+    W: "[WARNING]",
+    E: "[*ERROR*]",
+    S: "",
+    D: "[_DEBUG_]",
 }
 
 # Message content indices:
@@ -99,8 +99,9 @@ MI_CONT = 1
 
 ## AUXILIARY FUNCTIONS #########################################################
 
+
 ## Printing utilities ----------------------------------------------------------
-def printers(queue, symbol = "[--]"):
+def printers(queue, symbol="[--]"):
     """
     Generate and return standard FC print functions that redirect their output
     to the multiprocess queue QUEUE after prefixing SYMBOL. The functions are
@@ -119,55 +120,77 @@ def printers(queue, symbol = "[--]"):
     NOTE: the given queue will be used through its put_nowait method, and no
     Exception checking is done within the print functions.
     """
-    symbol += ' '
+    symbol += " "
     funcs = {}
-    def printr(message, prefix = True):
+
+    def printr(message, prefix=True):
         queue.put_nowait(
-            (R, tm.strftime("[%H:%M:%S]") + (symbol if prefix else '') \
-                + message))
+            (R, tm.strftime("[%H:%M:%S]") + (symbol if prefix else "") + message)
+        )
+
     funcs[R] = printr
 
-    def printe(message, prefix = True):
+    def printe(message, prefix=True):
         queue.put_nowait(
-            (E,  tm.strftime("[%H:%M:%S]") + (symbol if prefix else '') \
-                + message))
+            (E, tm.strftime("[%H:%M:%S]") + (symbol if prefix else "") + message)
+        )
+
     funcs[E] = printe
 
-    def printw(message, prefix = True):
+    def printw(message, prefix=True):
         queue.put_nowait(
-            (W,  tm.strftime("[%H:%M:%S]") + (symbol if prefix else '') \
-                + message))
+            (W, tm.strftime("[%H:%M:%S]") + (symbol if prefix else "") + message)
+        )
+
     funcs[W] = printw
 
-    def printd(message, prefix = True):
+    def printd(message, prefix=True):
         if DEBUGP:
             queue.put_nowait(
-                (D,  tm.strftime("[%H:%M:%S]") + (symbol if prefix else '') \
-                    + message))
+                (D, tm.strftime("[%H:%M:%S]") + (symbol if prefix else "") + message)
+            )
+
     funcs[D] = printd
 
-    def prints(message, prefix = True):
+    def prints(message, prefix=True):
         queue.put_nowait(
-            (S, ( tm.strftime("[%H:%M:%S]") + symbol if prefix else '') \
-                + message))
+            (S, (tm.strftime("[%H:%M:%S]") + symbol if prefix else "") + message)
+        )
+
     funcs[S] = prints
 
-    def printx(exception, message = ''):
+    def printx(exception, message=""):
         # Build a robust traceback string: prefer the exception's own traceback if available
         try:
-            if isinstance(exception, BaseException) and getattr(exception, "__traceback__", None) is not None:
-                tb_text = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+            if (
+                isinstance(exception, BaseException)
+                and getattr(exception, "__traceback__", None) is not None
+            ):
+                tb_text = "".join(
+                    traceback.format_exception(
+                        type(exception), exception, exception.__traceback__
+                    )
+                )
             else:
                 tb_text = traceback.format_exc()
         except Exception:
-            tb_text = '(failed to format traceback)'
+            tb_text = "(failed to format traceback)"
         queue.put_nowait(
-            (E, tm.strftime("[%H:%M:%S]") + symbol + message \
-                + ' "{}"'.format(exception) \
-                + '\nTraceback:\n' + tb_text))
+            (
+                E,
+                tm.strftime("[%H:%M:%S]")
+                + symbol
+                + message
+                + ' "{}"'.format(exception)
+                + "\nTraceback:\n"
+                + tb_text,
+            )
+        )
+
     funcs[X] = printx
 
     return funcs
+
 
 class PrintClient:
     """
@@ -175,9 +198,10 @@ class PrintClient:
     facilities given by printers. Serves as a shortcut for common member
     function creation.
     """
+
     SYMBOL = "[--]"
 
-    def __init__(self, pqueue, symbol = "[--]"):
+    def __init__(self, pqueue, symbol="[--]"):
         """
         Create the following member functions for streamlined queued printing
         in this instance:
@@ -199,6 +223,7 @@ class PrintClient:
         self.printx = P[X]
         self.pqueue = pqueue
 
+
 class PrintServer(PrintClient):
     """
     Watch a print queue for messages and print them to some form of text
@@ -209,6 +234,7 @@ class PrintServer(PrintClient):
     in its life time. Unless overriden, trying to start a PrintServer twice will
     raise a RuntimeError.
     """
+
     SYMBOL = "[PS]"
 
     def __init__(self, pqueue):
@@ -236,8 +262,9 @@ class PrintServer(PrintClient):
         been started.
         """
         self._checkStarted()
-        self.thread = mt.Thread(name = "FC Print Thread",
-            target = self._routine, daemon = True)
+        self.thread = mt.Thread(
+            name="FC Print Thread", target=self._routine, daemon=True
+        )
         self.thread.start()
         self._setStarted()
 
@@ -261,8 +288,7 @@ class PrintServer(PrintClient):
                     break
                 self.print(*message)
             except Exception as e:
-                print("[ERROR] Exception in print thread:",
-                    traceback.format_exc())
+                print("[ERROR] Exception in print thread:", traceback.format_exc())
                 self.printx(e, "Exception in print thread:")
         print(self.SYMBOL, "Print thread terminated.")
         self.printr("Print thread terminated.")

@@ -34,18 +34,18 @@ DEFAULT_DELTA = 10
 DEFAULT_PACKET_SIZE = 32768
 DEFAULT_TIMEOUT = 3
 
-MAIN_SEPARATOR = '|'
-LIST_SEPARATOR = ','
+MAIN_SEPARATOR = "|"
+LIST_SEPARATOR = ","
 
-CODE_F = 'F'
-CODE_N = 'N'
-CODE_S = 'S'
-CODE_ERROR = 'E'
-CODE_UNIFORM = 'U'
-CODE_DC_VECTOR = 'D'
-CODE_PROFILE = 'P'
-CODE_EVALUATE = 'V'
-CODE_RESET = 'R'
+CODE_F = "F"
+CODE_N = "N"
+CODE_S = "S"
+CODE_ERROR = "E"
+CODE_UNIFORM = "U"
+CODE_DC_VECTOR = "D"
+CODE_PROFILE = "P"
+CODE_EVALUATE = "V"
+CODE_RESET = "R"
 
 
 # CLASS DEFINITIONS ############################################################
@@ -53,17 +53,30 @@ class NoThread:
     def is_alive(self):
         return False
 
+
 class FCClient:
     """
     Interface for external control. Contains all necessary behavior to control
     the MkIV over a network.
     """
-    def __init__(self, R = 11, C = 11, L = 1,
-        lport = DEFAULT_LPORT, bport = DEFAULT_BPORT, listener_ip = "0.0.0.0",
-        delta = DEFAULT_DELTA, repeat = 0,
-        timeout = DEFAULT_TIMEOUT, auto_configure = True,
-        packet_size = DEFAULT_PACKET_SIZE, silent = False,
-        error_callback = None, broadcast_callback = None):
+
+    def __init__(
+        self,
+        R=11,
+        C=11,
+        L=1,
+        lport=DEFAULT_LPORT,
+        bport=DEFAULT_BPORT,
+        listener_ip="0.0.0.0",
+        delta=DEFAULT_DELTA,
+        repeat=0,
+        timeout=DEFAULT_TIMEOUT,
+        auto_configure=True,
+        packet_size=DEFAULT_PACKET_SIZE,
+        silent=False,
+        error_callback=None,
+        broadcast_callback=None,
+    ):
         """
         Build and initialize an FCClient instance.
 
@@ -101,8 +114,8 @@ class FCClient:
             The method must accept one string. Defaults to printing to STDOUT.
         """
         self.R, self.C, self.L = R, C, L
-        self.RC = self.R*self.C
-        self.RCL = self.RC*self.L
+        self.RC = self.R * self.C
+        self.RCL = self.RC * self.L
         self.listener_port, self.broadcast_port = lport, bport
         self.listener_ip = listener_ip
         self.delta = delta
@@ -111,13 +124,15 @@ class FCClient:
         self.auto_configure = auto_configure
         self.packet_size = packet_size
         self.silent = silent
-        self._errorCallback = self._printError if error_callback is None else \
-            error_callback
+        self._errorCallback = (
+            self._printError if error_callback is None else error_callback
+        )
 
         # Broadcast:
         self.broadcast_socket = None
-        self._broadcastCallback = self._printGrid if broadcast_callback is None\
-            else broadcast_callback
+        self._broadcastCallback = (
+            self._printGrid if broadcast_callback is None else broadcast_callback
+        )
         self.no_thread = NoThread()
         self.broadcast_thread = self.no_thread
 
@@ -134,15 +149,15 @@ class FCClient:
         if self.isBroadcastThreadActive():
             self.stopBroadcastThread()
         self._buildBroadcastSocket()
-        self.broadcast_thread = mt.Thread(target = self._broadcastRoutine,
-            daemon = True)
+        self.broadcast_thread = mt.Thread(target=self._broadcastRoutine, daemon=True)
         self.broadcast_thread.start()
 
-    def stopBroadcastThread(self, redundant = False):
+    def stopBroadcastThread(self, redundant=False):
         self._verify(redundant, bool)
         if self.isBroadcastThreadActive() or redundant:
             self.listener_socket.sendto(
-                bytearray('', 'ascii'), self.broadcast_socket.getsockname())
+                bytearray("", "ascii"), self.broadcast_socket.getsockname()
+            )
             self.broadcast_thread = self.no_thread
 
     def isBroadcastThreadActive(self):
@@ -156,7 +171,7 @@ class FCClient:
             self.startBroadcastThread()
 
     def setBroadcastPort(self, port):
-        self._verify(port, int, minimum = 0, maximum = 65536)
+        self._verify(port, int, minimum=0, maximum=65536)
         restart = self.isBroadcastThreadActive()
         self.stopBroadcastThread()
         self.broadcast_port = port
@@ -172,7 +187,7 @@ class FCClient:
         Change the port number to which to send commands to the listener.
         - port := int, port to set as target.
         """
-        self._verify(port, int, minimum = 0, maximum = 65536)
+        self._verify(port, int, minimum=0, maximum=65536)
         self.listener_port = port
         self.print(f"Listener port set to {port}")
         self.requestReset()
@@ -196,7 +211,7 @@ class FCClient:
         """
         return (self.index_in, self.index_out)
 
-    def setListenerIndices(self, index_in = None, index_out = None):
+    def setListenerIndices(self, index_in=None, index_out=None):
         """
         Modify the listener indices.
         - index_in: int, index for incoming messages (replies)
@@ -220,7 +235,7 @@ class FCClient:
         Send a command to set the entire array to the given duty cycle.
         - dc := float, value to assign. Must be in [0.0, 1.0]
         """
-        self._verify(dc, int, float, minimum = 0.0, maximum = 1.0)
+        self._verify(dc, int, float, minimum=0.0, maximum=1.0)
         return self._sendToListener(CODE_UNIFORM, dc)
 
     def sendDCVector(self, vector):
@@ -231,10 +246,14 @@ class FCClient:
         - vector: list or tuple, vector of duty cycles to apply.
         """
         if len(vector) != self.RCL:
-            raise ValueError("Vector size mismatch. Got {}. Expected {}".format(
-                len(vector), self.RCL))
-        return self._sendToListener(CODE_DC_VECTOR,
-            f"{self.R}|{self.C}|{self.L}|" + str(vector)[1:-1])
+            raise ValueError(
+                "Vector size mismatch. Got {}. Expected {}".format(
+                    len(vector), self.RCL
+                )
+            )
+        return self._sendToListener(
+            CODE_DC_VECTOR, f"{self.R}|{self.C}|{self.L}|" + str(vector)[1:-1]
+        )
 
     def mapRCL(self, f):
         """
@@ -248,11 +267,11 @@ class FCClient:
                 layers of the grid in question.
             It must return a value between 0.0 and 1.0.
         """
-        vector = [0]*self.RCL
+        vector = [0] * self.RCL
         for l in range(self.L):
             for r in range(self.R):
                 for c in range(self.C):
-                    k = l*self.RC + r*self.C + c
+                    k = l * self.RC + r * self.C + c
                     vector[k] = f(r, c, l, self.R, self.C, self.L)
         return self.sendDCVector(vector)
 
@@ -298,14 +317,23 @@ class FCClient:
         """
         # Safe evaluation with restricted scope
         safe_builtins = {
-            'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
-            'min': min, 'max': max, 'abs': abs, 'round': round
+            "len": len,
+            "range": range,
+            "str": str,
+            "int": int,
+            "float": float,
+            "min": min,
+            "max": max,
+            "abs": abs,
+            "round": round,
         }
-        safe_globals = {'__builtins__': safe_builtins}
+        safe_globals = {"__builtins__": safe_builtins}
         safe_locals = {}
-        
+
         try:
-            return eval(self._sendToListener(CODE_PROFILE, attribute), safe_globals, safe_locals)
+            return eval(
+                self._sendToListener(CODE_PROFILE, attribute), safe_globals, safe_locals
+            )
         except Exception as e:
             print(f"Safe evaluation failed: {e}")
             return None
@@ -314,27 +342,28 @@ class FCClient:
         """
         Send a request that this side's outgoing listener index be reset.
         """
-        return self._sendToListener(CODE_RESET, get_reply = False)
+        return self._sendToListener(CODE_RESET, get_reply=False)
 
     # Other ....................................................................
     def setPacketSize(self, size):
-        self._verify(size, int, minimum = 1)
+        self._verify(size, int, minimum=1)
         self.packet_size = size
         if self.isBroadcastThreadActive():
             self.startBroadcastThread()
 
     def setDimensions(self, R, C, L):
-        self._verify(R, int, minimum = 0)
-        self._verify(C, int, minimum = 0)
-        self._verify(L, int, minimum = 0)
+        self._verify(R, int, minimum=0)
+        self._verify(C, int, minimum=0)
+        self._verify(L, int, minimum=0)
         self.R, self.C, self.L = R, C, L
-        self.RC = self.R*self.C
-        self.RCL = self.RC*self.L
-        self.print("Dimensions updated to R: {}, C: {}, L: {}".format(
-            self.R, self.C, self.L))
+        self.RC = self.R * self.C
+        self.RCL = self.RC * self.L
+        self.print(
+            "Dimensions updated to R: {}, C: {}, L: {}".format(self.R, self.C, self.L)
+        )
 
     def setRepeat(self, repeat):
-        self._verify(repeat, int, minimum = 0)
+        self._verify(repeat, int, minimum=0)
 
     # Internal methods ---------------------------------------------------------
     def _buildSockets(self):
@@ -355,7 +384,7 @@ class FCClient:
         """
         if self.listener_socket is not None:
             self.listener_socket.close()
-        self.listener_socket = self._socket(name = "Listener")
+        self.listener_socket = self._socket(name="Listener")
         self.listener_socket.settimeout(self.timeout)
 
     def _buildBroadcastSocket(self):
@@ -368,12 +397,11 @@ class FCClient:
         """
         if self.broadcast_socket is not None:
             self.broadcast_socket.close()
-        self.broadcast_socket = self._socket(
-            port = self.broadcast_port, name = "Broadcast")
+        self.broadcast_socket = self._socket(port=self.broadcast_port, name="Broadcast")
         self.broadcast_socket.settimeout(None)
         self.broadcast_socket.setsockopt(sk.SOL_SOCKET, sk.SO_BROADCAST, 1)
 
-    def _socket(self, port = 0, name = ""):
+    def _socket(self, port=0, name=""):
         """
         Build and return a new UDP socket bound to the given port. The socket
         is set as "reuseable."
@@ -387,11 +415,10 @@ class FCClient:
         sock = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         sock.setsockopt(sk.SOL_SOCKET, sk.SO_REUSEADDR, 1)
         sock.bind(("", port))
-        self.print("{} socket opened on port {}".format(
-            name, sock.getsockname()[1]))
+        self.print("{} socket opened on port {}".format(name, sock.getsockname()[1]))
         return sock
 
-    def _sendToListener(self, code, content = "", get_reply = True):
+    def _sendToListener(self, code, content="", get_reply=True):
         """
         Send a message to the command listener.
 
@@ -402,13 +429,12 @@ class FCClient:
         """
         if self.listener_port == 0:
             raise RuntimeError(
-            "Listener port set to 0. Is the listener in the other end active?")
+                "Listener port set to 0. Is the listener in the other end active?"
+            )
 
-        message = bytearray("{}|{}|{}".format(self.index_out, code, content),
-                'ascii')
+        message = bytearray("{}|{}|{}".format(self.index_out, code, content), "ascii")
         for _ in range(1 + self.repeat):
-            self.listener_socket.sendto(message,
-                (self.listener_ip, self.listener_port))
+            self.listener_socket.sendto(message, (self.listener_ip, self.listener_port))
         self.index_out += 1
 
         if get_reply:
@@ -433,15 +459,21 @@ class FCClient:
         Upon timeout, the returned tuple will instead be:
             (None, None)
         """
-        index_new, code_new, reply, message, sender \
-            = self.index_in, None, "[NONE]", "", None
+        index_new, code_new, reply, message, sender = (
+            self.index_in,
+            None,
+            "[NONE]",
+            "",
+            None,
+        )
         try:
-            while self._discard(index_new, self.index_in) \
-                    or code_new not in (code, CODE_ERROR):
-                reply_raw, sender = self.listener_socket.recvfrom(
-                    self.packet_size)
+            while self._discard(index_new, self.index_in) or code_new not in (
+                code,
+                CODE_ERROR,
+            ):
+                reply_raw, sender = self.listener_socket.recvfrom(self.packet_size)
 
-                reply = reply_raw.decode('ascii')
+                reply = reply_raw.decode("ascii")
                 splitted = reply.split(MAIN_SEPARATOR)
                 index_new, code_new = int(splitted[0]), splitted[1]
                 message = splitted[2]
@@ -450,8 +482,10 @@ class FCClient:
             self.print("Timed out.")
             return (None, None)
         except Exception as e:
-            self.print("While parsing the message: \n\t{}\n\n".format(reply)\
-                + "The following error occurred: {}".format(e))
+            self.print(
+                "While parsing the message: \n\t{}\n\n".format(reply)
+                + "The following error occurred: {}".format(e)
+            )
             return (None, None)
 
         self.index_in = index_new
@@ -475,9 +509,8 @@ class FCClient:
         b_index_in = 0
         while True:
             try:
-                message, sender = self.broadcast_socket.recvfrom(
-                    self.packet_size)
-                decoded = message.decode('ascii')
+                message, sender = self.broadcast_socket.recvfrom(self.packet_size)
+                decoded = message.decode("ascii")
                 if decoded == "":
                     break
                 parsed = self._parseBroadcast(decoded, b_index_in)
@@ -489,7 +522,7 @@ class FCClient:
                         if self.listener_ip != sender[0]:
                             self.setListenerIP(sender[0])
                         R, C, L = parsed[4:7]
-                        if self.RCL != R*C*L:
+                        if self.RCL != R * C * L:
                             self.setDimensions(R, C, L)
                     self._broadcastCallback(*parsed[3:])
             except Exception as e:
@@ -532,12 +565,13 @@ class FCClient:
             for r in range(R):
                 grid += "\n| "
                 for c in range(C):
-                    k = l*self.RC + r*self.C + c
+                    k = l * self.RC + r * self.C + c
                     rpm = rpms[k]
                     grid += f"{rpm:6d} "
                 grid += "|"
-        self.print("** {}x{}x{} Grid received at time stamp {}:\n{}".format(
-            R, C, L, t, grid))
+        self.print(
+            "** {}x{}x{} Grid received at time stamp {}:\n{}".format(R, C, L, t, grid)
+        )
 
     def print(self, *args, **kwargs):
         """
@@ -547,19 +581,20 @@ class FCClient:
         if not self.silent:
             print("[FCClient]", *args, **kwargs)
 
-    def _verify(self, value, *types, minimum = None, maximum = None):
+    def _verify(self, value, *types, minimum=None, maximum=None):
         """
         Used to verify arguments and raise exceptions if necessary.
         """
         if type(value) not in types:
-            raise TypeError("Bad argument type. Expected {}. Got {}".format(
-                types, type(value)))
+            raise TypeError(
+                "Bad argument type. Expected {}. Got {}".format(types, type(value))
+            )
         if minimum is not None and value < minimum:
-            raise ValueError("Under-range argument value {}. Min: {}".format(
-                value, minimum))
+            raise ValueError(
+                "Under-range argument value {}. Min: {}".format(value, minimum)
+            )
         if maximum is not None and value > maximum:
-            raise ValueError("Over-range value {}. Max: {}".format(
-                value, maximum))
+            raise ValueError("Over-range value {}. Max: {}".format(value, maximum))
         return
 
     def _parseGeneric(self, vector):
@@ -571,6 +606,7 @@ class FCClient:
             return None
         # Safe parsing using ast.literal_eval for simple values
         import ast
+
         result = []
         for raw_value in vector.split(LIST_SEPARATOR):
             try:
@@ -579,10 +615,17 @@ class FCClient:
             except (ValueError, SyntaxError):
                 # If literal parsing fails, try safe eval with restricted scope
                 safe_builtins = {
-                    'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
-                    'min': min, 'max': max, 'abs': abs, 'round': round
+                    "len": len,
+                    "range": range,
+                    "str": str,
+                    "int": int,
+                    "float": float,
+                    "min": min,
+                    "max": max,
+                    "abs": abs,
+                    "round": round,
                 }
-                safe_globals = {'__builtins__': safe_builtins}
+                safe_globals = {"__builtins__": safe_builtins}
                 safe_locals = {}
                 try:
                     result.append(eval(raw_value.strip(), safe_globals, safe_locals))
@@ -591,10 +634,9 @@ class FCClient:
                     result.append(None)
         return result
 
+
 # TEST RUN #####################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     c = FCClient()
     c.startBroadcastThread()
     pass
-
-

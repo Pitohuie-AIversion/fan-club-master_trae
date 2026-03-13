@@ -17,9 +17,11 @@ import fc.archive as ac
 from fc.backend.mapper import Mapper
 from fc.frontend.gui.widgets.control import GridWidget
 
+
 class CaptureSend:
     def __init__(self):
         self.last = None
+
     def __call__(self, vec):
         self.last = list(vec)
         print("[SEND]", [round(x, 3) for x in self.last])
@@ -90,6 +92,7 @@ def main():
     grid2.map(GridWidget._const(0.55), 0, 0)
 
     print("Done.")
+
 
 if __name__ == "__main__":
     main()

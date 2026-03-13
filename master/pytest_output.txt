@@ -1,0 +1,37 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.5.0 -- X:\Users\Pitoyoung\anaconda3\python.exe
+cachedir: .pytest_cache
+rootdir: D:\2025\chendashuai_wind_turnnal\fan-club-master\fan-club-master_trae\master
+configfile: pytest.ini
+plugins: anyio-4.6.2
+collecting ... Registered plugin: network_diagnostics v1.0.0
+Registered plugin: dc_data v1.0.0
+Registered plugin: disconnection_event v1.0.0
+collected 8 items
+
+tests/test_prefill.py::test_gridwidget_prefill ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_empty_selection_maps_all ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_select_all_then_map ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_multilayer_prefill_and_selection ** 2 2 2 4 8
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_hold_clears_selection_on_map ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_multislave_prefill_selection_changes ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_gridwidget_map_without_feedback_prefills_zero ** 2 2 1 4 4
+[REM] Pass MAX RPM to color bar
+PASSED
+tests/test_prefill.py::test_livetable_initially_paused_feedback_and_map Icon error: image "pyimage1" doesn't exist
+Icon error: image "pyimage2" doesn't exist
+PASSED
+
+============================== 8 passed in 2.04s ==============================

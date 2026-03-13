@@ -78,8 +78,9 @@ from fc import printer as pt, standards as s, archive as ac
 
 # CONSTANT DEFINITIONS #########################################################
 RECV_SIZE = 32768
-MAIN_SPLITTER = '|'
+MAIN_SPLITTER = "|"
 END_CODE = "END"
+
 
 # CLASS DEFINITIONS ############################################################
 class NoController:
@@ -92,23 +93,30 @@ class NoController:
     def _rip(self):
         raise RuntimeError("No controller set up for external control")
 
+
 class ExternalControl(pt.PrintClient):
     """
     Back end for "external control" functionality.
     """
+
     SYMBOL = "[EX]"
     NOTHING = lambda n: None
     BROADCAST_TEMPLATE = "{}|B|{}|{}|{}|{}|{}|{}"
 
     # Note: Optimize F vector processing to avoid redundant calculations
 
-    def __init__(self, mapper, archive, pqueue,
-        controller = NoController(),
-        setFEBroadcastStatus = NOTHING,
-        setFEBroadcastOut = NOTHING,
-        setFEListenerStatus = NOTHING,
-        setFEListenerIn = NOTHING,
-        setFEListenerOut = NOTHING):
+    def __init__(
+        self,
+        mapper,
+        archive,
+        pqueue,
+        controller=NoController(),
+        setFEBroadcastStatus=NOTHING,
+        setFEBroadcastOut=NOTHING,
+        setFEListenerStatus=NOTHING,
+        setFEListenerIn=NOTHING,
+        setFEListenerOut=NOTHING,
+    ):
         """
         - mapper := FC Mapper instance (grid mapping).
         - archive := MkIV FCArchive instance.
@@ -135,7 +143,7 @@ class ExternalControl(pt.PrintClient):
         self.setFEListenerIn = setFEListenerIn
         self.setFEListenerOut = setFEListenerOut
 
-        self.ip = '0.0.0.0'
+        self.ip = "0.0.0.0"
         self.sockets = {}
         self.statuses = {}
         self.indices = {}
@@ -152,17 +160,17 @@ class ExternalControl(pt.PrintClient):
             self.activateListener(self.defaultListenerPort, self.defaultRepeat)
         if self.archive[ac.externalBroadcastAutoStart]:
             self.activateBroadcast(
-                (self.defaultBroadcastIP, self.defaultBroadcastPort),
-                self.defaultRepeat)
+                (self.defaultBroadcastIP, self.defaultBroadcastPort), self.defaultRepeat
+            )
 
         self.commandHandlers = {
-            s.EX_CMD_F : self._handleF,
-            s.EX_CMD_N : self._handleN,
-            s.EX_CMD_S : self._handleS,
-            s.EX_CMD_DC_VECTOR : self._handleDCVector,
-            s.EX_CMD_UNIFORM : self._handleUniform,
-            s.EX_CMD_PROFILE : self._handleProfile,
-            s.EX_CMD_EVALUATE : self._handleEvaluate,
+            s.EX_CMD_F: self._handleF,
+            s.EX_CMD_N: self._handleN,
+            s.EX_CMD_S: self._handleS,
+            s.EX_CMD_DC_VECTOR: self._handleDCVector,
+            s.EX_CMD_UNIFORM: self._handleUniform,
+            s.EX_CMD_PROFILE: self._handleProfile,
+            s.EX_CMD_EVALUATE: self._handleEvaluate,
         }
 
     # API ----------------------------------------------------------------------
@@ -204,22 +212,27 @@ class ExternalControl(pt.PrintClient):
         """
         Activate the listener module.
         """
-        if self._activate(s.EX_LISTENER, port = port):
+        if self._activate(s.EX_LISTENER, port=port):
             self.listenerPort = port
             self.listenerRepeat = repeat
 
             # Create and start listener thread with proper naming
             self.listenerThread = mt.Thread(
-                target = self._listenerRoutine,
-                args = (self.sockets[s.EX_LISTENER], self._processCommand,
+                target=self._listenerRoutine,
+                args=(
+                    self.sockets[s.EX_LISTENER],
+                    self._processCommand,
                     self.deactivateListener,
-                    self._setListenerIn, self._setListenerOut,
-                    self.listenerRepeat, self.pqueue),
-                daemon = True,
-                name = f"ExternalListener-{port}")
+                    self._setListenerIn,
+                    self._setListenerOut,
+                    self.listenerRepeat,
+                    self.pqueue,
+                ),
+                daemon=True,
+                name=f"ExternalListener-{port}",
+            )
             self.listenerThread.start()
             self.setFEListenerStatus(s.EX_ACTIVE)
-
 
     def deactivateBroadcast(self):
         """
@@ -229,7 +242,7 @@ class ExternalControl(pt.PrintClient):
         self.setFEBroadcastOut(self.indices[s.EX_BROADCAST][s.EX_I_OUT])
         self.setFEBroadcastStatus(s.EX_INACTIVE)
 
-    def deactivateListener(self, redundant = True):
+    def deactivateListener(self, redundant=True):
         """
         Deactivate the listener module.
         - redundant := whether to execute even if the listener appears to be
@@ -237,9 +250,10 @@ class ExternalControl(pt.PrintClient):
         """
         if not self.isListenerActive() or redundant:
             try:
-                temp = self._socket('Listener Deactivator', 0, False)
-                temp.sendto(bytearray('', 'ascii'),
-                    self.sockets[s.EX_LISTENER].getsockname())
+                temp = self._socket("Listener Deactivator", 0, False)
+                temp.sendto(
+                    bytearray("", "ascii"), self.sockets[s.EX_LISTENER].getsockname()
+                )
                 temp.close()
             except AttributeError:
                 pass
@@ -251,7 +265,7 @@ class ExternalControl(pt.PrintClient):
             self.setFEListenerStatus(s.EX_INACTIVE)
             self.warnedDimensions = False
 
-    def _activate(self, key, port = 0):
+    def _activate(self, key, port=0):
         """
         Activate the module referred to by the given key. If the requested
         module is already active, it will be deactivated first. Returns whether
@@ -264,13 +278,14 @@ class ExternalControl(pt.PrintClient):
         try:
             if self.isActive(key):
                 self.deactivate(key)
-            self.sockets[key] = self._socket(s.EX_NAMES[key], port,
-                key == s.EX_BROADCAST)
+            self.sockets[key] = self._socket(
+                s.EX_NAMES[key], port, key == s.EX_BROADCAST
+            )
             self.statuses[key] = s.EX_ACTIVE
             self.prints("{} Activated".format(s.EX_NAMES[key]))
             return True
         except Exception as e:
-            self.printx(e,"Error while activating {}".format(s.EX_NAMES[key]))
+            self.printx(e, "Error while activating {}".format(s.EX_NAMES[key]))
             self.deactivate(key)
             return False
 
@@ -287,7 +302,7 @@ class ExternalControl(pt.PrintClient):
             if sock is not None:
                 sock.close()
         except Exception as e:
-            self.printx(e,"Error while deactivating {}".format(s.EX_NAMES[key]))
+            self.printx(e, "Error while deactivating {}".format(s.EX_NAMES[key]))
         finally:
             self.sockets[key] = None
             self.indices[key][s.EX_I_IN] = 0
@@ -314,9 +329,14 @@ class ExternalControl(pt.PrintClient):
         """
         self.S = S
 
-    def setCallbacks(self, setFEBroadcastStatus = NOTHING,
-        setFEBroadcastOut = NOTHING, setFEListenerStatus = NOTHING,
-        setFEListenerIn = NOTHING, setFEListenerOut = NOTHING):
+    def setCallbacks(
+        self,
+        setFEBroadcastStatus=NOTHING,
+        setFEBroadcastOut=NOTHING,
+        setFEListenerStatus=NOTHING,
+        setFEListenerIn=NOTHING,
+        setFEListenerOut=NOTHING,
+    ):
         """
         Set the methods to be called to update the front end. The methods will
         be called immediately to match the current state of the back end.
@@ -343,13 +363,13 @@ class ExternalControl(pt.PrintClient):
             self.archive[ac.fanArray][ac.FA_layers],
         )
         self.R, self.C, self.L = self.dimensions
-        self.RC = self.R*self.C
-        self.RCL = self.RC*self.L
+        self.RC = self.R * self.C
+        self.RCL = self.RC * self.L
 
         self.delta = self.archive[ac.externalIndexDelta]
 
         self.defaultListenerPort = self.archive[ac.externalDefaultListenerPort]
-        self.defaultBroadcastPort =self.archive[ac.externalDefaultBroadcastPort]
+        self.defaultBroadcastPort = self.archive[ac.externalDefaultBroadcastPort]
         self.defaultBroadcastIP = self.archive[ac.externalDefaultBroadcastIP]
         self.defaultRepeat = self.archive[ac.externalDefaultRepeat]
 
@@ -379,12 +399,11 @@ class ExternalControl(pt.PrintClient):
             index = self.indices[s.EX_BROADCAST][s.EX_I_OUT]
             grid_str = str(self._G())[1:-1]  # Cache the expensive operation
             message = self.BROADCAST_TEMPLATE.format(
-                index, self.listenerPort, 0,  *self.dimensions,
-                grid_str)
-            message_bytes = bytearray(message, 'ascii')  # Convert once
+                index, self.listenerPort, 0, *self.dimensions, grid_str
+            )
+            message_bytes = bytearray(message, "ascii")  # Convert once
             for _ in range(self.broadcastRepeat):
-                self.sockets[s.EX_BROADCAST].sendto(
-                    message_bytes, self.broadcastTarget)
+                self.sockets[s.EX_BROADCAST].sendto(message_bytes, self.broadcastTarget)
             self.setFEBroadcastOut(index)
             self.indices[s.EX_BROADCAST][s.EX_I_OUT] = index + 1
         except Exception as e:
@@ -395,7 +414,7 @@ class ExternalControl(pt.PrintClient):
         """
         Return a grid vector corresponding to the latest feedback vector.
         """
-        G = [s.PAD]*(self.mapper.getSize_G()*2)
+        G = [s.PAD] * (self.mapper.getSize_G() * 2)
         for k in range(self.mapper.getSize_K()):
             G[self.mapper.index_KG(k)] = self.F[k]
         return G
@@ -421,17 +440,17 @@ class ExternalControl(pt.PrintClient):
             return (None, 0)
         if index_new == 0:
             self.printw("NOTE: Input index 0 is always ignored")
-        if splitted[-1] == '':
+        if splitted[-1] == "":
             splitted = splitted[:-1]
         if index_new >= index_in - self.delta and index_new <= index_in:
             # new not in [old - delta, old]
             return (None, index_in)
         reply_content = ""
         if code not in s.EX_CMD_CODES:
-            raise KeyError("Unrecognized command code \"{}\"".format(code))
+            raise KeyError('Unrecognized command code "{}"'.format(code))
         reply_content = self.commandHandlers[code](*splitted)
         reply = "{}|{}|{}".format(index_out, code, reply_content)
-        return (bytearray(reply, 'ascii'), index_new)
+        return (bytearray(reply, "ascii"), index_new)
 
     def _setListenerIn(self, index):
         self.indices[s.EX_LISTENER][s.EX_I_IN] = index
@@ -451,31 +470,36 @@ class ExternalControl(pt.PrintClient):
         return str(self.S)[1:-1]
 
     def _handleDCVector(self, index_new, code, R_raw, C_raw, L_raw, vector_raw):
-        dcs = tuple(map(float, vector_raw.split(s.EX_LIST_SPLITTER)[:self.RCL]))
+        dcs = tuple(map(float, vector_raw.split(s.EX_LIST_SPLITTER)[: self.RCL]))
         R, C, L = int(R_raw), int(C_raw), int(L_raw)
-        if len(dcs) != R*C*L:
+        if len(dcs) != R * C * L:
             raise ValueError(
                 "DC vector length () does not match given ".format(len(dcs))
-                + "dimensions ({}x{}x{} = {})".format(L, R, C, L*R*C))
+                + "dimensions ({}x{}x{} = {})".format(L, R, C, L * R * C)
+            )
         if (R, C, L) != self.dimensions:
-            raise ValueError("DC matrix dimension mismatch. Expected "\
-                + "{}x{}x{}".format(R, C, L)\
-                + " and got {}x{}x{}".format(*self.dimensions))
+            raise ValueError(
+                "DC matrix dimension mismatch. Expected "
+                + "{}x{}x{}".format(R, C, L)
+                + " and got {}x{}x{}".format(*self.dimensions)
+            )
         self.controller.map(self._oneToOne(dcs), 0)
-        return str(R*C*L)
+        return str(R * C * L)
 
     def _oneToOne(self, vector):
         """
         Return an FC function that maps fans 1:1 to a given DC vector.
         """
+
         def f(r, c, l, *_):
             # Add bounds checking for robustness
             if r < 0 or r >= self.R or c < 0 or c >= self.C or l < 0 or l >= self.L:
                 return 0.0  # Return safe default for out-of-bounds access
-            index = l*self.RC + r*self.C + c
+            index = l * self.RC + r * self.C + c
             if index < 0 or index >= len(vector):
                 return 0.0  # Return safe default for out-of-bounds access
             return vector[index]
+
         return f
 
     def _handleUniform(self, index_new, code, dc_raw):
@@ -489,15 +513,22 @@ class ExternalControl(pt.PrintClient):
         return self.archive[ac.INVERSE[attribute]]
 
     def _handleEvaluate(self, index_new, code, expression):
-        self.printr("Executing externally received expression: \n\t"+expression)
+        self.printr("Executing externally received expression: \n\t" + expression)
         # Safe evaluation with restricted builtins and limited scope
         safe_builtins = {
-            'len': len, 'range': range, 'str': str, 'int': int, 'float': float,
-            'min': min, 'max': max, 'abs': abs, 'round': round
+            "len": len,
+            "range": range,
+            "str": str,
+            "int": int,
+            "float": float,
+            "min": min,
+            "max": max,
+            "abs": abs,
+            "round": round,
         }
-        safe_globals = {'__builtins__': safe_builtins}
+        safe_globals = {"__builtins__": safe_builtins}
         safe_locals = {}
-        
+
         try:
             return eval(expression, safe_globals, safe_locals)
         except Exception as e:
@@ -515,15 +546,16 @@ class ExternalControl(pt.PrintClient):
         while True:
             try:
                 message, sender = socket.recvfrom(RECV_SIZE)
-                decoded = message.decode('ascii')
+                decoded = message.decode("ascii")
                 if decoded == "":
                     break
                 try:
                     reply, index_in = method(decoded, index_in, index_out)
                 except Exception as e:
-                    px(e,"Exception while processing external command")
+                    px(e, "Exception while processing external command")
                     reply = bytearray(
-                        "{}|{}|{}".format(index_out, s.EX_REP_ERROR, e),'ascii')
+                        "{}|{}|{}".format(index_out, s.EX_REP_ERROR, e), "ascii"
+                    )
                 if reply is not None:
                     for _ in repeater:
                         socket.sendto(reply, sender)
@@ -533,7 +565,4 @@ class ExternalControl(pt.PrintClient):
             except Exception as e:
                 px(e, "Exception in external control listener routine")
         pr("External control listener routine ended")
-        stop(redundant = False)
-
-
-
+        stop(redundant=False)

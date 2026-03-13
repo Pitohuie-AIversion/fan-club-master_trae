@@ -84,7 +84,9 @@ def check_profiles():
                     try:
                         fan_idx = int(p)
                     except Exception:
-                        profile_errors.append(f"[{name}] cell[{ci}] bad fan index '{p}'")
+                        profile_errors.append(
+                            f"[{name}] cell[{ci}] bad fan index '{p}'"
+                        )
                         continue
                     if not (0 <= fan_idx < maxFans):
                         profile_errors.append(
@@ -114,9 +116,7 @@ def check_profiles():
             else:
                 k2 = M.index_GK(g)
                 if k2 != k:
-                    profile_errors.append(
-                        f"KG/GK mismatch: k {k} -> g {g} -> k {k2}"
-                    )
+                    profile_errors.append(f"KG/GK mismatch: k {k} -> g {g} -> k {k2}")
 
         for g in range(size_g):
             k = M.index_GK(g)
@@ -129,9 +129,7 @@ def check_profiles():
             else:
                 g2 = M.index_KG(k)
                 if g2 != g:
-                    profile_errors.append(
-                        f"GK/KG mismatch: g {g} -> k {k} -> g {g2}"
-                    )
+                    profile_errors.append(f"GK/KG mismatch: g {g} -> k {k} -> g {g2}")
 
         if profile_errors:
             errors.append((pname, profile_errors))

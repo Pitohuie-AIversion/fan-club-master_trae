@@ -45,10 +45,11 @@ _RIGHT_DRAG = 8
 ALT_COLOR_0 = gus.SURFACE_2
 ALT_COLOR_1 = gus.SURFACE_3
 
+
 ## MAIN ########################################################################
 class BaseGrid(ttk.Frame):
-    """ Interactive 2D grid widget that supports clicking, dragging, and live
-        cell color changes. """
+    """Interactive 2D grid widget that supports clicking, dragging, and live
+    cell color changes."""
 
     GRID_ROW = 0
     GRID_COLUMN = 0
@@ -56,19 +57,27 @@ class BaseGrid(ttk.Frame):
     GRID_WEIGHT = 1
 
     CALLBACK_CODES = {
-        _LEFT_CLICK : '<ButtonPress-1>',
-        _LEFT_DOUBLE : '<Double-Button-1>',
-        _LEFT_RELEASE : '<ButtonRelease-1>',
-        _RIGHT_CLICK : '<ButtonPress-3>',
-        _RIGHT_DOUBLE : '<Double-Button-3>',
-        _RIGHT_RELEASE : '<ButtonRelease-3>',
-        _LEFT_DRAG : '<B1-Motion>',
-        _RIGHT_DRAG : '<B3-Motion>'
+        _LEFT_CLICK: "<ButtonPress-1>",
+        _LEFT_DOUBLE: "<Double-Button-1>",
+        _LEFT_RELEASE: "<ButtonRelease-1>",
+        _RIGHT_CLICK: "<ButtonPress-3>",
+        _RIGHT_DOUBLE: "<Double-Button-3>",
+        _RIGHT_RELEASE: "<ButtonRelease-3>",
+        _LEFT_DRAG: "<B1-Motion>",
+        _RIGHT_DRAG: "<B3-Motion>",
     }
 
-
-    def __init__(self, master, R, C, cursor = 'crosshair', empty = "white",
-        border = 1, outline = "black", minCell = 10):
+    def __init__(
+        self,
+        master,
+        R,
+        C,
+        cursor="crosshair",
+        empty="white",
+        border=1,
+        outline="black",
+        minCell=10,
+    ):
         """
         Initialize an R row and C column 2D grid as a TKinter widget with parent
         MASTER.
@@ -102,36 +111,39 @@ class BaseGrid(ttk.Frame):
         """
         # Initialize data structures for grid representation
         import numpy as np
-        
+
         ttk.Frame.__init__(self, master)
-        
+
         # Store grid dimensions
         self.R, self.C = R, C
         self.total_cells = R * C
-        
+
         # Initialize NumPy arrays for cell data
-        self.cell_iids = np.full(self.total_cells, None, dtype=object)  # Canvas item IDs
-        self.cell_values = np.zeros(self.total_cells, dtype=float)       # Duty cycle values
-        self.cell_selected = np.zeros(self.total_cells, dtype=bool)      # Selection state
-        self.cell_active = np.zeros(self.total_cells, dtype=bool)        # Active state
-        self.cell_colors = np.full(self.total_cells, empty, dtype=object) # Fill colors
-        self.cell_outlines = np.full(self.total_cells, outline, dtype=object) # Border colors
+        self.cell_iids = np.full(
+            self.total_cells, None, dtype=object
+        )  # Canvas item IDs
+        self.cell_values = np.zeros(self.total_cells, dtype=float)  # Duty cycle values
+        self.cell_selected = np.zeros(self.total_cells, dtype=bool)  # Selection state
+        self.cell_active = np.zeros(self.total_cells, dtype=bool)  # Active state
+        self.cell_colors = np.full(self.total_cells, empty, dtype=object)  # Fill colors
+        self.cell_outlines = np.full(
+            self.total_cells, outline, dtype=object
+        )  # Border colors
         self.cell_widths = np.full(self.total_cells, border, dtype=int)  # Border widths
-        
+
         # Store default styling
         self.default_empty = empty
         self.default_outline = outline
         self.default_border = border
         self.min_cell_size = minCell
-        self.config(cursor = cursor)
+        self.config(cursor=cursor)
 
-        self.grid_rowconfigure(self.GRID_ROW, weight = self.GRID_WEIGHT)
-        self.grid_columnconfigure(self.GRID_COLUMN, weight = self.GRID_WEIGHT)
+        self.grid_rowconfigure(self.GRID_ROW, weight=self.GRID_WEIGHT)
+        self.grid_columnconfigure(self.GRID_COLUMN, weight=self.GRID_WEIGHT)
 
         self.canvasFrame = ttk.Frame(self)
-        self.canvasFrame.grid(row = self.GRID_ROW, column = self.GRID_COLUMN,
-            sticky = "NEWS")
-        
+        self.canvasFrame.grid(row=self.GRID_ROW, column=self.GRID_COLUMN, sticky="NEWS")
+
         # Configure canvas frame for scrollbars
         self.canvasFrame.grid_rowconfigure(0, weight=1)
         self.canvasFrame.grid_columnconfigure(0, weight=1)
@@ -147,25 +159,25 @@ class BaseGrid(ttk.Frame):
         self.outline = outline
 
         self.callbacks = {
-            _LEFT_CLICK : None,
-            _LEFT_DOUBLE : None,
-            _LEFT_RELEASE : None,
-            _RIGHT_CLICK : None,
-            _RIGHT_DOUBLE : None,
-            _RIGHT_RELEASE : None,
-            _LEFT_DRAG : None,
-            _RIGHT_DRAG : None
+            _LEFT_CLICK: None,
+            _LEFT_DOUBLE: None,
+            _LEFT_RELEASE: None,
+            _RIGHT_CLICK: None,
+            _RIGHT_DOUBLE: None,
+            _RIGHT_RELEASE: None,
+            _LEFT_DRAG: None,
+            _RIGHT_DRAG: None,
         }
 
         self.is_built = False
-        self.size = R*C
-        self.iids = [0]*self.size
+        self.size = R * C
+        self.iids = [0] * self.size
         # Text overlays for debugging/mapping display
-        self._temp_tiids = [0]*self.size
+        self._temp_tiids = [0] * self.size
         self._temp_tmaps = [[] for _ in range(self.size)]
-        self.fills = [self.empty]*self.size
-        self.outlines = [self.outline]*self.size
-        self.widths = [self.width]*self.size
+        self.fills = [self.empty] * self.size
+        self.outlines = [self.outline] * self.size
+        self.widths = [self.width] * self.size
         self.indices = {}
 
     # Widget operations --------------------------------------------------------
@@ -173,21 +185,21 @@ class BaseGrid(ttk.Frame):
         """
         Return the index that corresponds to row R and column C.
         """
-        return r*self.C + c
+        return r * self.C + c
 
     def _temp_setmap(self, i, s, f):
         """Set temporary mapping display for debugging purposes."""
         if self.canvas and i < len(self._temp_tiids) and self.winfo_exists():
             try:
                 self.canvas.itemconfig(
-                    self._temp_tiids[i], text = "{}\ns{}f{}".format(i, s, f),
-                        fill = "white")
+                    self._temp_tiids[i], text="{}\ns{}f{}".format(i, s, f), fill="white"
+                )
                 self._temp_tmaps[i] = [s, f]
             except tk.TclError:
                 # Canvas or widget has been destroyed, ignore the update
                 pass
 
-    def draw(self, cellLength = None, margin = 1):
+    def draw(self, cellLength=None, margin=1):
         """
         Build the grid. CELLLENGTH forces a cell size to use.
         """
@@ -195,57 +207,62 @@ class BaseGrid(ttk.Frame):
 
         if self.canvas != None:
             self.canvas.destroy()
-        
+
         # Destroy existing scrollbars if they exist
-        if hasattr(self, 'h_scrollbar'):
+        if hasattr(self, "h_scrollbar"):
             self.h_scrollbar.destroy()
-        if hasattr(self, 'v_scrollbar'):
+        if hasattr(self, "v_scrollbar"):
             self.v_scrollbar.destroy()
 
         # Create canvas with scrollbar support
         self.canvas = tk.Canvas(self.canvasFrame)
         self.canvas.grid(row=0, column=0, sticky="NEWS")
-        
+
         # Create scrollbars
-        self.v_scrollbar = ttk.Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
-        self.h_scrollbar = ttk.Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
-        
+        self.v_scrollbar = ttk.Scrollbar(
+            self.canvasFrame, orient="vertical", command=self.canvas.yview
+        )
+        self.h_scrollbar = ttk.Scrollbar(
+            self.canvasFrame, orient="horizontal", command=self.canvas.xview
+        )
+
         # Configure canvas scrolling
-        self.canvas.configure(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
-        
+        self.canvas.configure(
+            yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set
+        )
+
         # Initially hide scrollbars (will show them if needed)
         self.scrollbars_visible = False
 
         self.winfo_toplevel().update_idletasks()
         self.margin = margin
-        self.maxWidth = self.canvas.winfo_width() - self.margin*2
-        self.maxHeight = self.canvas.winfo_height() - self.margin*2
+        self.maxWidth = self.canvas.winfo_width() - self.margin * 2
+        self.maxHeight = self.canvas.winfo_height() - self.margin * 2
 
         if self.maxWidth <= 0 or self.maxHeight <= 0:
 
-            self.config(width = self.minCell*self.C,
-                height = self.minCell*self.R)
+            self.config(width=self.minCell * self.C, height=self.minCell * self.R)
 
-            self.maxWidth = self.winfo_reqwidth() - self.margin*2
-            self.maxHeight = self.winfo_reqheight() - self.margin*2
+            self.maxWidth = self.winfo_reqwidth() - self.margin * 2
+            self.maxHeight = self.winfo_reqheight() - self.margin * 2
 
         if cellLength is not None:
             self.cellLength = cellLength
         else:
             # Calculate optimal cell size with minimum constraints
-            calculated_cell = int(min(self.maxHeight/self.R, self.maxWidth/self.C))
+            calculated_cell = int(min(self.maxHeight / self.R, self.maxWidth / self.C))
             # Ensure minimum cell size for visibility
             self.cellLength = max(calculated_cell, self.minCell)
-            
+
             # If calculated size is too small, use minimum and allow scrolling
             if calculated_cell < self.minCell:
                 # Adjust canvas size to accommodate minimum cell size
                 required_width = self.minCell * self.C + self.margin * 2
                 required_height = self.minCell * self.R + self.margin * 2
-                
+
                 # Update canvas to required size
                 self.canvas.config(scrollregion=(0, 0, required_width, required_height))
-                
+
                 # Update max dimensions for drawing
                 self.maxWidth = required_width - self.margin * 2
                 self.maxHeight = required_height - self.margin * 2
@@ -255,7 +272,9 @@ class BaseGrid(ttk.Frame):
             if cellLength is None:
                 # Fallback to absolute minimum
                 self.cellLength = 3
-                print(f"Warning: Grid cells very small ({self.cellLength}px). Consider reducing grid size.")
+                print(
+                    f"Warning: Grid cells very small ({self.cellLength}px). Consider reducing grid size."
+                )
             else:
                 raise ValueError("Illegal cellLength {}".format(cellLength))
 
@@ -269,65 +288,86 @@ class BaseGrid(ttk.Frame):
         #   get extra space and divide it by two
         # To get total space get max space and subtract cell length times cells
 
-        xmargin = max(int((self.maxWidth - self.C*self.cellLength)/2), margin)
-        ymargin = max(int((self.maxHeight - self.R*self.cellLength)/2), margin)
+        xmargin = max(int((self.maxWidth - self.C * self.cellLength) / 2), margin)
+        ymargin = max(int((self.maxHeight - self.R * self.cellLength) / 2), margin)
 
         x, y = xmargin, ymargin
         l = self.cellLength
 
         for col in range(self.C):
             self.canvas.create_text(
-                x + l/2, ymargin/2, font = _font5, text = f"{col + 1}",
-                    fill = gus.TEXT_SECONDARY, angle = 0)
+                x + l / 2,
+                ymargin / 2,
+                font=_font5,
+                text=f"{col + 1}",
+                fill=gus.TEXT_SECONDARY,
+                angle=0,
+            )
             x += l
 
         x = xmargin
         for row in range(self.R):
             self.canvas.create_text(
-                xmargin/2, y + l/2, font = _font5, text = f"{row + 1}",
-                    fill = gus.TEXT_SECONDARY, angle = 0)
+                xmargin / 2,
+                y + l / 2,
+                font=_font5,
+                text=f"{row + 1}",
+                fill=gus.TEXT_SECONDARY,
+                angle=0,
+            )
             for col in range(self.C):
-                index = row*self.C + col
+                index = row * self.C + col
                 iid = self.canvas.create_rectangle(
-                    x, y, x + l, y + l, fill = self.fills[index],
-                    outline = self.outlines[index], width = self.widths[index])
+                    x,
+                    y,
+                    x + l,
+                    y + l,
+                    fill=self.fills[index],
+                    outline=self.outlines[index],
+                    width=self.widths[index],
+                )
                 self.indices[iid] = index
                 self.iids[index] = iid
 
                 # Create text overlay for debugging/mapping display
                 self._temp_tiids[index] = self.canvas.create_text(
-                    x + l/2, y + l/2, font = _font7)
+                    x + l / 2, y + l / 2, font=_font7
+                )
 
                 for key, callback in self.callbacks.items():
                     if callback is not None:
-                        self.canvas.tag_bind(iid, self.CALLBACK_CODES[key],
-                            self._wrapper(key))
+                        self.canvas.tag_bind(
+                            iid, self.CALLBACK_CODES[key], self._wrapper(key)
+                        )
 
                 x += l
             x = xmargin
             y += l
 
-
         # TODO show variables:
         self.canvas.create_text(
-            xmargin + l/2, l*self.R + ymargin*3/2,
-            font = _font6, text = f"   ",
-            fill = gus.TEXT_SECONDARY, angle = 0)
+            xmargin + l / 2,
+            l * self.R + ymargin * 3 / 2,
+            font=_font6,
+            text=f"   ",
+            fill=gus.TEXT_SECONDARY,
+            angle=0,
+        )
 
         self.xmargin = xmargin
         self.ymargin = ymargin
-        
+
         # Configure scrolling based on content size
         total_width = self.C * l + 2 * xmargin
         total_height = self.R * l + 2 * ymargin
-        
+
         # Set scroll region
         self.canvas.configure(scrollregion=(0, 0, total_width, total_height))
-        
+
         # Show/hide scrollbars based on content size
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
-        
+
         # Show horizontal scrollbar if content is wider than canvas
         if total_width > canvas_width and canvas_width > 1:
             self.h_scrollbar.grid(row=1, column=0, sticky="EW")
@@ -335,7 +375,7 @@ class BaseGrid(ttk.Frame):
                 self.scrollbars_visible = True
         else:
             self.h_scrollbar.grid_remove()
-        
+
         # Show vertical scrollbar if content is taller than canvas
         if total_height > canvas_height and canvas_height > 1:
             self.v_scrollbar.grid(row=0, column=1, sticky="NS")
@@ -353,8 +393,7 @@ class BaseGrid(ttk.Frame):
         if self.canvas and self.winfo_exists():
             try:
                 self.fills[i] = fill
-                self.canvas.itemconfig(
-                    self.iids[i], fill = fill)
+                self.canvas.itemconfig(self.iids[i], fill=fill)
             except tk.TclError:
                 # Canvas or widget has been destroyed, ignore the update
                 pass
@@ -363,7 +402,7 @@ class BaseGrid(ttk.Frame):
         """
         Set the cell at row R and column C to color FILL.
         """
-        self.filli(r*self.C + c, fill)
+        self.filli(r * self.C + c, fill)
 
     def outlinei(self, i, outline, width):
         """
@@ -374,8 +413,7 @@ class BaseGrid(ttk.Frame):
             try:
                 self.outlines[i] = outline
                 self.widths[i] = width
-                self.canvas.itemconfig(
-                    self.iids[i], outline = outline, width = width)
+                self.canvas.itemconfig(self.iids[i], outline=outline, width=width)
             except tk.TclError:
                 # Canvas or widget has been destroyed, ignore the update
                 pass
@@ -385,7 +423,7 @@ class BaseGrid(ttk.Frame):
         Set the border of the cell at row R and column Cto color OUTLINE and
         width WIDTH.
         """
-        self.outlinei(r*self.C + c, outline, width)
+        self.outlinei(r * self.C + c, outline, width)
 
     def seti(self, fill, outline, width):
         """
@@ -443,7 +481,7 @@ class BaseGrid(ttk.Frame):
             self.draw()
 
     def setCursor(self, cursor):
-        self.config(cursor = cursor)
+        self.config(cursor=cursor)
 
     def built(self):
         return self.is_built
@@ -455,13 +493,15 @@ class BaseGrid(ttk.Frame):
         index of the cell being clicked or None if the index could not be
         found
         """
+
         def wrapper(event):
             if self.callbacks[C] is not None:
                 iid = self.canvas.find_closest(
-                    self.canvas.canvasx(event.x),
-                    self.canvas.canvasy(event.y))[0]
+                    self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+                )[0]
                 index = self.indices[iid] if iid in self.indices else None
                 self.callbacks[C](self, index)
+
         return wrapper
 
     def _nothing(*args):
@@ -469,6 +509,7 @@ class BaseGrid(ttk.Frame):
         Placeholder method for unassigned callbacks.
         """
         pass
+
 
 ## TEST RUN ####################################################################
 if __name__ == "__main__":
@@ -481,22 +522,21 @@ if __name__ == "__main__":
         g.draw()
 
     def c(g, r, c):
-        g.setCell(r, c, fill='red',outline='blue')
+        g.setCell(r, c, fill="red", outline="blue")
 
     def d(g, r, c):
-        g.setCell(r, c, fill = gus.WARNING_MAIN, outline = gus.WARNING_DARK)
+        g.setCell(r, c, fill=gus.WARNING_MAIN, outline=gus.WARNING_DARK)
 
     def e(g, r, c):
-        g.setCell(r, c, fill = gus.SURFACE_5)
+        g.setCell(r, c, fill=gus.SURFACE_5)
 
     def dd(g, r, c):
-        g.setAll(width = 6 if g.G else 1)
+        g.setAll(width=6 if g.G else 1)
         g.G = not g.G
 
-
     root = tk.Tk()
-    root.winfo_toplevel().title('FC Base Grid demo')
-    root.geometry('500x500')
+    root.winfo_toplevel().title("FC Base Grid demo")
+    root.geometry("500x500")
     g = BaseGrid(root, 36, 36)
     g.G = False
 
@@ -506,11 +546,10 @@ if __name__ == "__main__":
     g.setLeftDoubleClick(dd)
     g.setDrag(d)
 
-    g.config(bg = gus.SURFACE_2)
-    g.pack(fill = tk.BOTH, expand = True)
+    g.config(bg=gus.SURFACE_2)
+    g.pack(fill=tk.BOTH, expand=True)
     g.draw(20)
 
     root.mainloop()
-
 
     print("FC Grid Demo run finished")

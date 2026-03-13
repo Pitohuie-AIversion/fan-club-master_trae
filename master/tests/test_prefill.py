@@ -20,9 +20,11 @@ from fc.archive import FCArchive
 from fc.backend.mapper import Mapper
 from fc.frontend.gui.widgets.control import GridWidget, LiveTable
 
+
 class CaptureSend:
     def __init__(self):
         self.last = None
+
     def __call__(self, vec):
         self.last = list(vec)
 
@@ -176,7 +178,7 @@ def test_gridwidget_multilayer_prefill_and_selection():
     # Select one cell in layer 0 only
     grid.deepVar.set(False)  # operate only current layer
     grid.layer = 0
-    grid.selected_g = [False]*grid.size_g
+    grid.selected_g = [False] * grid.size_g
     grid.selected_count = 0
     g_target = 2  # layer0 index for cell (r=1,c=0)
     grid.select_g(g_target)
@@ -188,18 +190,18 @@ def test_gridwidget_multilayer_prefill_and_selection():
     # Select one cell in layer 1 only
     grid.deepVar.set(False)  # operate only current layer
     grid.layer = 1
-    grid.selected_g = [False]*grid.size_g
+    grid.selected_g = [False] * grid.size_g
     grid.selected_count = 0
     g_target = grid.RC + 2  # layer1 index for cell (r=1,c=0)
     grid.select_g(g_target)
-    
+
     # Map only selection; others should be prefilled from F_buffer
     grid.map(GridWidget._const(0.9), 0, 0)
     assert approx_list(capture.last) == [0.2, 0.3, 0.9, 0.5]
 
     # Stay on layer 1 and select a different cell; ensure prefill still works
     grid.layer = 1
-    grid.selected_g = [False]*grid.size_g
+    grid.selected_g = [False] * grid.size_g
     grid.selected_count = 0
     g_target_l1 = grid.RC + 1  # layer1, cell index 1
     grid.select_g(g_target_l1)
@@ -287,7 +289,7 @@ def test_gridwidget_multislave_prefill_selection_changes():
     grid.map(GridWidget._const(0.9), 0, 0)
     # g=1 is in slave 1, fan 0 => k=2
     assert approx_list(capture.last) == [0.2, 0.3, 0.9, 0.5]
-    
+
     # Select grid index mapping to k=2 (slave 1, fan 0): that's column 1, row 0 => g=2
     grid.deselectAll()
     grid.select_g(2)
